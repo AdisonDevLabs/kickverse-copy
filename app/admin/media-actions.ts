@@ -4,12 +4,11 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { getDb } from '@/lib/db';
+import { mediaAssets } from '@/lib/db/schema'; // <-- Added schema import
 import { revalidatePath } from 'next/cache';
 
-// Using your specific public URL[cite: 7, 11]
 const R2_PUBLIC_URL = 'https://pub-f155ba911ca84f60b68320b0d5bb35df.r2.dev';
 
-// Configure S3 client for Cloudflare R2
 const S3 = new S3Client({
   region: "auto",
   endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
@@ -27,7 +26,7 @@ export async function generatePresignedUrls(fileNames: string[]) {
         const key = `products/${fileId}-${fileName.replace(/\s+/g, '-')}`;
         
         const command = new PutObjectCommand({
-          Bucket: "kickverse-copy-images", // Your specific bucket name
+          Bucket: "kickverse-copy-images",
           Key: key,
         });
 
@@ -51,14 +50,22 @@ export async function saveMediaAssetsToDb(assets: { id: string, url: string, fil
   try {
     const db = await getDb();
     
-    // Using raw SQL for bulk insert ease, or use Drizzle bulk insert if configured
-    const values = assets.map(a => `('${a.id}', '${a.url}', '${a.fileName}', 0)`).join(',');
+    // Map the array to match your exact Drizzle schema structure
+    const insertData = assets.map(a => ({
+      id: a.id,
+      url: a.url,
+      fileName: a.fileName,
+      isAssigned: false, // matches the schema default
+    }));
     
-    await db.run(`INSERT INTO media_assets (id, url, file_name, is_assigned) VALUES ${values}`);
+    // Execute a native Drizzle ORM bulk insert
+    await db.insert(mediaAssets).values(insertData);
     
     revalidatePath('/admin');
+    revalidatePath('/admin/products/new');
     return { success: true };
   } catch (error: any) {
+    console.error("Database Insert Error:", error);
     return { success: false, error: error.message };
   }
 }
