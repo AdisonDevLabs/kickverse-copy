@@ -15,24 +15,40 @@ export async function createProduct(formData: FormData) {
     const db = await getDb();
 
     // 1. Process Main Image
-    const mainImageFile = formData.get('mainImage') as File;
-    if (!mainImageFile || mainImageFile.size === 0) throw new Error('Main image is required');
+    const mediaMainImage = formData.get('mediaMainImage') as string;
+    let mainImageUrl = mediaMainImage;
 
-    const mainImageKey = `products/${Date.now()}-main-${mainImageFile.name.replace(/\s+/g, '-')}`;
-    await env.PRODUCT_IMAGES.put(mainImageKey, await mainImageFile.arrayBuffer(), { httpMetadata: { contentType: mainImageFile.type } });
-    const mainImageUrl = `${R2_PUBLIC_URL}/${mainImageKey}`;
+    // Fallback: If no library image selected, handle direct file upload
+    if (!mainImageUrl) {
+      const mainImageFile = formData.get('mainImage') as File;
+      if (!mainImageFile || mainImageFile.size === 0) throw new Error('Main image is required');
 
-    // 2. Process Gallery Images (Multiple files)
+      const mainImageKey = `products/${Date.now()}-main-${mainImageFile.name.replace(/\s+/g, '-')}`;
+      await env.PRODUCT_IMAGES.put(mainImageKey, await mainImageFile.arrayBuffer(), { httpMetadata: { contentType: mainImageFile.type } });
+      mainImageUrl = `${R2_PUBLIC_URL}/${mainImageKey}`;
+    }
+
+    // 2. Process Gallery Images
+    let galleryUrls: string[] = [];
+    const mediaGalleryImagesStr = formData.get('mediaGalleryImages') as string;
+    if (mediaGalleryImagesStr) {
+       const parsed = JSON.parse(mediaGalleryImagesStr);
+       if (Array.isArray(parsed)) galleryUrls = parsed;
+    }
+
+    // Fallback: Check for additional direct gallery uploads
     const galleryFiles = formData.getAll('galleryImages') as File[];
     const validGalleryFiles = galleryFiles.filter(file => file && file.size > 0);
 
-    const uploadPromises = validGalleryFiles.map(async (file) => {
-      const key = `products/${Date.now()}-gallery-${file.name.replace(/\s+/g, '-')}`;
-      await env.PRODUCT_IMAGES.put(key, await file.arrayBuffer(), { httpMetadata: { contentType: file.type } });
-      return `${R2_PUBLIC_URL}/${key}`;
-    });
-
-    const galleryUrls = await Promise.all(uploadPromises);
+    if (validGalleryFiles.length > 0) {
+      const uploadPromises = validGalleryFiles.map(async (file) => {
+        const key = `products/${Date.now()}-gallery-${file.name.replace(/\s+/g, '-')}`;
+        await env.PRODUCT_IMAGES.put(key, await file.arrayBuffer(), { httpMetadata: { contentType: file.type } });
+        return `${R2_PUBLIC_URL}/${key}`;
+      });
+      const newGalleryUrls = await Promise.all(uploadPromises);
+      galleryUrls = [...galleryUrls, ...newGalleryUrls];
+    }
 
     // 3. Construct the array: Main Image is ALWAYS index 0
     const finalImagesArray = [mainImageUrl, ...galleryUrls];
@@ -43,7 +59,6 @@ export async function createProduct(formData: FormData) {
       price: parseInt(formData.get('price') as string, 10),
       originalPrice: formData.get('originalPrice') ? parseInt(formData.get('originalPrice') as string, 10) : null,
       
-      // Store the single main image and the combined array
       image: mainImageUrl,
       images: finalImagesArray, 
       
@@ -70,7 +85,6 @@ export async function createProduct(formData: FormData) {
   }
 }
 
-
 export async function updateProduct(id: string, formData: FormData) {
   try {
     const { env } = await getCloudflareContext({ async: true });
@@ -80,49 +94,52 @@ export async function updateProduct(id: string, formData: FormData) {
     const existing = await db.select().from(products).where(eq(products.id, id)).limit(1);
     if (!existing[0]) throw new Error('Product not found');
 
+    // 1. Process Main Image
+    const mediaMainImage = formData.get('mediaMainImage') as string;
     let finalMainImageUrl = existing[0].image;
-    let finalImagesArray = existing[0].images; // Current gallery array
 
-    // 1. Process New Main Image (if provided)
-    const mainImageFile = formData.get('mainImage') as File;
-    if (mainImageFile && mainImageFile.size > 0) {
-      const mainImageKey = `products/${Date.now()}-main-${mainImageFile.name.replace(/\s+/g, '-')}`;
-      await env.PRODUCT_IMAGES.put(mainImageKey, await mainImageFile.arrayBuffer(), { httpMetadata: { contentType: mainImageFile.type } });
-      finalMainImageUrl = `${R2_PUBLIC_URL}/${mainImageKey}`;
-      
-      // If only the main image is updated, swap out index 0 of the existing array
-      if (finalImagesArray.length > 0) {
-        finalImagesArray[0] = finalMainImageUrl;
-      } else {
-        finalImagesArray = [finalMainImageUrl];
+    if (mediaMainImage) {
+      finalMainImageUrl = mediaMainImage; // Use library selection
+    } else {
+      const mainImageFile = formData.get('mainImage') as File;
+      if (mainImageFile && mainImageFile.size > 0) {
+        const mainImageKey = `products/${Date.now()}-main-${mainImageFile.name.replace(/\s+/g, '-')}`;
+        await env.PRODUCT_IMAGES.put(mainImageKey, await mainImageFile.arrayBuffer(), { httpMetadata: { contentType: mainImageFile.type } });
+        finalMainImageUrl = `${R2_PUBLIC_URL}/${mainImageKey}`;
       }
     }
 
-    // 2. Process New Gallery Images (if provided)
+    // 2. Process Gallery Images
+    let galleryUrls: string[] = [];
+    const mediaGalleryImagesStr = formData.get('mediaGalleryImages') as string;
+    
+    // Form client provides the exact intended gallery state
+    if (mediaGalleryImagesStr) {
+      const parsed = JSON.parse(mediaGalleryImagesStr);
+      if (Array.isArray(parsed)) galleryUrls = parsed;
+    }
+
     const galleryFiles = formData.getAll('galleryImages') as File[];
     const validGalleryFiles = galleryFiles.filter(file => file && file.size > 0);
     
     if (validGalleryFiles.length > 0) {
-      // Create an array of upload tasks
       const uploadPromises = validGalleryFiles.map(async (file) => {
         const key = `products/${Date.now()}-gallery-${file.name.replace(/\s+/g, '-')}`;
         await env.PRODUCT_IMAGES.put(key, await file.arrayBuffer(), { httpMetadata: { contentType: file.type } });
         return `${R2_PUBLIC_URL}/${key}`;
       });
-
-      // Execute all uploads at the exact same time
-      const galleryUrls = await Promise.all(uploadPromises);
-      
-      // Overwrite the old gallery. Main Image is ALWAYS index 0
-      finalImagesArray = [finalMainImageUrl, ...galleryUrls];
+      const directGalleryUrls = await Promise.all(uploadPromises);
+      galleryUrls = [...galleryUrls, ...directGalleryUrls];
     }
+
+    // Compile Final Array
+    const finalImagesArray = [finalMainImageUrl, ...galleryUrls];
 
     const updatedData = {
       name: formData.get('name') as string,
       price: parseInt(formData.get('price') as string, 10),
       originalPrice: formData.get('originalPrice') ? parseInt(formData.get('originalPrice') as string, 10) : null,
       
-      // Update both columns securely
       image: finalMainImageUrl,
       images: finalImagesArray,
       

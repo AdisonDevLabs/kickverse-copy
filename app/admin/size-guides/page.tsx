@@ -1,3 +1,5 @@
+// app/admin/size-guides/page.tsx
+
 import { getDb } from '@/lib/db';
 import { sizeGuides } from '@/lib/db/schema';
 import SizeGuidesClient from './SizeGuidesClient';

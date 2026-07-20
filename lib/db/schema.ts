@@ -76,3 +76,13 @@ export const colorMap = sqliteTable('color_map', {
   colorName: text('color_name').primaryKey(),
   hexCode: text('hex_code').notNull()
 });
+
+// ==========================================
+// 5. MEDIA ASSETS
+// ==========================================
+export const mediaAssets = sqliteTable('media_assets', {
+  id: text('id').primaryKey(),
+  url: text('url').notNull(),
+  fileName: text('file_name').notNull(),
+  isAssigned: integer('is_assigned', { mode: 'boolean' }).default(false)
+});

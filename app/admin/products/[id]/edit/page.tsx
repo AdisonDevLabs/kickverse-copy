@@ -1,7 +1,7 @@
 // app/admin/products/[id]/edit/page.tsx
 import { getDb } from '@/lib/db';
-import { products, categories } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { products, categories, mediaAssets } from '@/lib/db/schema';
+import { eq, desc } from 'drizzle-orm';
 import EditFormClient from './EditFormClient';
 
 export const dynamic = 'force-dynamic';
@@ -15,8 +15,14 @@ export default async function EditProductPage({ params }: Props) {
   const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
   const product = result[0];
   
-  // 1. Fetch the categories from the database
   const allCategories = await db.select().from(categories);
+
+  let allMedia: any[] = [];
+  try {
+     allMedia = await db.select().from(mediaAssets).orderBy(desc(mediaAssets.id));
+  } catch (e) {
+     console.error("Please ensure you've exported mediaAssets in schema.ts", e);
+  }
 
   if (!product) {
     return (
@@ -26,6 +32,5 @@ export default async function EditProductPage({ params }: Props) {
     );
   }
 
-  // 2. Pass both props into the client form
-  return <EditFormClient product={product} initialCategories={allCategories} />;
+  return <EditFormClient product={product} initialCategories={allCategories} initialMedia={allMedia} />;
 }

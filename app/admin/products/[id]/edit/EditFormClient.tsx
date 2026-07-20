@@ -3,10 +3,10 @@
 
 import React, { useState } from 'react';
 import { updateProduct, createQuickCategory } from '../../../actions';
-import { Upload, CheckCircle, ArrowLeft, Plus, X } from 'lucide-react';
+import { CheckCircle, ArrowLeft, Plus, X, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 
-export default function EditFormClient({ product, initialCategories }: { product: any, initialCategories: any[] }) {
+export default function EditFormClient({ product, initialCategories, initialMedia }: { product: any, initialCategories: any[], initialMedia: any[] }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<{ success?: boolean; message?: string } | null>(null);
 
@@ -17,12 +17,21 @@ export default function EditFormClient({ product, initialCategories }: { product
   const [newCategoryName, setNewCategoryName] = useState('');
   const [isSavingCategory, setIsSavingCategory] = useState(false);
 
+  // Media Library Mapping State - Hydrated from existing data
+  const [mainImageUrl, setMainImageUrl] = useState<string>(product.image || '');
+  
+  // Gallery removes the first element since index 0 is always the Main Image
+  const initialGallery = (product.images || []).filter((url: string) => url !== product.image);
+  const [galleryUrls, setGalleryUrls] = useState<string[]>(initialGallery);
+  
+  const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
+  const [mediaTarget, setMediaTarget] = useState<'main' | 'gallery'>('main');
+
   const handleAddCategory = async () => {
     if (!newCategoryName.trim()) return;
     setIsSavingCategory(true);
     const res = await createQuickCategory(newCategoryName);
     
-    // Add && res.category here to satisfy TypeScript strict mode
     if (res.success && res.category) {
       setActiveCategories([...activeCategories, res.category]);
       setSelectedCategory(res.category.name);
@@ -41,6 +50,7 @@ export default function EditFormClient({ product, initialCategories }: { product
 
     const formData = new FormData(e.currentTarget);
     formData.set('category', selectedCategory);
+    
     const response = await updateProduct(product.id, formData);
     
     setStatus({ success: response.success, message: response.success ? response.message : response.error });
@@ -151,11 +161,53 @@ export default function EditFormClient({ product, initialCategories }: { product
             <textarea name="description" rows={4} defaultValue={product.description} className="w-full bg-brand-dark border border-white/10 rounded-md px-4 py-3 text-white outline-none focus:border-brand-primary transition-colors"></textarea>
           </div>
 
-          <div className="bg-brand-dark p-6 rounded-md border border-white/5">
-            <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2 flex items-center">
-               <Upload className="w-4 h-4 mr-2" /> Update Main Image (Leave blank to keep existing)
-            </label>
-            <input type="file" name="mainImage" accept="image/*" className="text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-white/10 file:text-white hover:file:bg-white/20 transition-colors cursor-pointer" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <div className="bg-brand-dark p-6 rounded-md border border-white/5 space-y-4">
+              <label className="block text-xs font-bold uppercase tracking-widest text-gray-400">Update Main Image</label>
+              {mainImageUrl ? (
+                <div className="relative w-32 h-32 rounded-md overflow-hidden border border-white/10 group">
+                  <img src={mainImageUrl} alt="Main" className="w-full h-full object-cover" />
+                  <button type="button" onClick={() => setMainImageUrl('')} className="absolute top-2 right-2 p-1 bg-red-500/90 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity shadow-md">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  <button type="button" onClick={() => { setMediaTarget('main'); setIsMediaModalOpen(true); }} className="w-fit px-4 py-2 bg-brand-primary/10 hover:bg-brand-primary/20 text-brand-primary border border-brand-primary/30 rounded-md text-xs font-bold uppercase tracking-widest transition-colors flex items-center shrink-0">
+                    <ImageIcon className="w-4 h-4 mr-2" /> Browse Library
+                  </button>
+                  <span className="text-gray-500 text-xs uppercase font-bold tracking-widest">OR</span>
+                  <input type="file" name="mainImage" accept="image/*" className="text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-bold file:bg-white/10 file:text-white hover:file:bg-white/20 transition-colors cursor-pointer" />
+                </div>
+              )}
+              <input type="hidden" name="mediaMainImage" value={mainImageUrl} />
+            </div>
+
+            <div className="bg-brand-dark p-6 rounded-md border border-white/5 space-y-4">
+              <label className="block text-xs font-bold uppercase tracking-widest text-gray-400">Update Gallery Images</label>
+              {galleryUrls.length > 0 && (
+                <div className="flex flex-wrap gap-4">
+                  {galleryUrls.map(url => (
+                    <div key={url} className="relative w-16 h-16 rounded-md overflow-hidden border border-white/10 group">
+                      <img src={url} alt="Gallery" className="w-full h-full object-cover" />
+                      <button type="button" onClick={() => setGalleryUrls(prev => prev.filter(u => u !== url))} className="absolute top-1 right-1 p-1 bg-red-500/90 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity shadow-md">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="flex flex-col gap-4">
+                <button type="button" onClick={() => { setMediaTarget('gallery'); setIsMediaModalOpen(true); }} className="w-fit px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-md text-xs font-bold uppercase tracking-widest transition-colors flex items-center shrink-0">
+                  <ImageIcon className="w-4 h-4 mr-2" /> Browse Library
+                </button>
+                <span className="text-gray-500 text-xs uppercase font-bold tracking-widest">OR</span>
+                <input type="file" name="galleryImages" accept="image/*" multiple className="text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-bold file:bg-white/10 file:text-white hover:file:bg-white/20 transition-colors cursor-pointer" />
+              </div>
+              <input type="hidden" name="mediaGalleryImages" value={JSON.stringify(galleryUrls)} />
+            </div>
+
           </div>
 
           <button type="submit" disabled={isSubmitting} className="w-full h-14 bg-brand-primary text-black font-bold uppercase tracking-widest rounded-md disabled:opacity-50 hover:bg-brand-hover transition-colors flex items-center justify-center">
@@ -163,6 +215,70 @@ export default function EditFormClient({ product, initialCategories }: { product
           </button>
         </form>
       </div>
+
+      {/* Embedded Media Library Selector Modal */}
+      {isMediaModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
+          <div className="bg-brand-card w-full max-w-5xl h-[85vh] rounded-md border border-white/10 flex flex-col shadow-2xl">
+            <div className="p-4 border-b border-white/10 flex justify-between items-center shrink-0">
+              <h3 className="font-display text-xl uppercase tracking-widest text-white">
+                {mediaTarget === 'main' ? 'Select Main Image' : 'Select Gallery Images'}
+              </h3>
+              <button type="button" onClick={() => setIsMediaModalOpen(false)} className="p-2 hover:bg-white/10 rounded-md transition-colors">
+                <X className="w-5 h-5 text-white" />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-auto p-4 sm:p-6">
+              {initialMedia.length === 0 ? (
+                <div className="text-center py-12 text-gray-400 text-sm uppercase tracking-widest font-bold">
+                  No media found. Upload some from the Admin Dashboard first.
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                  {initialMedia.map((m: any) => {
+                    const isSelected = mediaTarget === 'main' 
+                      ? mainImageUrl === m.url 
+                      : galleryUrls.includes(m.url);
+                    return (
+                      <div 
+                        key={m.id} 
+                        onClick={() => {
+                          if (mediaTarget === 'main') {
+                            setMainImageUrl(m.url);
+                            setIsMediaModalOpen(false);
+                          } else {
+                            setGalleryUrls(prev => 
+                              prev.includes(m.url) ? prev.filter(url => url !== m.url) : [...prev, m.url]
+                            );
+                          }
+                        }}
+                        className={`relative aspect-square rounded-md overflow-hidden cursor-pointer border-2 transition-all ${isSelected ? 'border-brand-primary' : 'border-transparent hover:border-white/30'}`}
+                      >
+                        <img src={m.url} alt={m.fileName} loading="lazy" className="w-full h-full object-cover" />
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-brand-primary/20 flex items-center justify-center backdrop-blur-[1px]">
+                            <CheckCircle className="w-8 h-8 text-brand-primary drop-shadow-md" />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {mediaTarget === 'gallery' && (
+              <div className="p-4 border-t border-white/10 shrink-0 flex justify-between items-center bg-brand-dark rounded-b-md">
+                <span className="text-xs font-bold uppercase tracking-widest text-gray-400">{galleryUrls.length} selected</span>
+                <button type="button" onClick={() => setIsMediaModalOpen(false)} className="bg-brand-primary text-black px-6 py-3 rounded-md font-bold text-xs uppercase tracking-widest hover:bg-brand-hover transition-colors">
+                  Confirm Selection
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

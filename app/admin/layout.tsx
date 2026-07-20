@@ -1,5 +1,5 @@
 // app/admin/layout.tsx
-import { ArrowLeft, Box, Palette, Ruler } from 'lucide-react';
+import { ArrowLeft, Box, Palette, Ruler, Image as ImageIcon } from 'lucide-react';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -53,6 +53,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
          
          {/* Render Modal with fetched props */}
          <CategoryManager categories={allCategories} />
+         <Link href="/admin" className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors whitespace-nowrap">
+           <ImageIcon className="w-4 h-4 mr-2" /> Media Library
+         </Link>
          
          <Link href="/admin/colors" className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors whitespace-nowrap">
            <Palette className="w-4 h-4 mr-2" /> Colors

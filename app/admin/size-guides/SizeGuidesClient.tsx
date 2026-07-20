@@ -1,3 +1,5 @@
+// app/admin/size-guides/SizeGuidesClient.tsx
+
 'use client';
 
 import React, { useState } from 'react';

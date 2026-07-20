@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Plus, Edit } from 'lucide-react';
 import DeleteButton from './DeleteButton';
 import CategoryManager from './CategoryManager';
+import MediaManager from './components/MediaManager';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,6 +33,10 @@ export default async function AdminDashboard() {
             <Plus className="w-4 h-4 mr-1.5 sm:mr-2" /> Add Product
           </Link>
         </div>
+      </div>
+      {/* Bulk Media Upload Section */}
+      <div className="mb-6 shrink-0">
+         <MediaManager />
       </div>
 
       {/* Table Container Wrapper - Purely self-scrollable container section */}
