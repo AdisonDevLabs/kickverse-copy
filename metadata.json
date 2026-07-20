@@ -1,0 +1,8 @@
+{
+  "name": "Remix: Diva Steps Collection",
+  "description": "Premium footwear ecommerce website optimized for mobile, featuring high-end design, flash deals, and WhatsApp checkout functionality for a seamless shopping experience.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
