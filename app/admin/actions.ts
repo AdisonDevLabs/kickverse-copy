@@ -3,8 +3,8 @@
 
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/lib/db';
-import { products, categories, colorMap, sizeGuides } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { products, categories, colorMap, sizeGuides, mediaAssets } from '@/lib/db/schema';
+import { eq, inArray } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
 const R2_PUBLIC_URL = 'https://pub-f155ba911ca84f60b68320b0d5bb35df.r2.dev'; 
@@ -14,44 +14,70 @@ export async function createProduct(formData: FormData) {
     const { env } = await getCloudflareContext({ async: true });
     const db = await getDb();
 
-    // 1. Process Main Image
-    const mediaMainImage = formData.get('mediaMainImage') as string;
-    let mainImageUrl = mediaMainImage;
+    // 1. Process Unified Images
+    const imageLayoutStr = formData.get('imageLayout') as string;
+    let finalImagesArray: string[] = [];
+    const mediaIdsToDelete: string[] = [];
 
-    // Fallback: If no library image selected, handle direct file upload
-    if (!mainImageUrl) {
-      const mainImageFile = formData.get('mainImage') as File;
-      if (!mainImageFile || mainImageFile.size === 0) throw new Error('Main image is required');
+    if (imageLayoutStr) {
+      // NEW LOGIC: Unified Drag & Drop
+      const imageLayout = JSON.parse(imageLayoutStr);
+      const imageFiles = formData.getAll('imageFiles') as File[];
+      
+      for (const item of imageLayout) {
+        if (item.type === 'library') {
+          finalImagesArray.push(item.url);
+          if (item.mediaId) mediaIdsToDelete.push(item.mediaId);
+        } else if (item.type === 'file') {
+          const file = imageFiles[item.fileIndex];
+          if (file && file.size > 0) {
+            const key = `products/${Date.now()}-unified-${file.name.replace(/\s+/g, '-')}`;
+            await env.PRODUCT_IMAGES.put(key, await file.arrayBuffer(), { httpMetadata: { contentType: file.type } });
+            finalImagesArray.push(`${R2_PUBLIC_URL}/${key}`);
+          }
+        }
+      }
+    } else {
+      // OLD LOGIC: Legacy Fallback
+      const mediaMainImage = formData.get('mediaMainImage') as string;
+      let mainImageUrl = mediaMainImage;
 
-      const mainImageKey = `products/${Date.now()}-main-${mainImageFile.name.replace(/\s+/g, '-')}`;
-      await env.PRODUCT_IMAGES.put(mainImageKey, await mainImageFile.arrayBuffer(), { httpMetadata: { contentType: mainImageFile.type } });
-      mainImageUrl = `${R2_PUBLIC_URL}/${mainImageKey}`;
+      if (!mainImageUrl) {
+        const mainImageFile = formData.get('mainImage') as File;
+        if (!mainImageFile || mainImageFile.size === 0) throw new Error('Main image is required');
+
+        const mainImageKey = `products/${Date.now()}-main-${mainImageFile.name.replace(/\s+/g, '-')}`;
+        await env.PRODUCT_IMAGES.put(mainImageKey, await mainImageFile.arrayBuffer(), { httpMetadata: { contentType: mainImageFile.type } });
+        mainImageUrl = `${R2_PUBLIC_URL}/${mainImageKey}`;
+      }
+
+      let galleryUrls: string[] = [];
+      const mediaGalleryImagesStr = formData.get('mediaGalleryImages') as string;
+      if (mediaGalleryImagesStr) {
+         const parsed = JSON.parse(mediaGalleryImagesStr);
+         if (Array.isArray(parsed)) galleryUrls = parsed;
+      }
+
+      const galleryFiles = formData.getAll('galleryImages') as File[];
+      const validGalleryFiles = galleryFiles.filter(file => file && file.size > 0);
+
+      if (validGalleryFiles.length > 0) {
+        const uploadPromises = validGalleryFiles.map(async (file) => {
+          const key = `products/${Date.now()}-gallery-${file.name.replace(/\s+/g, '-')}`;
+          await env.PRODUCT_IMAGES.put(key, await file.arrayBuffer(), { httpMetadata: { contentType: file.type } });
+          return `${R2_PUBLIC_URL}/${key}`;
+        });
+        const newGalleryUrls = await Promise.all(uploadPromises);
+        galleryUrls = [...galleryUrls, ...newGalleryUrls];
+      }
+      
+      finalImagesArray = [mainImageUrl, ...galleryUrls];
     }
 
-    // 2. Process Gallery Images
-    let galleryUrls: string[] = [];
-    const mediaGalleryImagesStr = formData.get('mediaGalleryImages') as string;
-    if (mediaGalleryImagesStr) {
-       const parsed = JSON.parse(mediaGalleryImagesStr);
-       if (Array.isArray(parsed)) galleryUrls = parsed;
-    }
+    if (finalImagesArray.length === 0) throw new Error('At least one product image is required');
 
-    // Fallback: Check for additional direct gallery uploads
-    const galleryFiles = formData.getAll('galleryImages') as File[];
-    const validGalleryFiles = galleryFiles.filter(file => file && file.size > 0);
-
-    if (validGalleryFiles.length > 0) {
-      const uploadPromises = validGalleryFiles.map(async (file) => {
-        const key = `products/${Date.now()}-gallery-${file.name.replace(/\s+/g, '-')}`;
-        await env.PRODUCT_IMAGES.put(key, await file.arrayBuffer(), { httpMetadata: { contentType: file.type } });
-        return `${R2_PUBLIC_URL}/${key}`;
-      });
-      const newGalleryUrls = await Promise.all(uploadPromises);
-      galleryUrls = [...galleryUrls, ...newGalleryUrls];
-    }
-
-    // 3. Construct the array: Main Image is ALWAYS index 0
-    const finalImagesArray = [mainImageUrl, ...galleryUrls];
+    // Index 0 is always the main image based on the unified order
+    const finalMainImageUrl = finalImagesArray[0];
 
     const newProduct = {
       id: `p-${Date.now()}`,
@@ -59,7 +85,7 @@ export async function createProduct(formData: FormData) {
       price: parseInt(formData.get('price') as string, 10),
       originalPrice: formData.get('originalPrice') ? parseInt(formData.get('originalPrice') as string, 10) : null,
       
-      image: mainImageUrl,
+      image: finalMainImageUrl,
       images: finalImagesArray, 
       
       category: formData.get('category') as string,
@@ -75,6 +101,12 @@ export async function createProduct(formData: FormData) {
     };
 
     await db.insert(products).values(newProduct);
+
+    // If media assets were utilized from the library, automatically clear them out
+    if (mediaIdsToDelete.length > 0) {
+      await db.delete(mediaAssets).where(inArray(mediaAssets.id, mediaIdsToDelete));
+    }
+
     revalidatePath('/shop');
     revalidatePath('/');
     revalidatePath('/admin');
@@ -90,50 +122,72 @@ export async function updateProduct(id: string, formData: FormData) {
     const { env } = await getCloudflareContext({ async: true });
     const db = await getDb();
 
-    // Fetch existing product
     const existing = await db.select().from(products).where(eq(products.id, id)).limit(1);
     if (!existing[0]) throw new Error('Product not found');
 
-    // 1. Process Main Image
-    const mediaMainImage = formData.get('mediaMainImage') as string;
+    const imageLayoutStr = formData.get('imageLayout') as string;
     let finalMainImageUrl = existing[0].image;
+    let finalImagesArray = existing[0].images || [];
+    const mediaIdsToDelete: string[] = [];
 
-    if (mediaMainImage) {
-      finalMainImageUrl = mediaMainImage; // Use library selection
-    } else {
-      const mainImageFile = formData.get('mainImage') as File;
-      if (mainImageFile && mainImageFile.size > 0) {
-        const mainImageKey = `products/${Date.now()}-main-${mainImageFile.name.replace(/\s+/g, '-')}`;
-        await env.PRODUCT_IMAGES.put(mainImageKey, await mainImageFile.arrayBuffer(), { httpMetadata: { contentType: mainImageFile.type } });
-        finalMainImageUrl = `${R2_PUBLIC_URL}/${mainImageKey}`;
+    if (imageLayoutStr) {
+      // NEW LOGIC: Unified Drag & Drop Integration (if you upgrade your edit form)
+      const imageLayout = JSON.parse(imageLayoutStr);
+      const imageFiles = formData.getAll('imageFiles') as File[];
+      finalImagesArray = [];
+      
+      for (const item of imageLayout) {
+        if (item.type === 'library' || item.type === 'existing') {
+          finalImagesArray.push(item.url);
+          if (item.mediaId) mediaIdsToDelete.push(item.mediaId);
+        } else if (item.type === 'file') {
+          const file = imageFiles[item.fileIndex];
+          if (file && file.size > 0) {
+            const key = `products/${Date.now()}-unified-${file.name.replace(/\s+/g, '-')}`;
+            await env.PRODUCT_IMAGES.put(key, await file.arrayBuffer(), { httpMetadata: { contentType: file.type } });
+            finalImagesArray.push(`${R2_PUBLIC_URL}/${key}`);
+          }
+        }
       }
-    }
+      if (finalImagesArray.length > 0) {
+         finalMainImageUrl = finalImagesArray[0];
+      }
+    } else {
+      // OLD LOGIC: Keeping backward compatibility just in case
+      const mediaMainImage = formData.get('mediaMainImage') as string;
+      if (mediaMainImage) {
+        finalMainImageUrl = mediaMainImage; 
+      } else {
+        const mainImageFile = formData.get('mainImage') as File;
+        if (mainImageFile && mainImageFile.size > 0) {
+          const mainImageKey = `products/${Date.now()}-main-${mainImageFile.name.replace(/\s+/g, '-')}`;
+          await env.PRODUCT_IMAGES.put(mainImageKey, await mainImageFile.arrayBuffer(), { httpMetadata: { contentType: mainImageFile.type } });
+          finalMainImageUrl = `${R2_PUBLIC_URL}/${mainImageKey}`;
+        }
+      }
 
-    // 2. Process Gallery Images
-    let galleryUrls: string[] = [];
-    const mediaGalleryImagesStr = formData.get('mediaGalleryImages') as string;
-    
-    // Form client provides the exact intended gallery state
-    if (mediaGalleryImagesStr) {
-      const parsed = JSON.parse(mediaGalleryImagesStr);
-      if (Array.isArray(parsed)) galleryUrls = parsed;
-    }
+      let galleryUrls: string[] = [];
+      const mediaGalleryImagesStr = formData.get('mediaGalleryImages') as string;
+      if (mediaGalleryImagesStr) {
+        const parsed = JSON.parse(mediaGalleryImagesStr);
+        if (Array.isArray(parsed)) galleryUrls = parsed;
+      }
 
-    const galleryFiles = formData.getAll('galleryImages') as File[];
-    const validGalleryFiles = galleryFiles.filter(file => file && file.size > 0);
-    
-    if (validGalleryFiles.length > 0) {
-      const uploadPromises = validGalleryFiles.map(async (file) => {
-        const key = `products/${Date.now()}-gallery-${file.name.replace(/\s+/g, '-')}`;
-        await env.PRODUCT_IMAGES.put(key, await file.arrayBuffer(), { httpMetadata: { contentType: file.type } });
-        return `${R2_PUBLIC_URL}/${key}`;
-      });
-      const directGalleryUrls = await Promise.all(uploadPromises);
-      galleryUrls = [...galleryUrls, ...directGalleryUrls];
-    }
+      const galleryFiles = formData.getAll('galleryImages') as File[];
+      const validGalleryFiles = galleryFiles.filter(file => file && file.size > 0);
+      
+      if (validGalleryFiles.length > 0) {
+        const uploadPromises = validGalleryFiles.map(async (file) => {
+          const key = `products/${Date.now()}-gallery-${file.name.replace(/\s+/g, '-')}`;
+          await env.PRODUCT_IMAGES.put(key, await file.arrayBuffer(), { httpMetadata: { contentType: file.type } });
+          return `${R2_PUBLIC_URL}/${key}`;
+        });
+        const directGalleryUrls = await Promise.all(uploadPromises);
+        galleryUrls = [...galleryUrls, ...directGalleryUrls];
+      }
 
-    // Compile Final Array
-    const finalImagesArray = [finalMainImageUrl, ...galleryUrls];
+      finalImagesArray = [finalMainImageUrl, ...galleryUrls];
+    }
 
     const updatedData = {
       name: formData.get('name') as string,
@@ -154,6 +208,11 @@ export async function updateProduct(id: string, formData: FormData) {
 
     await db.update(products).set(updatedData).where(eq(products.id, id));
     
+    // Automatically wipe assigned media from the library pool during updates as well
+    if (mediaIdsToDelete.length > 0) {
+      await db.delete(mediaAssets).where(inArray(mediaAssets.id, mediaIdsToDelete));
+    }
+
     revalidatePath('/shop');
     revalidatePath('/');
     revalidatePath('/admin');
@@ -189,7 +248,7 @@ export async function createQuickCategory(name: string) {
       slug,
       name,
       label: 'New Category',
-      image: '/pexels-wedding-maps-130174465-10114295.jpg', // Safe fallback image from your existing assets
+      image: '/pexels-wedding-maps-130174465-10114295.jpg',
       span: 'md:col-span-2'
     });
     
@@ -200,7 +259,6 @@ export async function createQuickCategory(name: string) {
   }
 }
 
-// Add these to app/admin/actions.ts
 export async function createCategory(formData: FormData) {
   try {
     const { env } = await getCloudflareContext({ async: true });
@@ -216,14 +274,12 @@ export async function createCategory(formData: FormData) {
         throw new Error('Category image is required');
     }
 
-    // Upload to R2
     const key = `categories/${slug}-${Date.now()}`;
     await env.PRODUCT_IMAGES.put(key, await imageFile.arrayBuffer(), { 
         httpMetadata: { contentType: imageFile.type } 
     });
     const imageUrl = `https://pub-f155ba911ca84f60b68320b0d5bb35df.r2.dev/${key}`;
 
-    // Insert FULL row into categories table
     await db.insert(categories).values({ 
         slug, 
         name, 
@@ -258,14 +314,12 @@ export async function updateCategory(slug: string, formData: FormData) {
     const label = formData.get('label') as string;
     const span = formData.get('span') as string || 'md:col-span-2';
     
-    // Fetch existing category to keep old image if a new one isn't provided
     const existing = await db.select().from(categories).where(eq(categories.slug, slug)).limit(1);
     if (!existing[0]) throw new Error('Category not found');
 
     let imageUrl = existing[0].image;
     const imageFile = formData.get('image') as File;
     
-    // Only upload to R2 if a new image was selected
     if (imageFile && imageFile.size > 0) {
       const key = `categories/${slug}-${Date.now()}`;
       await env.PRODUCT_IMAGES.put(key, await imageFile.arrayBuffer(), { 
@@ -274,7 +328,6 @@ export async function updateCategory(slug: string, formData: FormData) {
       imageUrl = `https://pub-f155ba911ca84f60b68320b0d5bb35df.r2.dev/${key}`;
     }
 
-    // Update the row. We do not change the slug so product associations don't break.
     await db.update(categories).set({ 
         name, 
         label, 
@@ -292,9 +345,6 @@ export async function updateCategory(slug: string, formData: FormData) {
   }
 }
 
-// ==========================================
-// COLOR MAP ACTIONS
-// ==========================================
 export async function saveColor(colorName: string, hexCode: string, isEdit: boolean) {
   try {
     const db = await getDb();
@@ -302,7 +352,6 @@ export async function saveColor(colorName: string, hexCode: string, isEdit: bool
     if (isEdit) {
       await db.update(colorMap).set({ hexCode }).where(eq(colorMap.colorName, colorName));
     } else {
-      // Check if exists first to avoid PK collision
       const existing = await db.select().from(colorMap).where(eq(colorMap.colorName, colorName)).limit(1);
       if (existing.length > 0) throw new Error("Color already exists.");
       await db.insert(colorMap).values({ colorName, hexCode });
@@ -327,9 +376,6 @@ export async function deleteColor(colorName: string) {
   }
 }
 
-// ==========================================
-// SIZE GUIDE ACTIONS
-// ==========================================
 export async function saveSizeGuide(id: string, name: string, headers: string[], rows: string[][], isEdit: boolean) {
   try {
     const db = await getDb();
