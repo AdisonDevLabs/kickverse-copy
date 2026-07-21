@@ -10,7 +10,6 @@ export default function CategoryManager({ categories }: { categories: any[] }) {
   const [loading, setLoading] = useState(false);
   const [list, setList] = useState(categories);
 
-  // Edit Mode State
   const [editSlug, setEditSlug] = useState<string | null>(null);
   const [nameInput, setNameInput] = useState('');
   const [labelInput, setLabelInput] = useState('');
@@ -42,13 +41,11 @@ export default function CategoryManager({ categories }: { categories: any[] }) {
     
     if (res.success && res.category) {
       if (editSlug) {
-        // Update existing item in the list
         setList(list.map(c => c.slug === editSlug ? { ...c, name: res.category.name, label: formData.get('label') } : c));
       } else {
-        // Add new item to the list
         setList([...list, { slug: res.category.slug, name: res.category.name, label: formData.get('label') }]);
       }
-      handleCancelEdit(); // Reset form state
+      handleCancelEdit(); 
     } else {
       alert(res.error);
     }
@@ -66,88 +63,99 @@ export default function CategoryManager({ categories }: { categories: any[] }) {
     <>
       <button 
         onClick={() => setIsOpen(true)} 
-        className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors whitespace-nowrap bg-transparent border-none p-0 cursor-pointer"
+        className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-brand-primary transition-colors whitespace-nowrap bg-transparent border-none p-0 cursor-pointer h-full"
       >
         <Tag className="w-4 h-4 mr-2" /> Categories
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-brand-card w-full max-w-md rounded-md border border-white/10 p-6 flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-brand-card w-full max-w-md rounded-lg border border-white/10 p-6 flex flex-col max-h-[90vh] shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center mb-6 shrink-0">
-              <h3 className="font-display text-xl uppercase">
+              <h3 className="font-display text-xl uppercase tracking-wider text-white">
                 {editSlug ? 'Edit Category' : 'Manage Categories'}
               </h3>
-              <button onClick={() => { setIsOpen(false); handleCancelEdit(); }}><X className="w-5 h-5 hover:text-brand-primary transition-colors" /></button>
+              <button onClick={() => { setIsOpen(false); handleCancelEdit(); }} className="p-1 rounded-md hover:bg-white/10 transition-colors">
+                <X className="w-5 h-5 text-gray-400 hover:text-white" />
+              </button>
             </div>
             
-            {/* Full Form for Category Creation / Updating */}
-            <form onSubmit={handleSubmit} className="space-y-4 mb-6 shrink-0 bg-brand-dark p-4 rounded-md border border-white/5 relative">
+            <form onSubmit={handleSubmit} className="space-y-4 mb-6 shrink-0 bg-black/20 p-5 rounded-lg border border-white/5 relative">
               
-              <input 
-                type="text" 
-                name="name" 
-                value={nameInput}
-                onChange={(e) => setNameInput(e.target.value)}
-                required 
-                placeholder="Category Name (e.g. Men's Shoes)" 
-                className="w-full bg-brand-dark px-3 py-2 rounded-md border border-white/10 outline-none focus:border-brand-primary text-sm" 
-              />
+              <div className="space-y-3">
+                <input 
+                  type="text" 
+                  name="name" 
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  required 
+                  placeholder="Category Name (e.g. Men's Shoes)" 
+                  className="w-full bg-brand-dark px-4 py-2.5 rounded-md border border-white/10 outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-sm" 
+                />
+                
+                <input 
+                  type="text" 
+                  name="label" 
+                  value={labelInput}
+                  onChange={(e) => setLabelInput(e.target.value)}
+                  required 
+                  placeholder="Marketing Label (e.g. Trending Now)" 
+                  className="w-full bg-brand-dark px-4 py-2.5 rounded-md border border-white/10 outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-sm" 
+                />
+              </div>
               
-              <input 
-                type="text" 
-                name="label" 
-                value={labelInput}
-                onChange={(e) => setLabelInput(e.target.value)}
-                required 
-                placeholder="Marketing Label (e.g. Trending Now)" 
-                className="w-full bg-brand-dark px-3 py-2 rounded-md border border-white/10 outline-none focus:border-brand-primary text-sm" 
-              />
-              
-              {/* Span is now hidden from the UI to keep it clean */}
               <input type="hidden" name="span" value="md:col-span-2" />
 
-              <div className="border border-white/10 p-3 rounded-md flex items-center">
-                <Upload className="w-4 h-4 mr-2 text-gray-400" />
+              <div className="border border-dashed border-white/20 p-4 rounded-md flex flex-col items-center justify-center bg-brand-dark hover:bg-white/[0.02] hover:border-brand-primary/50 transition-colors relative cursor-pointer group">
+                <Upload className="w-5 h-5 mb-2 text-gray-400 group-hover:text-brand-primary transition-colors" />
+                <span className="text-xs font-medium text-gray-400 group-hover:text-white transition-colors">
+                  {editSlug ? 'Click to replace image (Optional)' : 'Click to upload category image'}
+                </span>
                 <input 
                   type="file" 
                   name="image" 
                   accept="image/*" 
-                  required={!editSlug} // Only required when creating a NEW category
-                  className="text-xs text-gray-400 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-white/10 file:text-white hover:file:bg-white/20 cursor-pointer w-full" 
+                  required={!editSlug}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
                 />
               </div>
-              {editSlug && <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Leave image blank to keep current image</p>}
               
-              <div className="flex gap-2">
-                <button type="submit" disabled={loading} className="flex-1 bg-brand-primary text-black px-4 py-3 rounded-md font-bold text-xs uppercase tracking-widest hover:bg-brand-hover transition-colors disabled:opacity-50 flex items-center justify-center">
-                  {loading ? 'Saving...' : editSlug ? <><CheckCircle className="w-4 h-4 mr-2"/> Update</> : <><FolderPlus className="w-4 h-4 mr-2"/> Add Category</>}
+              <div className="flex gap-3 pt-2">
+                <button type="submit" disabled={loading} className="flex-1 bg-brand-primary text-black px-4 py-3 rounded-md font-bold text-xs uppercase tracking-widest hover:bg-brand-hover transition-colors disabled:opacity-50 flex items-center justify-center shadow-lg shadow-brand-primary/20">
+                  {loading ? (
+                    <><CheckCircle className="w-4 h-4 mr-2 animate-pulse"/> Saving...</>
+                  ) : editSlug ? (
+                    <><CheckCircle className="w-4 h-4 mr-2"/> Update</>
+                  ) : (
+                    <><FolderPlus className="w-4 h-4 mr-2"/> Add</>
+                  )}
                 </button>
                 
                 {editSlug && (
-                  <button type="button" onClick={handleCancelEdit} className="px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-md font-bold text-xs uppercase tracking-widest transition-colors">
+                  <button type="button" onClick={handleCancelEdit} className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-md font-bold text-xs uppercase tracking-widest transition-colors">
                     Cancel
                   </button>
                 )}
               </div>
             </form>
 
-            {/* List of Existing Categories */}
-            <div className="space-y-2 overflow-auto scrollbar-hide flex-1">
-              <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Existing Categories</h4>
-              {list.map(c => (
-                <div key={c.slug} className={`flex justify-between items-center p-3 rounded-md border transition-colors ${editSlug === c.slug ? 'bg-white/10 border-brand-primary' : 'bg-brand-dark border-white/5'}`}>
-                  <span className="text-sm font-medium">{c.name}</span>
-                  <div className="flex items-center gap-1">
-                    <button onClick={() => handleEditClick(c)} className="text-blue-400 hover:text-blue-300 transition-colors p-1" title="Edit">
-                      <Edit className="w-4 h-4"/>
-                    </button>
-                    <button onClick={() => handleDelete(c.slug)} className="text-red-400 hover:text-red-300 transition-colors p-1" title="Delete">
-                      <Trash2 className="w-4 h-4"/>
-                    </button>
+            <div className="flex flex-col flex-1 min-h-0">
+              <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 px-1">Existing Categories</h4>
+              <div className="space-y-2 overflow-y-auto custom-scrollbar pr-2 flex-1">
+                {list.map(c => (
+                  <div key={c.slug} className={`flex justify-between items-center p-3.5 rounded-lg border transition-all ${editSlug === c.slug ? 'bg-brand-primary/10 border-brand-primary shadow-inner' : 'bg-brand-dark border-white/5 hover:border-white/10'}`}>
+                    <span className="text-sm font-medium text-gray-200">{c.name}</span>
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => handleEditClick(c)} className="text-gray-400 hover:text-blue-400 transition-colors p-2 rounded hover:bg-blue-500/10" title="Edit">
+                        <Edit className="w-4 h-4"/>
+                      </button>
+                      <button onClick={() => handleDelete(c.slug)} className="text-gray-400 hover:text-red-400 transition-colors p-2 rounded hover:bg-red-500/10" title="Delete">
+                        <Trash2 className="w-4 h-4"/>
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>

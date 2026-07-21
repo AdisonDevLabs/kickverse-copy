@@ -23,10 +23,8 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   metadataBase: new URL(brand.url),
-  
   title: brand.seo.title,
   description: brand.seo.description,
-
   openGraph: {
     title: brand.seo.title,
     description: brand.seo.description,
@@ -43,7 +41,6 @@ export const metadata: Metadata = {
     locale: 'en_US',
     type: 'website',
   },
-
   icons: {
     icon: brand.seo.favicon,
     apple: brand.seo.appleIcon,
@@ -52,9 +49,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
-    <html lang="en" className={`${inter.variable} ${anton.variable} ${poppins.variable}`} suppressHydrationWarning>
-      <body className="font-sans bg-brand-dark text-white antialiased selection:bg-brand-primary selection:text-black">
-        {/* We removed the Storefront components from here! */}
+    <html lang="en" className={`scroll-smooth ${inter.variable} ${anton.variable} ${poppins.variable}`} suppressHydrationWarning>
+      <body className="font-sans bg-brand-dark text-white antialiased selection:bg-brand-primary selection:text-black min-h-screen flex flex-col">
         {children}
       </body>
     </html>

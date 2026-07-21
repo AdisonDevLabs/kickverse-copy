@@ -1,7 +1,7 @@
 // app/admin/DeleteButton.tsx
 'use client';
 
-import { Trash2 } from 'lucide-react';
+import { Trash2, Loader2 } from 'lucide-react';
 import { deleteProduct } from './actions';
 import { useState } from 'react';
 
@@ -20,9 +20,14 @@ export default function DeleteButton({ id }: { id: string }) {
     <button 
       onClick={handleDelete} 
       disabled={isDeleting}
-      className="text-red-400 hover:text-red-300 p-2 bg-red-500/10 rounded-md disabled:opacity-50"
+      className="text-gray-400 hover:text-red-400 p-2 sm:p-2.5 bg-white/5 hover:bg-red-500/10 rounded-md disabled:opacity-50 transition-all border border-transparent hover:border-red-500/20"
+      aria-label="Delete Product"
     >
-      <Trash2 className="w-4 h-4" />
+      {isDeleting ? (
+        <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin text-red-400" />
+      ) : (
+        <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+      )}
     </button>
   );
 }

@@ -1,9 +1,9 @@
 // app/admin/components/MediaManager.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import imageCompression from 'browser-image-compression';
-import { Upload, CheckCircle, Loader2, XCircle } from 'lucide-react';
+import { Upload, CheckCircle, Loader2, XCircle, ImagePlus } from 'lucide-react';
 import { generatePresignedUrls, saveMediaAssetsToDb } from '../media-actions';
 
 type FileStatus = {
@@ -15,18 +15,27 @@ type FileStatus = {
 export default function MediaManager() {
   const [isUploading, setIsUploading] = useState(false);
   const [statusText, setStatusText] = useState('');
-  const [progress, setProgress] = useState(0);
   const [fileStatuses, setFileStatuses] = useState<FileStatus[]>([]);
+
+  // Calculate a smooth, accurate overall progress based on exact individual file progresses
+  const overallProgress = useMemo(() => {
+    if (fileStatuses.length === 0) return 0;
+    const totalProgressSum = fileStatuses.reduce((acc, file) => {
+      if (file.status === 'completed') return acc + 100;
+      if (file.status === 'failed') return acc + 100; // Count failed as "done" for progress bar purposes
+      if (file.status === 'compressing') return acc + 10; // Compression represents 10% of the work
+      return acc + (10 + (file.progress * 0.9)); // Upload represents 90% of the work
+    }, 0);
+    return Math.round(totalProgressSum / fileStatuses.length);
+  }, [fileStatuses]);
 
   const handleBulkUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
     setIsUploading(true);
-    setProgress(0);
     const fileArray = Array.from(files);
     
-    // Initialize individual tracking statuses
     setFileStatuses(fileArray.map(f => ({
       name: f.name,
       progress: 0,
@@ -34,10 +43,9 @@ export default function MediaManager() {
     })));
     
     try {
-      // 1. Compress Images Client-Side
-      setStatusText(`Compressing ${fileArray.length} images...`);
+      setStatusText('Compressing images...');
       const compressionOptions = {
-        maxSizeMB: 0.3, // Target ~300KB
+        maxSizeMB: 0.3,
         maxWidthOrHeight: 1920,
         useWebWorker: true,
       };
@@ -46,13 +54,11 @@ export default function MediaManager() {
         fileArray.map(async (file, index) => {
           setFileStatuses(prev => prev.map((fs, i) => i === index ? { ...fs, status: 'compressing' } : fs));
           const compressed = await imageCompression(file, compressionOptions);
-          setProgress(Math.round(((index + 1) / fileArray.length) * 20)); // First 20% of progress
           return compressed;
         })
       );
 
-      // 2. Get Presigned URLs
-      setStatusText('Requesting secure upload links...');
+      setStatusText('Requesting secure links...');
       const fileNames = compressedFiles.map(f => f.name);
       const urlResponse = await generatePresignedUrls(fileNames);
       
@@ -60,14 +66,11 @@ export default function MediaManager() {
         throw new Error(urlResponse.error || 'Failed to generate upload URLs');
       }
 
-      // 3. Upload directly to Cloudflare R2 with progress tracking
-      setStatusText('Uploading to Cloudflare R2...');
-      let uploadedCount = 0;
+      setStatusText('Uploading to Cloudflare...');
       
       const uploadPromises = compressedFiles.map((file, index) => {
         const targetUrlData = urlResponse.urls![index];
         
-        // Wrap XMLHttpRequest in a Promise to maintain existing flow
         return new Promise<void>((resolve, reject) => {
           setFileStatuses(prev => prev.map((fs, i) => i === index ? { ...fs, status: 'uploading' } : fs));
           
@@ -75,7 +78,6 @@ export default function MediaManager() {
           xhr.open('PUT', targetUrlData.uploadUrl);
           xhr.setRequestHeader('Content-Type', file.type);
           
-          // Track specific file upload progress
           xhr.upload.onprogress = (event) => {
             if (event.lengthComputable) {
               const percentComplete = Math.round((event.loaded / event.total) * 100);
@@ -86,8 +88,6 @@ export default function MediaManager() {
           xhr.onload = () => {
             if (xhr.status >= 200 && xhr.status < 300) {
               setFileStatuses(prev => prev.map((fs, i) => i === index ? { ...fs, status: 'completed', progress: 100 } : fs));
-              uploadedCount++;
-              setProgress(20 + Math.round((uploadedCount / compressedFiles.length) * 70)); // Up to 90%
               resolve();
             } else {
               setFileStatuses(prev => prev.map((fs, i) => i === index ? { ...fs, status: 'failed' } : fs));
@@ -104,36 +104,36 @@ export default function MediaManager() {
         });
       });
 
-      await Promise.all(uploadPromises);
+      // We use Promise.allSettled so one failed upload doesn't stop the rest
+      await Promise.allSettled(uploadPromises);
 
-      // 4. Save Public URLs to D1 Database
       setStatusText('Saving to database...');
-      const assetsToSave = urlResponse.urls.map(u => ({
-        id: u.id,
-        url: u.publicUrl,
-        fileName: u.fileName
-      }));
+      const successfulUploads = fileStatuses.map((fs, index) => ({
+        fs, urlData: urlResponse.urls![index]
+      })).filter(({ fs }) => fs.status !== 'failed');
 
-      await saveMediaAssetsToDb(assetsToSave);
+      if (successfulUploads.length > 0) {
+        const assetsToSave = successfulUploads.map(({ urlData }) => ({
+          id: urlData.id,
+          url: urlData.publicUrl,
+          fileName: urlData.fileName
+        }));
+        await saveMediaAssetsToDb(assetsToSave);
+      }
       
-      setProgress(100);
-      setStatusText('Upload Complete!');
+      setStatusText(successfulUploads.length === fileArray.length ? 'Upload Complete!' : 'Finished with some errors');
       
-      // Reset after 3 seconds
       setTimeout(() => {
         setIsUploading(false);
         setStatusText('');
-        setProgress(0);
         setFileStatuses([]); 
-      }, 3000);
+      }, 4000);
 
     } catch (error: any) {
-      // We don't wipe the fileStatuses here so failed items remain visible
       alert(`Upload failed: ${error.message}`);
       setIsUploading(false);
     }
     
-    // Reset file input
     e.target.value = '';
   };
 
@@ -141,70 +141,77 @@ export default function MediaManager() {
   const visibleFiles = fileStatuses.filter(f => f.status !== 'completed');
 
   return (
-    <div className="bg-brand-dark border border-white/10 rounded-md p-6">
-      <div className="flex flex-col items-center justify-center border-2 border-dashed border-white/20 rounded-md p-8 bg-black/20 hover:border-brand-primary hover:bg-black/40 transition-all cursor-pointer relative">
+    <div className="bg-brand-card border border-white/5 rounded-lg p-6 shadow-sm">
+      <div className="flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-lg p-8 bg-brand-dark hover:border-brand-primary/50 hover:bg-white/[0.02] transition-all cursor-pointer relative group overflow-hidden">
+        
         <input 
           type="file" 
           multiple 
           accept="image/*" 
           onChange={handleBulkUpload}
           disabled={isUploading}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10"
         />
         
         {!isUploading && !hasFailures ? (
-          <>
-            <Upload className="w-10 h-10 text-gray-400 mb-3" />
-            <h3 className="font-bold text-sm uppercase tracking-widest text-white mb-1">Bulk Upload Media</h3>
-            <p className="text-xs text-gray-500 text-center max-w-xs">
-              Drag & drop up to 200 images here. They will be compressed and uploaded instantly.
+          <div className="flex flex-col items-center transform group-hover:scale-105 transition-transform duration-300">
+            <div className="w-16 h-16 rounded-full bg-brand-primary/10 flex items-center justify-center mb-4 text-brand-primary">
+              <ImagePlus className="w-8 h-8" />
+            </div>
+            <h3 className="font-bold text-sm uppercase tracking-widest text-white mb-2">Bulk Upload Media</h3>
+            <p className="text-xs text-gray-500 text-center max-w-sm leading-relaxed">
+              Drag & drop up to 200 images here. They will be automatically compressed, optimized, and uploaded to Cloudflare.
             </p>
-          </>
+          </div>
         ) : (
-          <div className="flex flex-col items-center w-full max-w-md">
-            {progress === 100 && !hasFailures ? (
-              <CheckCircle className="w-10 h-10 text-brand-primary mb-3" />
-            ) : hasFailures && !isUploading ? (
-              <XCircle className="w-10 h-10 text-red-500 mb-3" />
-            ) : (
-              <Loader2 className="w-10 h-10 text-brand-primary mb-3 animate-spin" />
-            )}
+          <div className="flex flex-col w-full max-w-xl z-20 pointer-events-none">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                {overallProgress === 100 && !hasFailures ? (
+                  <CheckCircle className="w-6 h-6 text-brand-primary mr-3" />
+                ) : hasFailures && !isUploading ? (
+                  <XCircle className="w-6 h-6 text-red-500 mr-3" />
+                ) : (
+                  <Loader2 className="w-6 h-6 text-brand-primary mr-3 animate-spin" />
+                )}
+                <h3 className="font-bold text-sm uppercase tracking-widest text-white">
+                  {statusText || (hasFailures ? 'Some uploads failed' : '')}
+                </h3>
+              </div>
+              <span className="text-xl font-display text-brand-primary">{overallProgress}%</span>
+            </div>
             
-            <h3 className="font-bold text-sm uppercase tracking-widest text-white mb-3">
-              {statusText || (hasFailures ? 'Some uploads failed' : '')}
-            </h3>
-            
-            {/* Overall Progress Bar */}
+            {/* Cloudflare-style Master Progress Bar */}
             {isUploading && (
-              <div className="w-full mb-4">
-                <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-brand-primary transition-all duration-300" 
-                    style={{ width: `${progress}%` }}
-                  ></div>
+              <div className="w-full mb-6 bg-black/50 rounded-full h-3 border border-white/5 overflow-hidden shadow-inner">
+                <div 
+                  className="h-full bg-brand-primary relative transition-all duration-200 ease-out" 
+                  style={{ width: `${overallProgress}%` }}
+                >
+                  <div className="absolute top-0 bottom-0 left-0 right-0 bg-white/20 animate-pulse"></div>
                 </div>
-                <p className="text-xs text-gray-400 mt-2 text-center">{progress}% Overall</p>
               </div>
             )}
 
-            {/* Individual Files List (Hides completed automatically) */}
+            {/* Individual Files Queue */}
             {visibleFiles.length > 0 && (
-              <div className="w-full space-y-2 max-h-48 overflow-y-auto pr-2 scrollbar-hide mt-2">
+              <div className="w-full space-y-2 max-h-56 overflow-y-auto pr-2 custom-scrollbar border border-white/5 rounded-md p-2 bg-black/20">
                 {visibleFiles.map((file, idx) => (
-                  <div key={idx} className="w-full bg-black/40 p-3 rounded-md border border-white/5 text-left">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs font-medium text-white truncate max-w-[200px]" title={file.name}>
-                        {file.name}
+                  <div key={idx} className="w-full bg-brand-dark p-3 rounded border border-white/5 flex items-center justify-between">
+                    <span className="text-xs font-medium text-gray-300 truncate max-w-[60%]" title={file.name}>
+                      {file.name}
+                    </span>
+                    
+                    <div className="flex items-center gap-3 w-1/3 justify-end">
+                      <div className="flex-1 h-1.5 bg-black rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full transition-all duration-300 ${file.status === 'failed' ? 'bg-red-500' : 'bg-brand-primary'}`} 
+                          style={{ width: `${file.status === 'compressing' ? 10 : file.progress}%` }}
+                        ></div>
+                      </div>
+                      <span className={`text-[10px] font-bold uppercase tracking-widest w-16 text-right ${file.status === 'failed' ? 'text-red-400' : 'text-gray-500'}`}>
+                        {file.status === 'failed' ? 'Error' : file.status === 'compressing' ? 'Zipping' : `${file.progress}%`}
                       </span>
-                      <span className={`text-[10px] font-bold uppercase tracking-widest ${file.status === 'failed' ? 'text-red-400' : 'text-gray-400'}`}>
-                        {file.status === 'failed' ? 'Failed' : file.status === 'compressing' ? 'Compressing...' : `${file.progress}%`}
-                      </span>
-                    </div>
-                    <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full transition-all duration-300 ${file.status === 'failed' ? 'bg-red-500' : 'bg-brand-primary'}`} 
-                        style={{ width: `${file.progress}%` }}
-                      ></div>
                     </div>
                   </div>
                 ))}
@@ -212,7 +219,7 @@ export default function MediaManager() {
             )}
             
             {hasFailures && !isUploading && (
-               <p className="text-[10px] text-gray-500 mt-6 uppercase tracking-widest">Click area to try again</p>
+               <p className="text-[10px] text-gray-500 mt-6 uppercase tracking-widest text-center">Click anywhere in the dashed area to try again</p>
             )}
           </div>
         )}

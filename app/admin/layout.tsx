@@ -27,46 +27,51 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <div className="h-screen w-full bg-brand-dark text-white flex flex-col overflow-hidden">
+    <div className="h-screen w-full bg-brand-dark text-white flex flex-col overflow-hidden selection:bg-brand-primary selection:text-black">
       
       {/* Top Header */}
-      <header className="bg-brand-card border-b border-white/10 px-6 py-4 flex justify-between items-center h-14 shrink-0 w-full">
-        <div className="font-display text-xl uppercase tracking-widest text-brand-primary">
+      <header className="bg-brand-card border-b border-white/5 px-6 py-4 flex justify-between items-center h-16 shrink-0 w-full shadow-sm">
+        <div className="font-display text-2xl uppercase tracking-widest text-brand-primary">
           Admin Control
         </div>
         
         <form action={handleLogout}>
           <button 
             type="submit" 
-            className="text-gray-400 hover:text-white flex items-center text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer bg-transparent border-none p-0"
+            className="group flex items-center text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-all cursor-pointer bg-transparent border-none p-0"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" /> Exit Admin
+            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> 
+            Exit Admin
           </button>
         </form>
       </header>
 
       {/* Admin Navigation */}
-      <nav className="bg-brand-dark border-b border-white/10 px-6 py-3 flex gap-8 overflow-x-auto hide-scrollbar shrink-0 w-full items-center">
-         <Link href="/admin" className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors whitespace-nowrap">
+      <nav className="bg-black/20 border-b border-white/5 px-6 flex gap-8 overflow-x-auto hide-scrollbar shrink-0 w-full items-center h-12 shadow-inner">
+         <Link href="/admin" className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-brand-primary transition-colors whitespace-nowrap h-full border-b-2 border-transparent hover:border-brand-primary">
            <Box className="w-4 h-4 mr-2" /> Products
          </Link>
          
          {/* Render Modal with fetched props */}
-         <CategoryManager categories={allCategories} />
-         <Link href="/admin" className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors whitespace-nowrap">
+         <div className="flex items-center h-full border-b-2 border-transparent hover:border-brand-primary transition-colors">
+            <CategoryManager categories={allCategories} />
+         </div>
+
+         <Link href="/admin" className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-brand-primary transition-colors whitespace-nowrap h-full border-b-2 border-transparent hover:border-brand-primary">
            <ImageIcon className="w-4 h-4 mr-2" /> Media Library
          </Link>
          
-         <Link href="/admin/colors" className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors whitespace-nowrap">
+         <Link href="/admin/colors" className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-brand-primary transition-colors whitespace-nowrap h-full border-b-2 border-transparent hover:border-brand-primary">
            <Palette className="w-4 h-4 mr-2" /> Colors
          </Link>
-         <Link href="/admin/size-guides" className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors whitespace-nowrap">
+         
+         <Link href="/admin/size-guides" className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-brand-primary transition-colors whitespace-nowrap h-full border-b-2 border-transparent hover:border-brand-primary">
            <Ruler className="w-4 h-4 mr-2" /> Size Guides
          </Link>
       </nav>
       
       {/* Admin Content Area */}
-      <main className="flex-1 min-h-0 relative bg-brand-dark overflow-y-auto">
+      <main className="flex-1 min-h-0 relative bg-brand-dark overflow-y-auto custom-scrollbar">
         {children}
       </main>
     </div>
