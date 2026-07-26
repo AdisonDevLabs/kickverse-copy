@@ -194,7 +194,7 @@ export default function NewFormClient({ initialCategories, initialMedia }: { ini
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Selling Price (Ksh)</label>
-              <input type="number" name="price" required className="w-full bg-brand-dark border border-white/10 rounded-md px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors" />
+              <input type="number" name="price" defaultValue="3500" required className="w-full bg-brand-dark border border-white/10 rounded-md px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors" />
             </div>
             <div>
               <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Original Price (Optional)</label>
@@ -205,7 +205,7 @@ export default function NewFormClient({ initialCategories, initialMedia }: { ini
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Sizes (Comma separated)</label>
-              <input type="text" name="sizes" placeholder="e.g. 39, 40, 41, 42" required className="w-full bg-brand-dark border border-white/10 rounded-md px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors" />
+              <input type="text" name="sizes" defaultValue="39, 40, 41, 42, 43, 44" placeholder="e.g. 39, 40, 41, 42" required className="w-full bg-brand-dark border border-white/10 rounded-md px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors" />
             </div>
             <div>
               <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Colors (Comma separated)</label>

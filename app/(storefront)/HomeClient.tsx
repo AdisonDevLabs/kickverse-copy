@@ -8,7 +8,6 @@ import Image from 'next/image';
 import { motion } from 'motion/react';
 import { fadeUp, fadeLeft, heroReveal, staggerContainer, staggerItem } from '@/lib/animations';
 import { ArrowRight, Star, ShoppingBag, Truck, ShieldCheck, Clock, MessageCircle, Flame, Eye, Zap, Sparkles, Wallet, CheckCircle, Heart } from 'lucide-react';
-// We remove dummyProducts, testimonials, and heroCategories from these imports
 import { formatPrice } from '@/lib/data';
 import { reviewAvatars, reviewStats } from '@/lib/data/testimonials';
 import { brand } from '@/lib/data/brand';
