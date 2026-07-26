@@ -205,7 +205,7 @@ export default function MediaManager() {
         <input 
           type="file" 
           multiple 
-          accept="image/*" 
+          accept="image/jpeg, image/png, image/webp"
           onChange={handleBulkUpload}
           disabled={isUploading || fileStatuses.length > 0}
           className={`absolute inset-0 w-full h-full opacity-0 ${isUploading || fileStatuses.length > 0 ? 'pointer-events-none' : 'cursor-pointer z-10'}`}
