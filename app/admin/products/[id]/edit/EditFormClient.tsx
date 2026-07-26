@@ -256,7 +256,7 @@ export default function EditFormClient({ product, initialCategories, initialMedi
                 </button>
                 <label className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-md text-[10px] font-bold uppercase tracking-widest transition-colors flex items-center cursor-pointer">
                   <Plus className="w-4 h-4 mr-2" /> Upload Files
-                  <input type="file" multiple accept="image/jpeg, image/png, image/webp" className="hidden" onChange={handleFileSelect} />
+                  <input type="file" multiple accept="image/jpeg, image/png, image/webp, image/jpg" className="hidden" onChange={handleFileSelect} />
                 </label>
               </div>
             </div>
