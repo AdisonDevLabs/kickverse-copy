@@ -176,16 +176,19 @@ export function NavBar() {
       {/* Mobile Bottom Navigation Hub (Simplified to 4 elements to fix fat-finger issues) */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-brand-card/95 backdrop-blur-lg border-t border-white/5 px-6 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] z-[55]">
         <div className="flex justify-between items-center mb-1 max-w-sm mx-auto">
+          {/* 1. Home */}
           <Link href="/" className="flex flex-col items-center space-y-1 text-gray-400 hover:text-white transition-colors w-16 p-1 rounded-md">
             <Home className="h-5 w-5" />
             <span className="text-[9px] font-medium tracking-wide uppercase">Home</span>
           </Link>
           
-          <Link href="/shop" className="flex flex-col items-center space-y-1 text-gray-400 hover:text-white transition-colors w-16 p-1 rounded-md">
+          {/* 2. Sneakers */}
+          <Link href="/shop?type=sneakers" className="flex flex-col items-center space-y-1 text-gray-400 hover:text-white transition-colors w-16 p-1 rounded-md">
             <Grid className="h-5 w-5" />
-            <span className="text-[9px] font-medium tracking-wide uppercase">Shop</span>
+            <span className="text-[9px] font-medium tracking-wide uppercase">Sneakers</span>
           </Link>
           
+          {/* 3. Cart Icon */}
           <div className="relative">
             <button 
               onClick={() => setIsCartOpen(true)}
@@ -202,10 +205,13 @@ export function NavBar() {
             </button>
           </div>
           
-          <a href={`https://wa.me/${brand.whatsappNumber}`} target="_blank" rel="noreferrer" className="flex flex-col items-center space-y-1 text-gray-400 hover:text-brand-primary transition-colors w-16 p-1 rounded-md">
-            <MessageCircle className="w-5 h-5" />
-            <span className="text-[9px] font-bold tracking-wide uppercase text-center w-full">Order</span>
-          </a>
+          {/* 4. Soccer Cleats */}
+          <Link href="/shop?type=soccer-cleats" className="flex flex-col items-center space-y-1 text-gray-400 hover:text-white transition-colors w-16 p-1 rounded-md">
+            <Tag className="h-5 w-5" />
+            <span className="text-[8px] sm:text-[9px] font-medium tracking-wide uppercase text-center w-full whitespace-nowrap">
+              Soccer Cleats
+            </span>
+          </Link>
         </div>
       </div>
     </>

@@ -1,6 +1,9 @@
 // lib/db/schema.ts
 import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
 
+// Export this array so you can map over it in your Admin Panel's upload forms
+export const productTypeEnum = ['Sneakers', 'Soccer Cleats'] as const;
+
 // ==========================================
 // 1. PRODUCTS
 // ==========================================
@@ -13,7 +16,6 @@ export const users = sqliteTable('users', {
   resetTokenExpiry: integer('reset_token_expiry') // Stored as Unix timestamp
 });
 
-
 export const products = sqliteTable('products', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
@@ -21,7 +23,10 @@ export const products = sqliteTable('products', {
   originalPrice: integer('originalPrice'),
   image: text('image').notNull(),
   images: text('images', { mode: 'json' }).$type<string[]>().notNull(),
-  productType: text('product_type').notNull().default('Sneakers'), // Add this line
+  
+  // Enforce the types at the ORM level using the exported array
+  productType: text('product_type', { enum: productTypeEnum }).notNull().default('Sneakers'), 
+  
   category: text('category').notNull(),
   rating: real('rating').default(5.0),
   reviews: integer('reviews').default(0),
@@ -48,7 +53,6 @@ export const categories = sqliteTable('categories', {
 // ==========================================
 // 3. TESTIMONIALS & REVIEWS
 // ==========================================
-// This single table handles both your global testimonials and product-specific reviews
 export const testimonials = sqliteTable('testimonials', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
@@ -59,7 +63,6 @@ export const testimonials = sqliteTable('testimonials', {
   profile: text('profile').notNull(),
   date: text('date'),
   purchased: integer('purchased', { mode: 'boolean' }).default(false),
-  // Use this boolean to filter: true = show on homepage, false = show on product pages
   isGlobal: integer('is_global', { mode: 'boolean' }).default(false) 
 });
 

@@ -18,6 +18,9 @@ function ShopContent({ initialProducts }: { initialProducts: any[] }) {
   const searchParams = useSearchParams();
   const rawCategory = searchParams.get('category');
   const normalizeSlug = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  const rawType = searchParams.get('type');
+  
   
   const getInitialFilterCategory = (cat: string | null) => {
     if (!cat) return 'All';
@@ -36,8 +39,15 @@ function ShopContent({ initialProducts }: { initialProducts: any[] }) {
     return 'all'; 
   };
 
+  const getInitialProductType = (typeVal: string | null) => {
+    if (!typeVal) return 'All';
+    if (typeVal.toLowerCase() === 'sneakers') return 'Sneakers';
+    if (typeVal.toLowerCase() === 'soccer-cleats') return 'Soccer Cleats';
+    return 'All';
+  };
+
   const [filterCategory, setFilterCategory] = useState<string>(() => getInitialFilterCategory(rawCategory));
-  const [filterProductType, setFilterProductType] = useState<string>('All');
+  const [filterProductType, setFilterProductType] = useState<string>(() => getInitialProductType(rawType));
   const [filterPrice, setFilterPrice] = useState<string | null>(null);
   const [filterSize, setFilterSize] = useState<string | null>(null);
   
@@ -57,8 +67,16 @@ function ShopContent({ initialProducts }: { initialProducts: any[] }) {
     if (rawCategory) {
       setFilterCategory(getInitialFilterCategory(rawCategory));
       setDiscoveryMode(getInitialDiscoveryMode(rawCategory));
+      // Reset product type if they navigated via a specific category
+      setFilterProductType('All'); 
     }
-  }, [rawCategory]);
+    
+    if (rawType) {
+      setFilterProductType(getInitialProductType(rawType));
+      // Reset category if they navigated via a broad product type
+      setFilterCategory('All'); 
+    }
+  }, [rawCategory, rawType]);
 
   useEffect(() => {
     setVisibleCount(8);
