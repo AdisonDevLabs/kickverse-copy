@@ -1,7 +1,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"main": ".open-next/worker.js",
-	"name": "kickverse-copy",
+	"name": "kickverse",
 	"compatibility_date": "2026-07-16",
 	"compatibility_flags": [
 		"nodejs_compat",

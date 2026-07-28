@@ -1,8 +1,8 @@
-// app/admin/CategoryManager.tsx
 'use client';
 
 import React, { useState } from 'react';
 import { X, Trash2, Tag, Upload, FolderPlus, Edit, CheckCircle } from 'lucide-react';
+import imageCompression from 'browser-image-compression';
 import { createCategory, updateCategory, deleteCategory } from './actions';
 
 export default function CategoryManager({ categories }: { categories: any[] }) {
@@ -29,8 +29,32 @@ export default function CategoryManager({ categories }: { categories: any[] }) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    
+
     const formData = new FormData(e.currentTarget);
+    const imageFile = formData.get('image') as File;
+
+    // Compress category image to ~300KB before upload
+    if (imageFile && imageFile.size > 0) {
+      try {
+        const options = {
+          maxSizeMB: 0.3, // 300KB limit
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+        };
+
+        const compressedBlob = await imageCompression(imageFile, options);
+        const compressedFile = new File([compressedBlob], imageFile.name, {
+          type: imageFile.type,
+          lastModified: Date.now(),
+        });
+
+        // Replace the raw file in FormData with the compressed file
+        formData.set('image', compressedFile);
+      } catch (error) {
+        console.error('Image compression failed:', error);
+      }
+    }
+
     let res;
 
     if (editSlug) {
@@ -38,14 +62,14 @@ export default function CategoryManager({ categories }: { categories: any[] }) {
     } else {
       res = await createCategory(formData);
     }
-    
+
     if (res.success && res.category) {
       if (editSlug) {
         setList(list.map(c => c.slug === editSlug ? { ...c, name: res.category.name, label: formData.get('label') } : c));
       } else {
         setList([...list, { slug: res.category.slug, name: res.category.name, label: formData.get('label') }]);
       }
-      handleCancelEdit(); 
+      handleCancelEdit();
     } else {
       alert(res.error);
     }
