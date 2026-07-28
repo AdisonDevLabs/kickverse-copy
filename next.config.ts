@@ -20,18 +20,27 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'pub-f155ba911ca84f60b68320b0d5bb35df.r2.dev',
+        port: '',
+        pathname: '/**', // Added this to explicitly allow nested R2 paths
       },
       {
         protocol: 'https',
-        hostname: 'kickverse-copy.storxia.tech',
+        hostname: 'kickverse.storxia.tech',
+        port: '',
+        pathname: '/**',
       }
     ],
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '5mb', // Increased from the default 1mb limit
+    },
   },
   output: 'standalone',
   transpilePackages: ['motion'],
   webpack: (config, {dev}) => {
     // HMR is disabled in AI Studio via DISABLE_HMR env var.
-    // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
+    // Do not modify—file watching is disabled to prevent flickering during agent edits.
     if (dev && process.env.DISABLE_HMR === 'true') {
       config.watchOptions = {
         ignored: /.*/,
