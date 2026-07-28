@@ -37,6 +37,7 @@ function ShopContent({ initialProducts }: { initialProducts: any[] }) {
   };
 
   const [filterCategory, setFilterCategory] = useState<string>(() => getInitialFilterCategory(rawCategory));
+  const [filterProductType, setFilterProductType] = useState<string>('All');
   const [filterPrice, setFilterPrice] = useState<string | null>(null);
   const [filterSize, setFilterSize] = useState<string | null>(null);
   
@@ -101,22 +102,34 @@ function ShopContent({ initialProducts }: { initialProducts: any[] }) {
   }, [filterCategory, filterPrice, filterSize, sortOption, discoveryMode]);
 
   const sortedAndFilteredProducts = useMemo(() => {
-    // USING THE DATABASE PRODUCTS PASSED FROM THE SERVER
     let result = [...initialProducts];
     
+    // 1. Update the Search Query to check productType
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(p => 
         p.name.toLowerCase().includes(query) || 
-        p.category.toLowerCase().includes(query)
+        p.category.toLowerCase().includes(query) ||
+        (p.productType && p.productType.toLowerCase().includes(query)) // Add this
+      );
+    }
+    if (filterProductType && filterProductType !== 'All') {
+      result = result.filter(p => 
+        p.productType && p.productType.toLowerCase() === filterProductType.toLowerCase()
       );
     }
 
+    // 2. Update Category Filter to check both category AND productType
     if (filterCategory && filterCategory.toLowerCase() !== 'all') {
       const targetCategory = normalizeSlug(filterCategory);
       result = result.filter(p => {
         const prodCategory = normalizeSlug(p.category || '');
-        return prodCategory.includes(targetCategory) || targetCategory.includes(prodCategory);
+        const prodType = normalizeSlug(p.productType || ''); // Add this
+        
+        return prodCategory.includes(targetCategory) || 
+               targetCategory.includes(prodCategory) ||
+               prodType.includes(targetCategory) ||  // Add this
+               targetCategory.includes(prodType);    // Add this
       });
     }
 
@@ -173,6 +186,7 @@ function ShopContent({ initialProducts }: { initialProducts: any[] }) {
   const clearAllFilters = () => {
     setSearchQuery('');
     setFilterCategory('All');
+    setFilterProductType('All');
     setFilterPrice(null);
     setFilterSize(null);
     setDiscoveryMode('all');
@@ -251,33 +265,65 @@ function ShopContent({ initialProducts }: { initialProducts: any[] }) {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             </div>
             
-            {/* Discovery Chips */}
-            <div className="flex-1 w-full overflow-x-auto hide-scrollbar flex gap-2 pb-1 md:pb-0 items-center">
-              {discoveryChips.map((chip) => {
-                const isCategoryChip = ['sneakers', 'kids', 'ladies-shoes', 'school-shoes', 'sb-dunk'].includes(chip.id);
-                
-                const isActive = !searchQuery && (
-                  normalizeSlug(filterCategory) === normalizeSlug(chip.id) ||
-                  (discoveryMode === chip.id && filterCategory === 'All')
-                );
+            {/* Discovery & Filter Chips */}
+            <div className="flex-1 w-full overflow-x-auto hide-scrollbar flex gap-4 pb-1 md:pb-0 items-center">
+              
+              {/* 1. Product Types Group */}
+              <div className="flex items-center gap-2 border-r border-white/10 pr-4">
+                <span className="text-[9px] uppercase tracking-widest text-gray-500 font-bold hidden sm:block">Type:</span>
+                {['Sneakers', 'Soccer Cleats'].map((type) => {
+                  const isActive = filterProductType === type;
+                  return (
+                    <button
+                      key={type}
+                      onClick={() => {
+                        // Toggle type on/off, and reset collections when switching types
+                        setFilterProductType(isActive ? 'All' : type);
+                        setFilterCategory('All');
+                        setDiscoveryMode('all');
+                      }}
+                      className={`whitespace-nowrap px-4 py-1.5 rounded-md text-[10px] sm:text-xs font-bold tracking-widest transition-colors ${
+                        isActive
+                          ? 'bg-brand-primary text-black shadow-lg shadow-brand-primary/20'
+                          : 'bg-brand-dark text-gray-300 hover:bg-white/10 hover:text-white border border-white/5'
+                      }`}
+                    >
+                      {type}
+                    </button>
+                  );
+                })}
+              </div>
 
-                return (
-                  <button
-                    key={chip.id}
-                    onClick={() => { 
-                      clearAllFilters(); 
-                      setFilterCategory(chip.id.replace(/-/g, ' '));
-                    }}
-                    className={`whitespace-nowrap px-4 py-1.5 rounded-md text-[10px] sm:text-xs font-bold tracking-widest transition-colors ${
-                      isActive
-                        ? 'bg-white text-black shadow-lg shadow-white/20'
-                        : 'bg-brand-dark text-gray-400 hover:bg-white/10 hover:text-white border border-white/5'
-                    }`}
-                  >
-                    {chip.label}
-                  </button>
-                );
-              })}
+              {/* 2. Collections / Categories Group */}
+              <div className="flex items-center gap-2">
+                <span className="text-[9px] uppercase tracking-widest text-gray-500 font-bold hidden sm:block">Collection:</span>
+                {discoveryChips
+                  // Optionally filter out 'sneakers' if it still exists in your discoveryChips array
+                  .filter(chip => !['sneakers', 'soccer-cleats'].includes(chip.id))
+                  .map((chip) => {
+                    const isActive = !searchQuery && (
+                      normalizeSlug(filterCategory) === normalizeSlug(chip.id) ||
+                      (discoveryMode === chip.id && filterCategory === 'All')
+                    );
+
+                    return (
+                      <button
+                        key={chip.id}
+                        onClick={() => { 
+                          clearAllFilters(); 
+                          setFilterCategory(chip.id.replace(/-/g, ' '));
+                        }}
+                        className={`whitespace-nowrap px-4 py-1.5 rounded-md text-[10px] sm:text-xs font-bold tracking-widest transition-colors ${
+                          isActive
+                            ? 'bg-white text-black shadow-lg shadow-white/20'
+                            : 'bg-brand-dark text-gray-400 hover:bg-white/10 hover:text-white border border-white/5'
+                        }`}
+                      >
+                        {chip.label}
+                      </button>
+                    );
+                })}
+              </div>
             </div>
 
             {/* Desktop Actions */}

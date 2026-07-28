@@ -71,7 +71,7 @@ export default async function ProductPage({ params }: Props) {
   // 2. Fetch related products (same category, excluding the current product, limit 4)
   const relatedProducts = await db.select()
     .from(products)
-    .where(and(eq(products.category, product.category), not(eq(products.id, product.id))))
+    .where(and(eq(products.productType, product.productType), not(eq(products.id, product.id))))
     .limit(4);
 
   // 3. Fetch recently viewed/others (randomized products excluding the current one, limit 8)

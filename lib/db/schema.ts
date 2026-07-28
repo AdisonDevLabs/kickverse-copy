@@ -21,6 +21,7 @@ export const products = sqliteTable('products', {
   originalPrice: integer('originalPrice'),
   image: text('image').notNull(),
   images: text('images', { mode: 'json' }).$type<string[]>().notNull(),
+  productType: text('product_type').notNull().default('Sneakers'), // Add this line
   category: text('category').notNull(),
   rating: real('rating').default(5.0),
   reviews: integer('reviews').default(0),
@@ -30,7 +31,7 @@ export const products = sqliteTable('products', {
   isBestSeller: integer('isBestSeller', { mode: 'boolean' }).default(false),
   isFlashDeal: integer('isFlashDeal', { mode: 'boolean' }).default(false),
   description: text('description').notNull(),
-  created_at: text('created_at') // SQLite stores timestamps as text/strings by default
+  created_at: text('created_at')
 });
 
 // ==========================================

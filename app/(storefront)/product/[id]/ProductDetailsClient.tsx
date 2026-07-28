@@ -190,8 +190,21 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
           <span className="mx-2 text-white/20">/</span>
           <Link href="/shop" className="hover:text-white transition-colors">Shop</Link>
           <span className="mx-2 text-white/20">/</span>
-          <Link href={`/shop?category=${product.category.toLowerCase()}`} className="hover:text-white transition-colors">{product.category}</Link>
+          
+          {/* New Product Type Breadcrumb */}
+          {product.productType && (
+             <>
+               <span className="text-gray-400">{product.productType}</span>
+               <span className="mx-2 text-white/20">/</span>
+             </>
+          )}
+
+          {/* Collection/Category Breadcrumb */}
+          <Link href={`/shop?category=${product.category.toLowerCase().replace(/\s+/g, '-')}`} className="hover:text-white transition-colors">
+            {product.category}
+          </Link>
           <span className="mx-2 text-white/20">/</span>
+          
           <span className="text-brand-primary truncate">{product.name}</span>
         </div>
       </motion.div>
