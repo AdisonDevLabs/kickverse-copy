@@ -17,14 +17,16 @@ import { staggerContainer, staggerItem, fadeIn, fadeUp } from '@/lib/animations'
 function ShopContent({ initialProducts }: { initialProducts: any[] }) {
   const searchParams = useSearchParams();
   const rawCategory = searchParams.get('category');
+  const normalizeSlug = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
   
   const getInitialFilterCategory = (cat: string | null) => {
     if (!cat) return 'All';
-    if (cat === 'sneakers') return 'Sneakers';
-    if (cat === 'kids') return 'Kids';
-    if (cat === 'ladies-shoes') return 'Ladies Shoes';
-    if (cat === 'school-shoes') return 'School Shoes';
-    return 'All';
+    // Reserved modes stay handled by getInitialDiscoveryMode
+    if (['deals', 'new-arrivals', 'best-sellers', 'trending'].includes(cat)) {
+      return 'All';
+    }
+    // Convert hyphens to spaces for display, or return raw slug
+    return cat.replace(/-/g, ' ');
   };
 
   const getInitialDiscoveryMode = (cat: string | null) => {
@@ -110,8 +112,12 @@ function ShopContent({ initialProducts }: { initialProducts: any[] }) {
       );
     }
 
-    if (filterCategory && filterCategory !== 'All') {
-      result = result.filter(p => p.category.toLowerCase() === filterCategory.toLowerCase());
+    if (filterCategory && filterCategory.toLowerCase() !== 'all') {
+      const targetCategory = normalizeSlug(filterCategory);
+      result = result.filter(p => {
+        const prodCategory = normalizeSlug(p.category || '');
+        return prodCategory.includes(targetCategory) || targetCategory.includes(prodCategory);
+      });
     }
 
     if (filterPrice) {
@@ -248,14 +254,11 @@ function ShopContent({ initialProducts }: { initialProducts: any[] }) {
             {/* Discovery Chips */}
             <div className="flex-1 w-full overflow-x-auto hide-scrollbar flex gap-2 pb-1 md:pb-0 items-center">
               {discoveryChips.map((chip) => {
-                const isCategoryChip = ['sneakers', 'kids', 'ladies-shoes', 'school-shoes'].includes(chip.id);
-                const mappedCategory = isCategoryChip ? 
-                  (chip.id === 'sneakers' ? 'Sneakers' : 
-                   chip.id === 'kids' ? 'Kids' : 
-                   chip.id === 'ladies-shoes' ? 'Ladies Shoes' : 'School Shoes') : null;
-
+                const isCategoryChip = ['sneakers', 'kids', 'ladies-shoes', 'school-shoes', 'sb-dunk'].includes(chip.id);
+                
                 const isActive = !searchQuery && (
-                  isCategoryChip ? filterCategory === mappedCategory : discoveryMode === chip.id && filterCategory === 'All'
+                  normalizeSlug(filterCategory) === normalizeSlug(chip.id) ||
+                  (discoveryMode === chip.id && filterCategory === 'All')
                 );
 
                 return (
@@ -263,11 +266,7 @@ function ShopContent({ initialProducts }: { initialProducts: any[] }) {
                     key={chip.id}
                     onClick={() => { 
                       clearAllFilters(); 
-                      if (isCategoryChip && mappedCategory) {
-                        setFilterCategory(mappedCategory);
-                      } else {
-                        setDiscoveryMode(chip.id);
-                      }
+                      setFilterCategory(chip.id.replace(/-/g, ' '));
                     }}
                     className={`whitespace-nowrap px-4 py-1.5 rounded-md text-[10px] sm:text-xs font-bold tracking-widest transition-colors ${
                       isActive

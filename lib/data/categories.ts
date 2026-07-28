@@ -49,7 +49,7 @@ export const discoveryChips = [
   { id: 'premium-styles', label: '✨ Premium Styles', context: 'Premium Collection' },
 ];
 
-export const filterCategories = ['All', 'Heels', 'Sneakers', 'Flats', 'Sandals', 'Mens Clothing'];
+export const filterCategories = ['All', 'Sneakers', 'Mules', 'Jordan', 'Air max'];
 
 export const searchSuggestions = ['Trending Sneakers', 'Best Selling Heels', 'Office Shoes', 'Party Wear', 'Budget Picks'];
 
@@ -65,4 +65,4 @@ export const navLinksData = [
 
 export const priceRanges = ['Under 2,000', '2,000 - 4,000', 'Over 4,000'];
 
-export const filterSizes = ['36', '37', '38', '39', '40', '41', '42', '43', "S", "M", "L", "XL", "XXL"];
+export const filterSizes = ['34', '35', '36', '37', '38', '39', '40', '41', '42', '43', "44"];
