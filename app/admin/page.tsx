@@ -29,10 +29,13 @@ export default async function AdminDashboard() {
           </p>
         </div>
         
-        <div className="flex flex-wrap items-center gap-4 shrink-0 bg-brand-card p-2 rounded-lg border border-white/5">
+        <div className="flex flex-wrap items-center gap-3 shrink-0 bg-brand-card p-2 rounded-lg border border-white/5">
           <div className="px-3 border-r border-white/10 hidden sm:flex items-center h-full">
             <CategoryManager categories={allCategories} />
           </div>
+
+          {/* Media Manager integrated into the top action bar */}
+          <MediaManager />
 
           <Link 
             href="/admin/products/new" 
@@ -41,11 +44,6 @@ export default async function AdminDashboard() {
             <Plus className="w-4 h-4 mr-2" /> Add Product
           </Link>
         </div>
-      </div>
-
-      {/* Bulk Media Upload Section */}
-      <div className="mb-8 shrink-0">
-         <MediaManager />
       </div>
 
       {/* Table Container Wrapper */}

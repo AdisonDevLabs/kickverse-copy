@@ -70,11 +70,10 @@ export default function MediaManager() {
           xhr.send(file);
         });
 
-        return true; // Success!
+        return true; 
       } catch (err) {
         attempts++;
         if (attempts <= MAX_AUTO_RETRIES) {
-          // Reset file progress and wait 1s before retrying
           setFileStatuses(prev => prev.map((fs, i) => i === index ? { ...fs, progress: 0, status: 'uploading', retryCount: attempts } : fs));
           await new Promise(r => setTimeout(r, 1000));
         } else {
@@ -90,7 +89,6 @@ export default function MediaManager() {
     setIsUploading(true);
 
     try {
-      // 1. Compression
       setStatusText(`Compressing ${filesToProcess.length} image(s)...`);
       const compressionOptions = {
         maxSizeMB: 0.3,
@@ -106,7 +104,6 @@ export default function MediaManager() {
         })
       );
 
-      // 2. Request Presigned URLs
       setStatusText('Requesting secure links...');
       const fileNames = compressedItems.map(item => item.originalName);
       const urlResponse = await generatePresignedUrls(fileNames);
@@ -115,9 +112,7 @@ export default function MediaManager() {
         throw new Error(urlResponse.error || 'Failed to generate upload URLs');
       }
 
-      // 3. Upload to Cloudflare R2 with Auto-Retry
       setStatusText('Uploading to Cloudflare...');
-      
       const uploadPromises = compressedItems.map((item, urlIdx) => {
         const urlData = urlResponse.urls![urlIdx];
         return uploadSingleFile(item.compressed, item.index, urlData.uploadUrl).then(success => ({
@@ -128,7 +123,6 @@ export default function MediaManager() {
 
       const results = await Promise.all(uploadPromises);
 
-      // 4. Save successful uploads to DB
       setStatusText('Saving to database...');
       const successfulAssets = results
         .filter(r => r.success)
@@ -167,7 +161,6 @@ export default function MediaManager() {
 
     const fileArray = Array.from(files);
     
-    // Initialize file status queue with file references
     const initialStatuses: FileStatus[] = fileArray.map(f => ({
       file: f,
       name: f.name,
@@ -184,14 +177,12 @@ export default function MediaManager() {
     e.target.value = '';
   };
 
-  // Manual trigger to retry only remaining failed files
   const handleRetryFailed = async () => {
     const failedItems = fileStatuses
       .map((fs, index) => ({ file: fs.file, index, status: fs.status }))
       .filter(item => item.status === 'failed');
 
     if (failedItems.length === 0) return;
-
     await processAndUpload(failedItems);
   };
 
@@ -202,7 +193,6 @@ export default function MediaManager() {
       }
     }
     setIsOpen(false);
-    // Optional: Reset queue on close if not actively uploading
     if (!isUploading) {
       setFileStatuses([]);
       setStatusText('');
@@ -214,18 +204,12 @@ export default function MediaManager() {
 
   return (
     <>
-      {/* Modal Trigger Button */}
+      {/* Sleek Modal Trigger Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="bg-brand-card border border-white/5 hover:border-brand-primary/50 text-white px-6 py-4 rounded-lg shadow-sm flex items-center justify-center gap-4 transition-all group w-full sm:w-auto"
+        className="bg-white/5 hover:bg-white/10 text-white px-5 py-2.5 rounded-md font-bold uppercase tracking-widest text-xs flex items-center transition-colors shrink-0 border border-white/10 shadow-sm"
       >
-        <div className="w-10 h-10 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary group-hover:scale-110 transition-transform">
-          <ImagePlus className="w-5 h-5" />
-        </div>
-        <div className="text-left">
-          <h3 className="font-bold text-sm uppercase tracking-widest">Bulk Upload Media</h3>
-          <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-0.5">Click to open upload manager</p>
-        </div>
+        <ImagePlus className="w-4 h-4 mr-2" /> Bulk Upload
       </button>
 
       {/* Modal Overlay */}
@@ -254,7 +238,6 @@ export default function MediaManager() {
             <div className="p-6">
               <div className="flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-lg p-8 bg-brand-dark hover:border-brand-primary/50 hover:bg-white/[0.02] transition-all relative group overflow-hidden">
                 
-                {/* File input layer is disabled/pointer-events-none when queue is active so it won't block scrolling */}
                 <input 
                   type="file" 
                   multiple 
@@ -304,7 +287,7 @@ export default function MediaManager() {
                       </div>
                     )}
 
-                    {/* Scrollable File List Queue - Pointer events enabled */}
+                    {/* Scrollable File List Queue */}
                     {visibleFiles.length > 0 && (
                       <div className="w-full space-y-2 max-h-56 overflow-y-auto pr-2 custom-scrollbar border border-white/5 rounded-md p-2 bg-black/20 pointer-events-auto">
                         {visibleFiles.map((file, idx) => (
@@ -335,7 +318,7 @@ export default function MediaManager() {
                       </div>
                     )}
                     
-                    {/* Retry Button for Persistent Failures */}
+                    {/* Retry Button */}
                     {hasFailures && !isUploading && (
                       <div className="flex items-center justify-between mt-4 pointer-events-auto">
                         <p className="text-[10px] text-gray-500 uppercase tracking-widest">
