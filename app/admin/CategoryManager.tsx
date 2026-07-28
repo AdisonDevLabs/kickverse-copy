@@ -114,7 +114,7 @@ export default function CategoryManager({ categories }: { categories: any[] }) {
                 <input 
                   type="file" 
                   name="image" 
-                  accept="image/*" 
+                  accept="image/jpeg, image/png, image/webp, image/jpg" 
                   required={!editSlug}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
                 />

@@ -3,7 +3,7 @@
 
 import React, { useState, useMemo } from 'react';
 import imageCompression from 'browser-image-compression';
-import { CheckCircle, Loader2, XCircle, ImagePlus, RefreshCw } from 'lucide-react';
+import { CheckCircle, Loader2, XCircle, ImagePlus, RefreshCw, X } from 'lucide-react';
 import { generatePresignedUrls, saveMediaAssetsToDb } from '../media-actions';
 
 type FileStatus = {
@@ -17,6 +17,7 @@ type FileStatus = {
 const MAX_AUTO_RETRIES = 2;
 
 export default function MediaManager() {
+  const [isOpen, setIsOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [statusText, setStatusText] = useState('');
   const [fileStatuses, setFileStatuses] = useState<FileStatus[]>([]);
@@ -194,112 +195,168 @@ export default function MediaManager() {
     await processAndUpload(failedItems);
   };
 
+  const handleCloseModal = () => {
+    if (isUploading) {
+      if (!window.confirm('An upload is currently in progress. Are you sure you want to close the window?')) {
+        return;
+      }
+    }
+    setIsOpen(false);
+    // Optional: Reset queue on close if not actively uploading
+    if (!isUploading) {
+      setFileStatuses([]);
+      setStatusText('');
+    }
+  };
+
   const hasFailures = fileStatuses.some(f => f.status === 'failed');
   const visibleFiles = fileStatuses.filter(f => f.status !== 'completed');
 
   return (
-    <div className="bg-brand-card border border-white/5 rounded-lg p-6 shadow-sm">
-      <div className="flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-lg p-8 bg-brand-dark hover:border-brand-primary/50 hover:bg-white/[0.02] transition-all relative group overflow-hidden">
-        
-        {/* File input layer is disabled/pointer-events-none when queue is active so it won't block scrolling */}
-        <input 
-          type="file" 
-          multiple 
-          accept="image/jpeg, image/png, image/webp, image/jpg"
-          onChange={handleBulkUpload}
-          disabled={isUploading || fileStatuses.length > 0}
-          className={`absolute inset-0 w-full h-full opacity-0 ${isUploading || fileStatuses.length > 0 ? 'pointer-events-none' : 'cursor-pointer z-10'}`}
-        />
-        
-        {fileStatuses.length === 0 ? (
-          <div className="flex flex-col items-center transform group-hover:scale-105 transition-transform duration-300">
-            <div className="w-16 h-16 rounded-full bg-brand-primary/10 flex items-center justify-center mb-4 text-brand-primary">
-              <ImagePlus className="w-8 h-8" />
-            </div>
-            <h3 className="font-bold text-sm uppercase tracking-widest text-white mb-2">Bulk Upload Media</h3>
-            <p className="text-xs text-gray-500 text-center max-w-sm leading-relaxed">
-              Drag & drop images here. Automated retries are enabled for network interruptions.
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col w-full max-w-xl z-20 pointer-events-auto">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center">
-                {overallProgress === 100 && !hasFailures ? (
-                  <CheckCircle className="w-6 h-6 text-brand-primary mr-3" />
-                ) : hasFailures && !isUploading ? (
-                  <XCircle className="w-6 h-6 text-red-500 mr-3" />
-                ) : (
-                  <Loader2 className="w-6 h-6 text-brand-primary mr-3 animate-spin" />
-                )}
-                <h3 className="font-bold text-sm uppercase tracking-widest text-white">
-                  {statusText || (hasFailures ? 'Some uploads failed' : '')}
-                </h3>
-              </div>
-              <span className="text-xl font-display text-brand-primary">{overallProgress}%</span>
-            </div>
-            
-            {/* Master Progress Bar */}
-            {isUploading && (
-              <div className="w-full mb-6 bg-black/50 rounded-full h-3 border border-white/5 overflow-hidden shadow-inner">
-                <div 
-                  className="h-full bg-brand-primary relative transition-all duration-200 ease-out" 
-                  style={{ width: `${overallProgress}%` }}
-                >
-                  <div className="absolute top-0 bottom-0 left-0 right-0 bg-white/20 animate-pulse"></div>
-                </div>
-              </div>
-            )}
+    <>
+      {/* Modal Trigger Button */}
+      <button
+        onClick={() => setIsOpen(true)}
+        className="bg-brand-card border border-white/5 hover:border-brand-primary/50 text-white px-6 py-4 rounded-lg shadow-sm flex items-center justify-center gap-4 transition-all group w-full sm:w-auto"
+      >
+        <div className="w-10 h-10 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary group-hover:scale-110 transition-transform">
+          <ImagePlus className="w-5 h-5" />
+        </div>
+        <div className="text-left">
+          <h3 className="font-bold text-sm uppercase tracking-widest">Bulk Upload Media</h3>
+          <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-0.5">Click to open upload manager</p>
+        </div>
+      </button>
 
-            {/* Scrollable File List Queue - Pointer events enabled */}
-            {visibleFiles.length > 0 && (
-              <div className="w-full space-y-2 max-h-56 overflow-y-auto pr-2 custom-scrollbar border border-white/5 rounded-md p-2 bg-black/20 pointer-events-auto">
-                {visibleFiles.map((file, idx) => (
-                  <div key={idx} className="w-full bg-brand-dark p-3 rounded border border-white/5 flex items-center justify-between">
-                    <span className="text-xs font-medium text-gray-300 truncate max-w-[50%]" title={file.name}>
-                      {file.name}
-                    </span>
-                    
-                    <div className="flex items-center gap-3 w-1/2 justify-end">
-                      <div className="flex-1 h-1.5 bg-black rounded-full overflow-hidden">
-                        <div 
-                          className={`h-full transition-all duration-300 ${file.status === 'failed' ? 'bg-red-500' : 'bg-brand-primary'}`} 
-                          style={{ width: `${file.status === 'compressing' ? 10 : file.progress}%` }}
-                        ></div>
-                      </div>
-                      <span className={`text-[10px] font-bold uppercase tracking-widest min-w-[70px] text-right ${file.status === 'failed' ? 'text-red-400' : 'text-gray-500'}`}>
-                        {file.status === 'failed' 
-                          ? 'Failed' 
-                          : file.status === 'compressing' 
-                          ? 'Zipping' 
-                          : file.retryCount > 0 
-                          ? `Retry ${file.retryCount}` 
-                          : `${file.progress}%`}
-                      </span>
+      {/* Modal Overlay */}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
+          <div 
+            className="relative w-full max-w-2xl bg-brand-card border border-white/10 rounded-xl shadow-2xl flex flex-col my-auto animate-in fade-in zoom-in duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex justify-between items-center p-5 border-b border-white/5 bg-black/20">
+              <h2 className="font-display text-lg uppercase tracking-widest text-brand-primary flex items-center">
+                <ImagePlus className="w-5 h-5 mr-3" />
+                Media Upload Manager
+              </h2>
+              <button 
+                onClick={handleCloseModal}
+                className="text-gray-500 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-md"
+                title="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6">
+              <div className="flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-lg p-8 bg-brand-dark hover:border-brand-primary/50 hover:bg-white/[0.02] transition-all relative group overflow-hidden">
+                
+                {/* File input layer is disabled/pointer-events-none when queue is active so it won't block scrolling */}
+                <input 
+                  type="file" 
+                  multiple 
+                  accept="image/jpeg, image/png, image/webp, image/jpg"
+                  onChange={handleBulkUpload}
+                  disabled={isUploading || fileStatuses.length > 0}
+                  className={`absolute inset-0 w-full h-full opacity-0 ${isUploading || fileStatuses.length > 0 ? 'pointer-events-none' : 'cursor-pointer z-10'}`}
+                />
+                
+                {fileStatuses.length === 0 ? (
+                  <div className="flex flex-col items-center transform group-hover:scale-105 transition-transform duration-300">
+                    <div className="w-16 h-16 rounded-full bg-brand-primary/10 flex items-center justify-center mb-4 text-brand-primary">
+                      <ImagePlus className="w-8 h-8" />
                     </div>
+                    <h3 className="font-bold text-sm uppercase tracking-widest text-white mb-2">Bulk Upload Media</h3>
+                    <p className="text-xs text-gray-500 text-center max-w-sm leading-relaxed">
+                      Drag & drop images here. Automated retries are enabled for network interruptions.
+                    </p>
                   </div>
-                ))}
+                ) : (
+                  <div className="flex flex-col w-full max-w-xl z-20 pointer-events-auto">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center">
+                        {overallProgress === 100 && !hasFailures ? (
+                          <CheckCircle className="w-6 h-6 text-brand-primary mr-3" />
+                        ) : hasFailures && !isUploading ? (
+                          <XCircle className="w-6 h-6 text-red-500 mr-3" />
+                        ) : (
+                          <Loader2 className="w-6 h-6 text-brand-primary mr-3 animate-spin" />
+                        )}
+                        <h3 className="font-bold text-sm uppercase tracking-widest text-white">
+                          {statusText || (hasFailures ? 'Some uploads failed' : '')}
+                        </h3>
+                      </div>
+                      <span className="text-xl font-display text-brand-primary">{overallProgress}%</span>
+                    </div>
+                    
+                    {/* Master Progress Bar */}
+                    {isUploading && (
+                      <div className="w-full mb-6 bg-black/50 rounded-full h-3 border border-white/5 overflow-hidden shadow-inner">
+                        <div 
+                          className="h-full bg-brand-primary relative transition-all duration-200 ease-out" 
+                          style={{ width: `${overallProgress}%` }}
+                        >
+                          <div className="absolute top-0 bottom-0 left-0 right-0 bg-white/20 animate-pulse"></div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Scrollable File List Queue - Pointer events enabled */}
+                    {visibleFiles.length > 0 && (
+                      <div className="w-full space-y-2 max-h-56 overflow-y-auto pr-2 custom-scrollbar border border-white/5 rounded-md p-2 bg-black/20 pointer-events-auto">
+                        {visibleFiles.map((file, idx) => (
+                          <div key={idx} className="w-full bg-brand-dark p-3 rounded border border-white/5 flex items-center justify-between">
+                            <span className="text-xs font-medium text-gray-300 truncate max-w-[50%]" title={file.name}>
+                              {file.name}
+                            </span>
+                            
+                            <div className="flex items-center gap-3 w-1/2 justify-end">
+                              <div className="flex-1 h-1.5 bg-black rounded-full overflow-hidden">
+                                <div 
+                                  className={`h-full transition-all duration-300 ${file.status === 'failed' ? 'bg-red-500' : 'bg-brand-primary'}`} 
+                                  style={{ width: `${file.status === 'compressing' ? 10 : file.progress}%` }}
+                                ></div>
+                              </div>
+                              <span className={`text-[10px] font-bold uppercase tracking-widest min-w-[70px] text-right ${file.status === 'failed' ? 'text-red-400' : 'text-gray-500'}`}>
+                                {file.status === 'failed' 
+                                  ? 'Failed' 
+                                  : file.status === 'compressing' 
+                                  ? 'Zipping' 
+                                  : file.retryCount > 0 
+                                  ? `Retry ${file.retryCount}` 
+                                  : `${file.progress}%`}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* Retry Button for Persistent Failures */}
+                    {hasFailures && !isUploading && (
+                      <div className="flex items-center justify-between mt-4 pointer-events-auto">
+                        <p className="text-[10px] text-gray-500 uppercase tracking-widest">
+                          Auto-retries exhausted for failed items.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={handleRetryFailed}
+                          className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-widest flex items-center transition-colors cursor-pointer"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5 mr-1.5" /> Retry Failed
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            )}
-            
-            {/* Retry Button for Persistent Failures */}
-            {hasFailures && !isUploading && (
-              <div className="flex items-center justify-between mt-4 pointer-events-auto">
-                <p className="text-[10px] text-gray-500 uppercase tracking-widest">
-                  Auto-retries exhausted for failed items.
-                </p>
-                <button
-                  type="button"
-                  onClick={handleRetryFailed}
-                  className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-widest flex items-center transition-colors cursor-pointer"
-                >
-                  <RefreshCw className="w-3.5 h-3.5 mr-1.5" /> Retry Failed
-                </button>
-              </div>
-            )}
+            </div>
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 }
