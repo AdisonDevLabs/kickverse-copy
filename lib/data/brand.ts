@@ -3,7 +3,7 @@ import { Truck, MessageCircle, Star, Sparkles, Tag, CheckCircle, ShieldCheck } f
 
 export const brand = {
   name: "KICKVERSE KE", //
-  url: "https://kickverse.storxia.tech/", //
+  url: "https://kickverse.co.ke/", //
   shortName: "KICKVERSE", //
   logo: "/brand-logo.jpeg", //
   tagline: "HOME OF THE BEST SNEAKERS", //

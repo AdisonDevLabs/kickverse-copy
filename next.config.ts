@@ -21,11 +21,18 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'pub-f155ba911ca84f60b68320b0d5bb35df.r2.dev',
         port: '',
-        pathname: '/**', // Added this to explicitly allow nested R2 paths
+        pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'kickverse.storxia.tech',
+        port: '',
+        pathname: '/**',
+      },
+
+      {
+        protocol: 'https',
+        hostname: 'kickverse.co.ke',
         port: '',
         pathname: '/**',
       }
