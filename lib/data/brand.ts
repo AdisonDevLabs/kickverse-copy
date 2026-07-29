@@ -102,8 +102,8 @@ export const brand = {
       description: "FREE DELIVERY ANYWHERE WITHIN NAIROBI CBD."
     },
     {
-      title: "Pay on Delivery",
-      description: "Order and Pay on delivery (locations around Nairobi) and its environs."
+      title: "Pay after Delivery",
+      description: "Order and Pay after delivery (locations around Nairobi) and its environs."
     }
   ],
   whatsappTrustSignals: [
@@ -141,7 +141,7 @@ Thank you.`,
 
 export const announcementMessages = [
   { text: "We Deliver countrywide", icon: Truck },
-  { text: "KINDLY CALL OR TEXT", icon: MessageCircle },
+  { text: "Comes Boxed & Well Packed", icon: MessageCircle },
   { text: "HOME OF THE BEST SNEAKERS & CLEATS", icon: Sparkles },
   { text: "Tested, trusted and approved", icon: Star },
   { text: "Order and Pay on delivery", icon: Tag },
