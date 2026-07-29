@@ -14,7 +14,7 @@ type ProductImage = {
   mediaId?: string; // ID to delete from mediaAssets once published
 };
 
-export default function NewFormClient({ initialCategories, initialMedia }: { initialCategories: any[], initialMedia: any[] }) {
+export default function NewFormClient({ initialCategories, initialMedia, productTypes }: { initialCategories: any[], initialMedia: any[], productTypes: readonly string[] }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<{ success?: boolean; message?: string } | null>(null);
 
@@ -146,27 +146,41 @@ export default function NewFormClient({ initialCategories, initialMedia }: { ini
 
       <div className="flex-1 min-h-0 overflow-auto scrollbar-hide bg-brand-card rounded-md border border-white/5">
         <form onSubmit={handleSubmit} className="space-y-6 p-4 sm:p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* 1. Product Name */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Product Name</label>
               <input type="text" name="name" required className="w-full bg-brand-dark border border-white/10 rounded-md px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors" />
             </div>
 
-            {/* Dynamic Category Selector */}
+            {/* 2. NEW: Product Type Selector */}
             <div>
-              <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Category</label>
+              <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Product Type</label>
+              <select 
+                name="productType" 
+                className="w-full bg-brand-dark border border-white/10 rounded-md px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors appearance-none cursor-pointer"
+              >
+                {productTypes.map((type) => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* 3. Category Selector */}
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Collection / Brand</label>
               {isAddingCategory ? (
                 <div className="flex gap-2">
                   <input 
                     type="text" 
                     value={newCategoryName} 
                     onChange={(e) => setNewCategoryName(e.target.value)} 
-                    placeholder="Category Name" 
+                    placeholder="e.g. Air Max" 
                     className="flex-1 bg-brand-dark border border-brand-primary rounded-md px-4 py-3 text-white focus:outline-none"
                     autoFocus
                   />
-                  <button type="button" onClick={handleAddCategory} disabled={isSavingCategory} className="px-4 bg-brand-primary text-black font-bold text-xs uppercase tracking-widest rounded-md hover:bg-brand-hover transition-colors">
-                    {isSavingCategory ? 'Saving' : 'Save'}
+                  <button type="button" onClick={handleAddCategory} disabled={isSavingCategory} className="px-4 bg-brand-primary text-black font-bold text-[10px] uppercase tracking-widest rounded-md hover:bg-brand-hover transition-colors">
+                    {isSavingCategory ? '...' : 'Save'}
                   </button>
                   <button type="button" onClick={() => setIsAddingCategory(false)} className="px-3 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-md transition-colors">
                     <X className="w-4 h-4" />
@@ -183,8 +197,8 @@ export default function NewFormClient({ initialCategories, initialMedia }: { ini
                       <option key={cat.slug} value={cat.name}>{cat.name}</option>
                     ))}
                   </select>
-                  <button type="button" onClick={() => setIsAddingCategory(true)} className="px-4 bg-white/5 hover:bg-white/10 text-white font-bold text-xs uppercase tracking-widest rounded-md transition-colors flex items-center shrink-0 border border-white/10">
-                    <Plus className="w-4 h-4 mr-1" /> New
+                  <button type="button" onClick={() => setIsAddingCategory(true)} className="px-3 bg-white/5 hover:bg-white/10 text-white font-bold text-[10px] uppercase tracking-widest rounded-md transition-colors flex items-center shrink-0 border border-white/10">
+                    <Plus className="w-3 h-3 mr-1" /> New
                   </button>
                 </div>
               )}

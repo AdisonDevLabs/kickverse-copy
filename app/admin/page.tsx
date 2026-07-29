@@ -54,6 +54,7 @@ export default async function AdminDashboard() {
               <th className="px-4 sm:px-6 py-4 font-bold uppercase tracking-widest text-gray-500 text-[10px]">Image</th>
               <th className="px-4 sm:px-6 py-4 font-bold uppercase tracking-widest text-gray-500 text-[10px]">Name</th>
               <th className="px-4 sm:px-6 py-4 font-bold uppercase tracking-widest text-gray-500 text-[10px]">Price</th>
+              <th className="px-4 sm:px-6 py-4 font-bold uppercase tracking-widest text-gray-500 text-[10px]">Type</th>
               <th className="px-4 sm:px-6 py-4 font-bold uppercase tracking-widest text-gray-500 text-[10px]">Category</th>
               <th className="px-4 sm:px-6 py-4 font-bold uppercase tracking-widest text-gray-500 text-[10px] text-right">Actions</th>
             </tr>
@@ -71,7 +72,7 @@ export default async function AdminDashboard() {
                   <td className="px-4 sm:px-6 py-3">
                     <div className="relative w-12 h-12 bg-black rounded-md overflow-hidden shrink-0 border border-white/5 group-hover:border-white/10 transition-colors">
                       <Image 
-                        src={p.image.startsWith('http') ? p.image : `https://kickverse-copy.storxia.tech${p.image}`} 
+                        src={p.image.startsWith('http') ? p.image : `https://kickverse.co.ke${p.image}`} 
                         alt={p.name} 
                         fill 
                         className="object-cover" 
@@ -80,6 +81,11 @@ export default async function AdminDashboard() {
                   </td>
                   <td className="px-4 sm:px-6 py-3 font-medium text-gray-200 truncate max-w-[180px] sm:max-w-xs">{p.name}</td>
                   <td className="px-4 sm:px-6 py-3 text-brand-primary font-mono font-semibold">Ksh {p.price.toLocaleString()}</td>
+                  <td className="px-4 sm:px-6 py-3 text-gray-400">
+                    <span className="bg-brand-primary/10 text-brand-primary border border-brand-primary/20 px-2 py-1 rounded text-xs">
+                      {p.productType}
+                    </span>
+                  </td>
                   <td className="px-4 sm:px-6 py-3 text-gray-400">
                     <span className="bg-white/5 px-2 py-1 rounded text-xs">{p.category}</span>
                   </td>

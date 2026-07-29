@@ -1,6 +1,5 @@
-// app/admin/products/new/page.tsx
 import { getDb } from '@/lib/db';
-import { categories, mediaAssets } from '@/lib/db/schema';
+import { categories, mediaAssets, productTypeEnum } from '@/lib/db/schema'; // <-- Add productTypeEnum
 import { desc } from 'drizzle-orm';
 import NewFormClient from './NewFormClient';
 
@@ -20,5 +19,6 @@ export default async function NewProductPage() {
      console.error("Please ensure you've exported mediaAssets in schema.ts", e);
   }
 
-  return <NewFormClient initialCategories={allCategories} initialMedia={allMedia} />;
+  // Pass the productTypeEnum to the client
+  return <NewFormClient initialCategories={allCategories} initialMedia={allMedia} productTypes={productTypeEnum} />;
 }

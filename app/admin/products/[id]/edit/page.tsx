@@ -1,6 +1,5 @@
-// app/admin/products/[id]/edit/page.tsx
 import { getDb } from '@/lib/db';
-import { products, categories, mediaAssets } from '@/lib/db/schema';
+import { products, categories, mediaAssets, productTypeEnum } from '@/lib/db/schema'; // <-- Add productTypeEnum
 import { eq, desc } from 'drizzle-orm';
 import EditFormClient from './EditFormClient';
 
@@ -32,5 +31,6 @@ export default async function EditProductPage({ params }: Props) {
     );
   }
 
-  return <EditFormClient product={product} initialCategories={allCategories} initialMedia={allMedia} />;
+  // Pass the productTypeEnum to the client
+  return <EditFormClient product={product} initialCategories={allCategories} initialMedia={allMedia} productTypes={productTypeEnum} />;
 }

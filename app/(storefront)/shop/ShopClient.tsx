@@ -80,7 +80,7 @@ function ShopContent({ initialProducts }: { initialProducts: any[] }) {
 
   useEffect(() => {
     setVisibleCount(8);
-  }, [filterCategory, filterPrice, filterSize, searchQuery, sortOption, discoveryMode]);
+  }, [filterCategory, filterProductType, filterPrice, filterSize, searchQuery, sortOption, discoveryMode]);
 
   useEffect(() => {
     if (isAdvancedFiltersOpen || quickViewProduct) {
@@ -117,7 +117,7 @@ function ShopContent({ initialProducts }: { initialProducts: any[] }) {
     setIsLoading(true);
     const timer = setTimeout(() => setIsLoading(false), 300);
     return () => clearTimeout(timer);
-  }, [filterCategory, filterPrice, filterSize, sortOption, discoveryMode]);
+  }, [filterCategory, filterProductType, filterPrice, filterSize, sortOption, discoveryMode]);
 
   const sortedAndFilteredProducts = useMemo(() => {
     let result = [...initialProducts];
@@ -197,9 +197,9 @@ function ShopContent({ initialProducts }: { initialProducts: any[] }) {
     }
 
     return result;
-  }, [searchQuery, filterCategory, filterPrice, filterSize, discoveryMode, sortOption, initialProducts]);
+  }, [searchQuery, filterCategory, filterProductType, filterPrice, filterSize, discoveryMode, sortOption, initialProducts]);
 
-  const hasActiveFilters = (filterCategory && filterCategory !== 'All') || filterPrice || filterSize || searchQuery || sortOption !== 'default' || discoveryMode !== 'all';
+  const hasActiveFilters = (filterCategory && filterCategory !== 'All') || (filterProductType && filterProductType !== 'All') || filterPrice || filterSize || searchQuery || sortOption !== 'default' || discoveryMode !== 'all';
 
   const clearAllFilters = () => {
     setSearchQuery('');

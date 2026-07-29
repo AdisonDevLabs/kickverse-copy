@@ -3,7 +3,7 @@
 
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/lib/db';
-import { products, categories, colorMap, sizeGuides, mediaAssets } from '@/lib/db/schema';
+import { products, categories, colorMap, sizeGuides, mediaAssets, productTypeEnum } from '@/lib/db/schema';
 import { eq, inArray } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
@@ -87,7 +87,9 @@ export async function createProduct(formData: FormData) {
       
       image: finalMainImageUrl,
       images: finalImagesArray, 
-      
+
+      productType: ((formData.get('productType') as string) || 'Sneakers') as typeof productTypeEnum[number],
+
       category: formData.get('category') as string,
       description: formData.get('description') as string,
       sizes: (formData.get('sizes') as string).split(',').map(s => s.trim()).filter(Boolean),
@@ -196,6 +198,8 @@ export async function updateProduct(id: string, formData: FormData) {
       
       image: finalMainImageUrl,
       images: finalImagesArray,
+
+      productType: ((formData.get('productType') as string) || 'Sneakers') as typeof productTypeEnum[number],
       
       category: formData.get('category') as string,
       description: formData.get('description') as string,
