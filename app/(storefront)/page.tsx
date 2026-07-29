@@ -13,7 +13,7 @@ export default async function HomePage() {
 
   const allProducts = await db.select().from(products);
   
-  const heroCategories = await db.select().from(categories).limit(8);
+  const heroCategories = await db.select().from(categories);
   
   const globalTestimonials = await db
     .select()

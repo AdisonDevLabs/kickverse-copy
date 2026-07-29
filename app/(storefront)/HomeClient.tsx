@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'motion/react';
 import { fadeUp, fadeLeft, heroReveal, staggerContainer, staggerItem } from '@/lib/animations';
-import { ArrowRight, Star, ShoppingBag, Truck, ShieldCheck, Clock, MessageCircle, Flame, Eye, Zap, Sparkles, Wallet, CheckCircle, Heart } from 'lucide-react';
+import { ArrowRight, Star, ShoppingBag, Truck, ShieldCheck, Clock, MessageCircle, Flame, Eye, Zap, Sparkles, Wallet, CheckCircle, Heart, Tag } from 'lucide-react';
 import { formatPrice } from '@/lib/data';
 import { reviewAvatars, reviewStats } from '@/lib/data/testimonials';
 import { brand } from '@/lib/data/brand';
@@ -17,29 +17,69 @@ export default function HomeClient({ initialProducts, initialCategories, initial
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   
-  const [timeLeft, setTimeLeft] = useState(4 * 3600 + 45 * 60 + 30);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+    // Set duration to 6 Days, 14 Hours, 45 Minutes
+    const FLASH_DEAL_DURATION = 6 * 24 * 3600 * 1000 + 14 * 3600 * 1000 + 45 * 60 * 1000;
+    
+    // Check if the user already has a running countdown
+    let endTime = localStorage.getItem('kickverse_flash_deal_end');
+    
+    // If no timer exists, or if the previous one expired, start a new 6-day timer
+    if (!endTime || parseInt(endTime) < Date.now()) {
+      endTime = (Date.now() + FLASH_DEAL_DURATION).toString();
+      localStorage.setItem('kickverse_flash_deal_end', endTime);
+    }
+
+    const calculateRemaining = () => {
+      const remaining = Math.floor((parseInt(endTime as string) - Date.now()) / 1000);
+      return remaining > 0 ? remaining : 0;
+    };
+
+    // Set initial time and start interval
+    setTimeLeft(calculateRemaining());
     const timer = setInterval(() => {
-      setTimeLeft(prev => (prev > 0 ? prev - 1 : 0));
+      setTimeLeft(calculateRemaining());
     }, 1000);
     
-    return () => {
-      clearInterval(timer);
-    };
+    return () => clearInterval(timer);
   }, []);
-  
+
   const formatTime = (seconds: number) => {
-    const h = Math.floor(seconds / 3600);
+    // Prevent Next.js hydration mismatch errors on first load
+    if (!mounted) return "06d : 14h : 45m : 30s"; 
+    
+    const d = Math.floor(seconds / (3600 * 24));
+    const h = Math.floor((seconds % (3600 * 24)) / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
-    return `${h.toString().padStart(2, '0')} : ${m.toString().padStart(2, '0')} : ${s.toString().padStart(2, '0')}`;
+    
+    // Format elegantly as Days : Hours : Minutes : Seconds
+    return `${d.toString().padStart(2, '0')}d : ${h.toString().padStart(2, '0')}h : ${m.toString().padStart(2, '0')}m : ${s.toString().padStart(2, '0')}s`;
   };
 
   // 1. Filter using the live database props instead of dummyProducts
+  const sneakerProducts = initialProducts.filter((p: any) => p.productType === 'Sneakers');
+
   const newArrivals = initialProducts.filter((p: any) => p.isNewArrival).slice(0, 4);
   const bestSellers = initialProducts.filter((p: any) => p.isBestSeller);
   const flashDeals = initialProducts.filter((p: any) => p.isFlashDeal);
+
+  const sneakerCategories = initialCategories.filter((collection: any) => 
+    sneakerProducts.some((p: any) => p.category === collection.name)
+  );
+  
+  // Fallback in case no products are mapped yet
+  const displayCategories = sneakerCategories.length > 0 ? sneakerCategories : initialCategories;
+
+  // 3. Filter Soccer Cleats and their corresponding categories
+  const cleatProducts = initialProducts.filter((p: any) => p.productType === 'Soccer Cleats');
+  const displayCleatCategories = initialCategories.filter((collection: any) => 
+    cleatProducts.some((p: any) => p.category === collection.name)
+  );
 
   return (
     <div ref={containerRef} className="flex flex-col min-h-screen bg-brand-dark text-white">
@@ -133,7 +173,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
         </motion.div>
       </section>
 
-      {/* Featured Collections */}
+      {/* Featured Sneakers Section */}
       <section className="py-24 bg-brand-card">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between md:items-end mb-16">
@@ -141,7 +181,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
               className="font-display uppercase tracking-wide text-5xl md:text-7xl text-white"
             >
-              {brand.sections?.featured?.title || "Featured Collections"}
+              Featured Sneakers
             </motion.h2>
             <motion.p 
               initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
@@ -161,14 +201,15 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               animate={{ x: ["0%", "-50%"] }}
               transition={{ repeat: Infinity, ease: "linear", duration: 35 }}
             >
-              {/* 2. Map over the initialCategories passed from the server */}
-              {[...initialCategories, ...initialCategories, ...initialCategories, ...initialCategories].map((collection: any, idx: number) => (
+              {/* 3. Map over the filtered displayCategories */}
+              {[...displayCategories, ...displayCategories, ...displayCategories, ...displayCategories].map((collection: any, idx: number) => (
                 <div 
                   key={idx} 
                   className={`relative w-[85vw] sm:w-[350px] md:w-[400px] shrink-0 h-[420px] md:h-[500px]`}
                 >
                   <Link 
-                    href={`/shop?category=${collection.slug}`} 
+                    // 4. Force the URL to pre-filter by Sneakers
+                    href={`/shop?type=sneakers&category=${collection.slug}`} 
                     className="block w-full h-full overflow-hidden group/card rounded-md bg-neutral-900 border border-white/5 relative"
                   >
                     <div className="absolute inset-0 bg-black/40 group-hover/card:bg-black/60 transition-colors duration-500 z-10" />
@@ -316,6 +357,68 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 </motion.div>
                 );
               })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Soccer Cleats Category Section (Static & Circular) */}
+      {displayCleatCategories.length > 0 && (
+        <section className="py-24 bg-brand-dark relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-6 relative z-10">
+            <div className="text-center mb-16">
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} className="inline-flex items-center text-brand-primary mb-4">
+                <Tag className="h-4 w-4 mr-2" />
+                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest">Dominate The Pitch</span>
+              </motion.div>
+              <motion.h2 
+                initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
+                className="font-display uppercase tracking-wide text-4xl md:text-6xl text-white mb-4"
+              >
+                Soccer Cleats
+              </motion.h2>
+              <motion.p 
+                initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
+                className="text-gray-300 max-w-2xl mx-auto font-medium text-base md:text-lg"
+              >
+                Engineered for speed, precision, and control. Find the perfect fit for your game.
+              </motion.p>
+            </div>
+
+            {/* Static Grid Layout with Circular Containers */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-12 justify-items-center">
+              {displayCleatCategories.map((collection: any, idx: number) => (
+                <motion.div 
+                  key={idx}
+                  initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
+                  className="flex flex-col items-center group w-full"
+                >
+                  <Link 
+                    href={`/shop?type=soccer-cleats&category=${collection.slug}`}
+                    className="block relative w-[40vw] h-[40vw] sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-white/5 group-hover:border-brand-primary transition-all duration-500 shadow-2xl mb-6 bg-neutral-900"
+                  >
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
+                    <Image
+                      src={collection.image}
+                      alt={collection.name}
+                      fill
+                      referrerPolicy="no-referrer"
+                      className="object-cover group-hover:scale-110 transition-transform duration-700 opacity-90 group-hover:opacity-100"
+                    />
+                  </Link>
+                  
+                  <h3 className="font-display uppercase tracking-wider text-xl md:text-2xl text-white group-hover:text-brand-primary transition-colors text-center mb-2">
+                    {collection.name}
+                  </h3>
+                  
+                  <Link 
+                    href={`/shop?type=soccer-cleats&category=${collection.slug}`}
+                    className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-500 group-hover:text-white transition-colors flex items-center bg-white/5 px-4 py-2 rounded-full border border-white/10 group-hover:bg-brand-primary group-hover:text-black group-hover:border-brand-primary"
+                  >
+                    Explore <ArrowRight className="ml-2 h-3 w-3" />
+                  </Link>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
