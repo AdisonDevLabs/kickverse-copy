@@ -11,20 +11,21 @@ import ProductToolbar from './components/ProductToolbar';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminDashboard({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
+
+export default async function AdminDashboard(props: { searchParams: SearchParams }) {
   const db = await getDb();
   
-  // 1. Extract Search Params
+  // 1. Await the searchParams Promise (Required for Next.js 15+)
+  const searchParams = await props.searchParams;
+
+  // 2. Extract Search Params safely
   const query = typeof searchParams.q === 'string' ? searchParams.q : '';
   const categoryFilter = typeof searchParams.category === 'string' ? searchParams.category : '';
   const currentPage = typeof searchParams.page === 'string' ? Number(searchParams.page) : 1;
   const itemsPerPage = 20;
 
-  // 2. Build Dynamic Where Clause
+  // 3. Build Dynamic Where Clause
   const conditions = [];
   if (query) {
     conditions.push(ilike(products.name, `%${query}%`));
@@ -35,19 +36,28 @@ export default async function AdminDashboard({
   
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-  // 3. Execute Optimized Queries concurrently
+  // 4. Execute Optimized Queries concurrently
   const [allCategories, fetchedProducts, totalCountResult] = await Promise.all([
     db.select().from(categories),
     db.select().from(products)
       .where(whereClause)
       .limit(itemsPerPage)
       .offset((currentPage - 1) * itemsPerPage)
-      .orderBy(desc(products.id)), // Ensures newest items are seen first
+      .orderBy(desc(products.id)),
     db.select({ count: sql<number>`count(*)` }).from(products).where(whereClause)
   ]);
 
   const totalProducts = Number(totalCountResult[0]?.count || 0);
   const totalPages = Math.ceil(totalProducts / itemsPerPage);
+
+  // Helper function to build clean pagination URLs
+  const createPageUrl = (pageNumber: number) => {
+    const params = new URLSearchParams();
+    if (query) params.set('q', query);
+    if (categoryFilter) params.set('category', categoryFilter);
+    params.set('page', pageNumber.toString());
+    return `?${params.toString()}`;
+  };
 
   return (
     <div className="h-full w-full max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-8 flex flex-col overflow-hidden">
@@ -64,7 +74,7 @@ export default async function AdminDashboard({
         </div>
         
         <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 shrink-0 bg-brand-card p-2 rounded-lg border border-white/5 shadow-md">
-          {/* Integrated the new Toolbar Component */}
+          {/* Integrated the Toolbar Component */}
           <ProductToolbar categories={allCategories} />
 
           <div className="hidden lg:flex px-3 border-l border-white/10 items-center h-full">
@@ -125,7 +135,6 @@ export default async function AdminDashboard({
                     <p className="font-medium text-gray-200 truncate max-w-[150px] sm:max-w-xs md:max-w-md" title={p.name}>
                       {p.name}
                     </p>
-                    {/* Mobile only sub-details */}
                     <div className="flex sm:hidden items-center gap-2 mt-1">
                       <span className="text-[9px] text-gray-500 uppercase tracking-widest">{p.category}</span>
                     </div>
@@ -141,7 +150,6 @@ export default async function AdminDashboard({
                   <td className="px-4 sm:px-6 py-3 text-gray-400 hidden sm:table-cell">
                     <span className="bg-white/5 px-2 py-1 rounded text-xs">{p.category}</span>
                   </td>
-                  {/* Actions Column - Sticky on scroll for easy access */}
                   <td className="px-4 sm:px-6 py-3 text-right sticky right-0 bg-brand-card group-hover:bg-[#1a1a1a] transition-colors shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.5)]">
                     <div className="flex justify-end gap-2 sm:gap-3 opacity-90 group-hover:opacity-100 transition-opacity">
                       <Link href={`/admin/products/${p.id}/edit`} className="text-gray-400 hover:text-blue-400 p-2 bg-white/5 hover:bg-blue-500/10 rounded-md transition-all border border-transparent hover:border-blue-500/20" aria-label="Edit">
@@ -166,7 +174,7 @@ export default async function AdminDashboard({
           
           <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
             <Link
-              href={`?${new URLSearchParams({ ...Object.fromEntries(new URLSearchParams(typeof searchParams === 'string' ? searchParams : '')), page: String(Math.max(1, currentPage - 1)) }).toString()}`}
+              href={createPageUrl(Math.max(1, currentPage - 1))}
               className={`p-2 rounded-md border border-white/10 flex items-center text-xs font-bold uppercase tracking-widest transition-colors ${currentPage === 1 ? 'opacity-50 pointer-events-none text-gray-600' : 'text-white hover:bg-white/5 hover:border-white/20'}`}
             >
               <ChevronLeft className="w-4 h-4 sm:mr-1" />
@@ -178,7 +186,7 @@ export default async function AdminDashboard({
             </span>
 
             <Link
-              href={`?${new URLSearchParams({ ...Object.fromEntries(new URLSearchParams(typeof searchParams === 'string' ? searchParams : '')), page: String(Math.min(totalPages, currentPage + 1)) }).toString()}`}
+              href={createPageUrl(Math.min(totalPages, currentPage + 1))}
               className={`p-2 rounded-md border border-white/10 flex items-center text-xs font-bold uppercase tracking-widest transition-colors ${currentPage === totalPages ? 'opacity-50 pointer-events-none text-gray-600' : 'text-white hover:bg-white/5 hover:border-white/20'}`}
             >
               <span className="hidden sm:inline">Next</span>
