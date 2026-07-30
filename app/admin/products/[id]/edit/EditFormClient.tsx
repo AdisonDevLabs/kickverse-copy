@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { updateProduct, createQuickCategory } from '../../../actions';
 import { CheckCircle, ArrowLeft, Plus, X, Image as ImageIcon, GripHorizontal } from 'lucide-react';
 import Link from 'next/link';
+import imageCompression from 'browser-image-compression'; // <-- Add this import
 
 type ProductImage = {
   id: string; // Unique local ID for dragging
@@ -99,7 +100,7 @@ export default function EditFormClient({ product, initialCategories, initialMedi
 
   const onDragEnd = () => setDraggedIdx(null);
 
-  // Form Submission
+  // --- UPDATED SUBMISSION LOGIC ---
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (selectedImages.length === 0) {
@@ -112,19 +113,34 @@ export default function EditFormClient({ product, initialCategories, initialMedi
     const formData = new FormData(e.currentTarget);
     formData.set('category', selectedCategory);
     
-    // Build layout array to dictate order and identify files vs library urls vs existing
     const imageLayout: any[] = [];
     let fileIndex = 0;
 
-    selectedImages.forEach((img) => {
+    // Same compression options payload
+    const compressionOptions = {
+      maxSizeMB: 0.3,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+    };
+
+    for (const img of selectedImages) {
+      // Account for existing source tag in the Edit layout
       if (img.source === 'library' || img.source === 'existing') {
         imageLayout.push({ type: img.source, url: img.url, mediaId: img.mediaId });
       } else if (img.source === 'file' && img.file) {
         imageLayout.push({ type: 'file', fileIndex });
-        formData.append('imageFiles', img.file);
+        
+        try {
+          const compressedFile = await imageCompression(img.file, compressionOptions);
+          formData.append('imageFiles', compressedFile, img.file.name);
+        } catch (error) {
+          console.error("Compression failed, using original fallback", error);
+          formData.append('imageFiles', img.file);
+        }
+        
         fileIndex++;
       }
-    });
+    }
 
     formData.set('imageLayout', JSON.stringify(imageLayout));
     

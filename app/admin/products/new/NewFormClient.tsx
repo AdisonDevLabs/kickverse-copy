@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { createProduct, createQuickCategory } from '../../actions';
 import { CheckCircle, ArrowLeft, Plus, X, Image as ImageIcon, GripHorizontal } from 'lucide-react';
 import Link from 'next/link';
+import imageCompression from 'browser-image-compression'; // <-- Add this import
 
 type ProductImage = {
   id: string; // Unique local ID for dragging
@@ -84,7 +85,7 @@ export default function NewFormClient({ initialCategories, initialMedia, product
 
   const onDragEnd = () => setDraggedIdx(null);
 
-  // Form Submission
+  // --- UPDATED SUBMISSION LOGIC ---
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (selectedImages.length === 0) {
@@ -97,19 +98,36 @@ export default function NewFormClient({ initialCategories, initialMedia, product
     const formData = new FormData(e.currentTarget);
     formData.set('category', selectedCategory); 
     
-    // Build layout array to dictate order and identify files vs library urls
     const imageLayout: any[] = [];
     let fileIndex = 0;
 
-    selectedImages.forEach((img) => {
+    // Define the exact same compression options from your MediaManager
+    const compressionOptions = {
+      maxSizeMB: 0.3,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+    };
+
+    // Use a for...of loop to handle the async compression properly
+    for (const img of selectedImages) {
       if (img.source === 'library') {
         imageLayout.push({ type: 'library', url: img.url, mediaId: img.mediaId });
       } else if (img.source === 'file' && img.file) {
         imageLayout.push({ type: 'file', fileIndex });
-        formData.append('imageFiles', img.file);
+        
+        try {
+          // Compress the file dynamically
+          const compressedFile = await imageCompression(img.file, compressionOptions);
+          // Pass the original filename explicitly to ensure the R2 key generates correctly
+          formData.append('imageFiles', compressedFile, img.file.name);
+        } catch (error) {
+          console.error("Compression failed, using original fallback", error);
+          formData.append('imageFiles', img.file);
+        }
+        
         fileIndex++;
       }
-    });
+    }
 
     formData.set('imageLayout', JSON.stringify(imageLayout));
     
