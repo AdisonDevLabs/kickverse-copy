@@ -31,7 +31,6 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
 
   const [showAddedToast, setShowAddedToast] = useState(false);
   const [sizeError, setSizeError] = useState(false);
-  const [isStickyVisible, setIsStickyVisible] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -40,23 +39,12 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
        setSelectedSize(product.sizes?.[0] || '');
        setSelectedColor(product.colors?.[0] || '');
        
-       // Default size guide tab based on product type
        if (product.productType === 'Soccer Cleats' && sizeGuides) {
          const cleatGuide = sizeGuides.find((g: any) => g.id.toLowerCase().includes('cleat') || g.id.toLowerCase().includes('performance'));
          if (cleatGuide) setActiveGuideTab(cleatGuide.id);
        }
     }
   }, [product?.id, product, sizeGuides]);
-
-  // Handle Sticky Mobile CTA Visibility
-  useEffect(() => {
-    const handleScroll = () => {
-      // Show sticky CTA after scrolling past the main action buttons (approx 600px down)
-      setIsStickyVisible(window.scrollY > 600);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   if (!product) {
     return (
@@ -343,7 +331,6 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
                     )}
                   </div>
                   
-                  {/* Urgency Indicator */}
                   {product.isFlashDeal && (
                     <div className="flex items-center mt-2">
                       <div className="w-2 h-2 rounded-full bg-brand-accent animate-pulse mr-2"></div>
@@ -418,7 +405,6 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
                       ))}
                     </div>
                     
-                    {/* Contextual Fit Note for Cleats */}
                     {product.productType === 'Soccer Cleats' && (
                       <p className="mt-3 text-[10px] text-brand-primary/80 uppercase tracking-widest flex items-center">
                          <HelpCircle className="w-3 h-3 mr-1" />
@@ -465,7 +451,6 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
                 </button>
               </motion.div>
 
-              {/* Context-Aware Delivery & Trust Info */}
               <motion.div variants={staggerItem} className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-brand-card p-6 border border-white/5 mb-12 rounded-md">
                 <div className="flex items-start">
                   <Truck className="h-5 w-5 mr-3 text-gray-400 shrink-0" />
@@ -509,7 +494,6 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
                   </p>
                 </div>
 
-                {/* Dynamic Context-Aware Features */}
                 <div>
                   <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-white/10 pb-2">
                     {product.productType === 'Soccer Cleats' ? 'Performance Specs' : 'Design & Craft'}
@@ -756,33 +740,6 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
                 </div>
               </motion.div>
             </div>
-          )}
-        </AnimatePresence>
-
-        {/* Mobile Sticky Action Bar */}
-        <AnimatePresence>
-          {isStickyVisible && (
-            <motion.div
-              initial={{ y: 100 }}
-              animate={{ y: 0 }}
-              exit={{ y: 100 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="md:hidden fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom))] left-0 right-0 z-40 bg-brand-card/95 backdrop-blur-md border-t border-white/10 p-3 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] flex gap-2"
-            >
-              <button 
-                onClick={handleAddToCart}
-                className="flex-1 h-12 bg-brand-primary text-black font-bold uppercase tracking-widest text-xs flex items-center justify-center rounded-md"
-              >
-                Add To Cart
-              </button>
-              <button 
-                onClick={handleWhatsAppCheckout}
-                className="flex-[0.3] h-12 bg-transparent border border-brand-primary text-brand-primary flex items-center justify-center rounded-md hover:bg-brand-primary hover:text-black transition-colors"
-                aria-label="Order on WhatsApp"
-              >
-                <MessageCircle className="h-5 w-5" />
-              </button>
-            </motion.div>
           )}
         </AnimatePresence>
 
