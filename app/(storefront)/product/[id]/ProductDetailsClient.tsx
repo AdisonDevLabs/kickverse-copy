@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronRight, Star, Minus, Plus, ShoppingBag, MessageCircle, Heart, ArrowLeft, ShieldCheck, Truck, X, HelpCircle, CheckCircle, ChevronLeft, SearchX, Quote } from 'lucide-react';
-// dummyProducts is removed, but we keep formatPrice
 import { formatPrice } from '@/lib/data';
 import { productReviews } from '@/lib/data/testimonials';
 import { brand } from '@/lib/data/brand';
@@ -24,10 +23,10 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
-  const [activeGuideTab, setActiveGuideTab] = useState(sizeGuides[0]?.id || '');
+  const [activeGuideTab, setActiveGuideTab] = useState(sizeGuides?.[0]?.id || '');
 
   const colorMapObj = Object.fromEntries(
-    colorMap.map((c: any) => [c.colorName, c.hexCode])
+    colorMap?.map((c: any) => [c.colorName, c.hexCode]) || []
   );
 
   const [showAddedToast, setShowAddedToast] = useState(false);
@@ -40,8 +39,14 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
     if (product) {
        setSelectedSize(product.sizes?.[0] || '');
        setSelectedColor(product.colors?.[0] || '');
+       
+       // Default size guide tab based on product type
+       if (product.productType === 'Soccer Cleats' && sizeGuides) {
+         const cleatGuide = sizeGuides.find((g: any) => g.id.toLowerCase().includes('cleat') || g.id.toLowerCase().includes('performance'));
+         if (cleatGuide) setActiveGuideTab(cleatGuide.id);
+       }
     }
-  }, [product?.id, product]);
+  }, [product?.id, product, sizeGuides]);
 
   // Handle Sticky Mobile CTA Visibility
   useEffect(() => {
@@ -71,9 +76,7 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
     );
   }
 
-  const images = product.images && product.images.length > 0 
-  ? product.images 
-  : [product.image];
+  const images = product.images && product.images.length > 0 ? product.images : [product.image];
 
   const handleColorSelect = (color: string) => {
     setSelectedColor(color);
@@ -81,14 +84,12 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
     
     const colorLower = color.toLowerCase();
     
-    // 1. Direct match by parsing color string to find image match
     let matchedIdx = images.findIndex((img: string) => {
       const imgName = img.toLowerCase();
       return imgName.includes(colorLower) || 
              colorLower.split(' ').some((term: string) => term.length > 1 && imgName.includes(term));
     });
     
-    // 2. Fallback to index mapping if array lengths correspond
     if (matchedIdx === -1 && product.colors) {
       const cIdx = product.colors.indexOf(color);
       if (cIdx >= 0 && cIdx < images.length) {
@@ -107,7 +108,6 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
     
     const imgName = images[idx].toLowerCase();
     
-    // Reverse mapping image to color state
     let matchedColor = product.colors.find((c: string) => {
        const cLower = c.toLowerCase();
        return imgName.includes(cLower) ||
@@ -151,7 +151,25 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
 
   return (
     <div className="bg-brand-dark text-white min-h-screen relative pb-20 md:pb-0">
-      {/* Mini Cart Notification Toast - Moved to top right to avoid blocking view */}
+      
+      {/* Schema.org JSON-LD Breadcrumbs for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": `${brand.url}/` },
+              { "@type": "ListItem", "position": 2, "name": "Shop", "item": `${brand.url}/shop` },
+              { "@type": "ListItem", "position": 3, "name": product.category, "item": `${brand.url}/shop?category=${product.category.toLowerCase().replace(/\s+/g, '-')}` },
+              { "@type": "ListItem", "position": 4, "name": product.name, "item": `${brand.url}/product/${product.id}` }
+            ]
+          })
+        }}
+      />
+
+      {/* Mini Cart Notification Toast */}
       <AnimatePresence>
         {showAddedToast && (
           <motion.div
@@ -180,7 +198,7 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
         )}
       </AnimatePresence>
 
-      {/* Breadcrumbs (Desktop) */}
+      {/* Context-Aware Breadcrumbs (Desktop) */}
       <motion.div 
         initial="hidden" animate="visible" variants={fadeUp}
         className="bg-brand-card py-4 px-6 border-b border-white/10 hidden md:block"
@@ -191,15 +209,13 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
           <Link href="/shop" className="hover:text-white transition-colors">Shop</Link>
           <span className="mx-2 text-white/20">/</span>
           
-          {/* New Product Type Breadcrumb */}
           {product.productType && (
              <>
-               <span className="text-gray-400">{product.productType}</span>
+               <span className="text-white">{product.productType}</span>
                <span className="mx-2 text-white/20">/</span>
              </>
           )}
 
-          {/* Collection/Category Breadcrumb */}
           <Link href={`/shop?category=${product.category.toLowerCase().replace(/\s+/g, '-')}`} className="hover:text-white transition-colors">
             {product.category}
           </Link>
@@ -209,7 +225,7 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
         </div>
       </motion.div>
 
-      {/* Mobile Back Button - Changed to scroll normally with page rather than obscuring content */}
+      {/* Mobile Back Button */}
       <motion.div 
         initial="hidden" animate="visible" variants={fadeUp}
         className="md:hidden w-full bg-brand-card border-b border-white/10 px-4 py-3"
@@ -223,7 +239,7 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
         <div className="max-w-7xl mx-auto px-0 md:px-6 md:pb-12">
           <div className="flex flex-col md:flex-row gap-0 md:gap-12 lg:gap-16">
             
-            {/* Image Gallery */}
+            {/* Image Gallery with Mobile Drag Gestures */}
             <motion.div 
               initial="hidden" animate="visible" variants={fadeUp}
               className="md:w-1/2 md:sticky md:top-24 h-fit z-10"
@@ -240,11 +256,21 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activeImage}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.3 }}
-                    className="absolute inset-0"
+                    className="absolute inset-0 cursor-grab active:cursor-grabbing"
+                    drag="x"
+                    dragConstraints={{ left: 0, right: 0 }}
+                    dragElastic={0.2}
+                    onDragEnd={(e, { offset }) => {
+                      if (offset.x < -50) {
+                        handleImageSelect((activeImage + 1) % images.length);
+                      } else if (offset.x > 50) {
+                        handleImageSelect((activeImage - 1 + images.length) % images.length);
+                      }
+                    }}
                   >
                     <Image
                       src={images[activeImage]}
@@ -252,20 +278,14 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
                       fill
                       priority
                       referrerPolicy="no-referrer"
-                      className="object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
+                      className="object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out pointer-events-none"
                     />
                   </motion.div>
                 </AnimatePresence>
                 
-                {/* Mobile Swipe Indicators */}
-                <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 md:hidden z-20">
-                  {images.map((_: any, idx: number) => (
-                    <button 
-                      key={idx} 
-                      onClick={() => handleImageSelect(idx)}
-                      className={`h-2 rounded-full transition-all ${activeImage === idx ? 'bg-brand-primary w-6' : 'bg-white/50 w-2'}`}
-                    />
-                  ))}
+                {/* Mobile Image Counter Overlay */}
+                <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-md z-20 md:hidden pointer-events-none">
+                  {activeImage + 1} / {images.length}
                 </div>
               </div>
               
@@ -288,7 +308,6 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
               initial="hidden" animate="visible" variants={staggerContainer}
               className="md:w-1/2 p-6 md:p-0 flex flex-col z-0"
             >
-              {/* Header info */}
               <motion.div variants={staggerItem} className="mb-8 mt-2 md:mt-0">
                 <h1 className="font-display uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white leading-[1.1] mb-4">
                   {product.name}
@@ -311,38 +330,47 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
                   </span>
                 </div>
                 
-                <div className="flex items-end gap-4">
-                  <span className="text-3xl sm:text-4xl font-sans font-medium text-white">{formatPrice(product.price)}</span>
-                  {product.originalPrice && (
-                    <span className="text-lg sm:text-xl text-gray-500 line-through mb-1.5">{formatPrice(product.originalPrice)}</span>
-                  )}
-                  {product.originalPrice && (
-                    <span className="ml-2 bg-brand-accent/10 text-brand-accent rounded-md text-[10px] font-bold px-2 py-1 uppercase tracking-widest mb-2 border border-brand-accent/20 hidden sm:block">
-                      Save {Math.round((1 - product.price / product.originalPrice!) * 100)}%
-                    </span>
+                <div className="flex flex-col gap-1 items-start">
+                  <div className="flex items-end gap-4">
+                    <span className="text-3xl sm:text-4xl font-sans font-medium text-white">{formatPrice(product.price)}</span>
+                    {product.originalPrice && (
+                      <span className="text-lg sm:text-xl text-gray-500 line-through mb-1.5">{formatPrice(product.originalPrice)}</span>
+                    )}
+                    {product.originalPrice && (
+                      <span className="ml-2 bg-brand-accent/10 text-brand-accent rounded-md text-[10px] font-bold px-2 py-1 uppercase tracking-widest mb-2 border border-brand-accent/20 hidden sm:block">
+                        Save {Math.round((1 - product.price / product.originalPrice!) * 100)}%
+                      </span>
+                    )}
+                  </div>
+                  
+                  {/* Urgency Indicator */}
+                  {product.isFlashDeal && (
+                    <div className="flex items-center mt-2">
+                      <div className="w-2 h-2 rounded-full bg-brand-accent animate-pulse mr-2"></div>
+                      <span className="text-[10px] font-bold text-brand-accent uppercase tracking-widest">High Demand - Limited Stock</span>
+                    </div>
                   )}
                 </div>
               </motion.div>
 
-              {/* Size & Color Selection */}
               <motion.div variants={staggerItem} className="space-y-8 mb-10 py-8 border-y border-white/10">
                 
-                {/* Color Selection */}
                 {product.colors && product.colors.length > 0 && (
                   <div>
                     <span className="font-bold text-white uppercase tracking-widest text-xs block mb-4">Color: <span className="font-medium text-brand-primary ml-1">{selectedColor || 'Select'}</span></span>
                     <div className="flex flex-wrap gap-4">
                       {product.colors.map((color: string) => {
                         const primaryColor = color.split('/')[0].trim();
-                          const hexColor = colorMapObj[primaryColor] || colorMapObj[color] || '#333';
-                          return (
+                        const hexColor = colorMapObj[primaryColor] || colorMapObj[color] || '#333';
+                        return (
                           <button
                             key={color}
                             onClick={() => handleColorSelect(color)}
+                            aria-pressed={selectedColor === color}
+                            aria-label={`Select Color: ${color}`}
                             className={`relative w-12 h-12 rounded-full border-2 transition-all flex items-center justify-center ${
                               selectedColor === color ? 'border-brand-primary scale-110' : 'border-white/10 hover:border-white/50'
                             }`}
-                            aria-label={`Select Color: ${color}`}
                           >
                             <div className="w-9 h-9 rounded-full shadow-inner border border-white/5" style={{ backgroundColor: hexColor }}></div>
                           </button>
@@ -352,7 +380,6 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
                   </div>
                 )}
 
-                {/* Size Selection */}
                 {product.sizes && product.sizes.length > 0 && (
                   <div 
                     id="size-selector-container" 
@@ -370,11 +397,14 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
                         <HelpCircle className="w-3 h-3 mr-1" /> Size Guide
                       </button>
                     </div>
+                    
                     <div className="flex flex-wrap gap-3">
                       {product.sizes.map((size: string) => (
                         <button
                           key={size}
                           onClick={() => { setSelectedSize(size); setSizeError(false); }}
+                          aria-pressed={selectedSize === size}
+                          aria-label={`Select Size: ${size}`}
                           className={`h-12 flex-1 min-w-[64px] rounded-md font-bold text-sm transition-all border ${
                             selectedSize === size
                               ? 'bg-brand-primary text-black border-brand-primary'
@@ -387,13 +417,19 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
                         </button>
                       ))}
                     </div>
+                    
+                    {/* Contextual Fit Note for Cleats */}
+                    {product.productType === 'Soccer Cleats' && (
+                      <p className="mt-3 text-[10px] text-brand-primary/80 uppercase tracking-widest flex items-center">
+                         <HelpCircle className="w-3 h-3 mr-1" />
+                         Performance boots run snug. Consider half a size up for wide feet.
+                      </p>
+                    )}
                   </div>
                 )}
               </motion.div>
 
-              {/* Primary Purchase Section */}
               <motion.div variants={staggerItem} className="flex flex-col gap-4 mb-8">
-                {/* Quantity Selector */}
                 <div className="mb-2">
                   <span className="font-bold text-white uppercase tracking-widest text-xs block mb-3">Quantity</span>
                   <div className="inline-flex items-center border border-white/20 bg-brand-card rounded-md overflow-hidden">
@@ -429,20 +465,24 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
                 </button>
               </motion.div>
 
-              {/* Delivery & Trust Info */}
+              {/* Context-Aware Delivery & Trust Info */}
               <motion.div variants={staggerItem} className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-brand-card p-6 border border-white/5 mb-12 rounded-md">
                 <div className="flex items-start">
                   <Truck className="h-5 w-5 mr-3 text-gray-400 shrink-0" />
                   <div>
                     <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-1">Fast Delivery</h4>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Across Kenya within 24-48 hrs</p>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">
+                      {product.productType === 'Soccer Cleats' ? 'Ready for Matchday Delivery' : 'Across Kenya within 24-48 hrs'}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start">
                   <ShieldCheck className="h-5 w-5 mr-3 text-gray-400 shrink-0" />
                   <div>
                     <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-1">Quality Guaranteed</h4>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Premium materials & finish</p>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">
+                      {product.productType === 'Soccer Cleats' ? 'Authentic Performance Gear' : 'Pristine Packaging & Box'}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -461,23 +501,40 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
                 </div>
               </motion.div>
 
-              {/* Structured Product Description */}
               <motion.div variants={staggerItem} className="space-y-10">
                 <div>
                   <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-white/10 pb-2">Overview</h3>
                   <p className="text-gray-400 leading-relaxed font-light text-sm">
-                    {product.description} Designed for comfort and long-lasting wear, adapting seamlessly to your personal style.
+                    {product.description}
                   </p>
                 </div>
 
+                {/* Dynamic Context-Aware Features */}
                 <div>
-                  <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-white/10 pb-2">Features</h3>
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-white/10 pb-2">
+                    {product.productType === 'Soccer Cleats' ? 'Performance Specs' : 'Design & Craft'}
+                  </h3>
                   <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-2 text-sm text-gray-400 font-light">
-                    <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Premium Material</li>
-                    <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Comfort Fit Design</li>
-                    <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Lightweight Construction</li>
-                    <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Durable Finish</li>
-                    <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Easy to Style</li>
+                    {product.productType === 'Soccer Cleats' ? (
+                      <>
+                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Multi-Directional Traction</li>
+                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Precision Touch Upper</li>
+                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Anatomical Lockdown Fit</li>
+                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Lightweight Construction</li>
+                        {product.name.includes('FG') && <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-accent" /> Firm Ground (FG) Optimized</li>}
+                        {product.name.includes('AG') && <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-accent" /> Artificial Grass (AG) Ready</li>}
+                        {product.name.includes('SG') && <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-accent" /> Soft Ground (SG) Optimized</li>}
+                        {product.name.includes('TF') && <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-accent" /> Turf (TF) Ready</li>}
+                      </>
+                    ) : (
+                      <>
+                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Iconic Silhouette</li>
+                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Premium Material Blend</li>
+                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> All-Day Comfort Midsole</li>
+                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Durable Street Traction</li>
+                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Versatile Styling</li>
+                      </>
+                    )}
                   </ul>
                 </div>
               </motion.div>
@@ -642,8 +699,6 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
                   </p>
                   
                   <div className="overflow-x-auto print:overflow-visible rounded-md border border-white/10">
-                    
-                    {/* Add a tab selector so users can switch between Shoes & Apparel guides */}
                     {sizeGuides && sizeGuides.length > 1 && (
                       <div className="flex gap-2 p-4 border-b border-white/10 bg-white/5">
                         {sizeGuides.map((guide: any) => (
@@ -701,6 +756,33 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
                 </div>
               </motion.div>
             </div>
+          )}
+        </AnimatePresence>
+
+        {/* Mobile Sticky Action Bar */}
+        <AnimatePresence>
+          {isStickyVisible && (
+            <motion.div
+              initial={{ y: 100 }}
+              animate={{ y: 0 }}
+              exit={{ y: 100 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="md:hidden fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom))] left-0 right-0 z-40 bg-brand-card/95 backdrop-blur-md border-t border-white/10 p-3 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] flex gap-2"
+            >
+              <button 
+                onClick={handleAddToCart}
+                className="flex-1 h-12 bg-brand-primary text-black font-bold uppercase tracking-widest text-xs flex items-center justify-center rounded-md"
+              >
+                Add To Cart
+              </button>
+              <button 
+                onClick={handleWhatsAppCheckout}
+                className="flex-[0.3] h-12 bg-transparent border border-brand-primary text-brand-primary flex items-center justify-center rounded-md hover:bg-brand-primary hover:text-black transition-colors"
+                aria-label="Order on WhatsApp"
+              >
+                <MessageCircle className="h-5 w-5" />
+              </button>
+            </motion.div>
           )}
         </AnimatePresence>
 

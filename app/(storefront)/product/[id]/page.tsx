@@ -74,11 +74,11 @@ export default async function ProductPage({ params }: Props) {
     .where(and(eq(products.productType, product.productType), not(eq(products.id, product.id))))
     .limit(4);
 
-  // 3. Fetch recently viewed/others (randomized products excluding the current one, limit 8)
+  // 3. Fetch recently viewed/others (prioritize current product type, then randomize, limit 8)
   const recentlyViewed = await db.select()
     .from(products)
     .where(not(eq(products.id, product.id)))
-    .orderBy(sql`RANDOM()`)
+    .orderBy(sql`CASE WHEN ${products.productType} = ${product.productType} THEN 0 ELSE 1 END, RANDOM()`)
     .limit(8);
 
   return (
