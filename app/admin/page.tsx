@@ -1,9 +1,10 @@
 import { getDb } from '@/lib/db';
 import { products, categories } from '@/lib/db/schema';
-import { ilike, and, eq, sql, desc } from 'drizzle-orm';
+import { like, and, eq, sql, desc } from 'drizzle-orm';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Plus, Edit, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Suspense } from 'react';
+import { Plus, Edit, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import DeleteButton from './DeleteButton';
 import CategoryManager from './CategoryManager';
 import MediaManager from './components/MediaManager';
@@ -16,7 +17,7 @@ type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 export default async function AdminDashboard(props: { searchParams: SearchParams }) {
   const db = await getDb();
   
-  // 1. Await the searchParams Promise (Required for Next.js 15+)
+  // 1. Await the searchParams Promise
   const searchParams = await props.searchParams;
 
   // 2. Extract Search Params safely
@@ -25,10 +26,11 @@ export default async function AdminDashboard(props: { searchParams: SearchParams
   const currentPage = typeof searchParams.page === 'string' ? Number(searchParams.page) : 1;
   const itemsPerPage = 20;
 
-  // 3. Build Dynamic Where Clause
+  // 3. Build Dynamic Where Clause (Fixed for Cloudflare D1 / SQLite Compatibility)
   const conditions = [];
   if (query) {
-    conditions.push(ilike(products.name, `%${query}%`));
+    // Safely emulate 'ilike' using standard 'like' and sql`lower()` for SQLite support
+    conditions.push(like(sql`lower(${products.name})`, `%${query.toLowerCase()}%`));
   }
   if (categoryFilter) {
     conditions.push(eq(products.category, categoryFilter));
@@ -74,8 +76,11 @@ export default async function AdminDashboard(props: { searchParams: SearchParams
         </div>
         
         <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 shrink-0 bg-brand-card p-2 rounded-lg border border-white/5 shadow-md">
-          {/* Integrated the Toolbar Component */}
-          <ProductToolbar categories={allCategories} />
+          
+          {/* Suspense Wrapper added for Next.js 15 Client Component constraint */}
+          <Suspense fallback={<div className="h-10 w-full sm:w-64 bg-white/5 animate-pulse rounded-md border border-white/10 flex items-center justify-center"><Loader2 className="w-4 h-4 animate-spin text-gray-500" /></div>}>
+            <ProductToolbar categories={allCategories} />
+          </Suspense>
 
           <div className="hidden lg:flex px-3 border-l border-white/10 items-center h-full">
             <CategoryManager categories={allCategories} />
@@ -94,7 +99,7 @@ export default async function AdminDashboard(props: { searchParams: SearchParams
         </div>
       </div>
 
-      {/* Table Container Wrapper - Optimized for Mobile Scrolling */}
+      {/* Table Container Wrapper */}
       <div className="flex-1 min-h-0 bg-brand-card border border-white/5 rounded-lg overflow-x-auto overflow-y-auto shadow-2xl custom-scrollbar relative">
         <table className="w-full text-left text-xs sm:text-sm whitespace-nowrap table-auto min-w-[700px]">
           <thead className="bg-brand-card/95 border-b border-white/10 sticky top-0 z-10 backdrop-blur-md">
