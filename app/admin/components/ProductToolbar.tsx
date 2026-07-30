@@ -13,9 +13,15 @@ export default function ProductToolbar({ categories }: { categories: any[] }) {
   const [search, setSearch] = useState(searchParams.get('q') || '');
   const currentCategory = searchParams.get('category') || '';
 
-  // Debounced search to prevent spamming the server on every keystroke
+  // Debounced search
   useEffect(() => {
     const timer = setTimeout(() => {
+      const currentQ = searchParams.get('q') || '';
+      
+      // FIX: If the search text hasn't actually changed from what's currently in the URL, 
+      // do nothing. This prevents pagination (changing pages) from triggering a search reset!
+      if (search === currentQ) return;
+
       const params = new URLSearchParams(searchParams.toString());
       
       if (search) {
@@ -24,7 +30,7 @@ export default function ProductToolbar({ categories }: { categories: any[] }) {
         params.delete('q');
       }
       
-      // Reset to page 1 on new search
+      // Reset to page 1 ONLY when an actual new search is typed
       params.delete('page');
 
       startTransition(() => {
@@ -44,6 +50,8 @@ export default function ProductToolbar({ categories }: { categories: any[] }) {
     } else {
       params.delete('category');
     }
+    
+    // Reset to page 1 when changing categories
     params.delete('page');
 
     startTransition(() => {
