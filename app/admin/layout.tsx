@@ -10,7 +10,7 @@ import { categories } from '@/lib/db/schema';
 import CategoryManager from './CategoryManager'; 
 
 export const metadata = {
-  title: 'Admin Dashboard | Shoe World',
+  title: 'Admin Dashboard | Kickverse KE',
   robots: 'noindex, nofollow',
 };
 
