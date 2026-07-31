@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'motion/react';
 import { fadeUp, fadeLeft, heroReveal, staggerContainer, staggerItem } from '@/lib/animations';
-import { ArrowRight, Star, ShoppingBag, Truck, ShieldCheck, Clock, MessageCircle, Flame, Eye, Zap, Sparkles, Wallet, CheckCircle, Heart, Tag } from 'lucide-react';
+import { ArrowRight, Star, ShoppingBag, Truck, ShieldCheck, Clock, MessageCircle, Flame, Eye, Zap, Sparkles, Wallet, CheckCircle, Heart, Tag, Grid } from 'lucide-react';
 import { formatPrice } from '@/lib/data';
 import { reviewAvatars, reviewStats } from '@/lib/data/testimonials';
 import { brand } from '@/lib/data/brand';
@@ -171,6 +171,60 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                </Link>
             </motion.div>
         </motion.div>
+      </section>
+
+      {/* Quick Category Routing (Image-Based) */}
+      <section className="py-8 bg-brand-dark px-6 border-b border-white/5">
+        <div className="max-w-7xl mx-auto">
+          <motion.div 
+            initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
+            className="grid grid-cols-2 gap-4 md:gap-6"
+          >
+            {/* Sneakers Route */}
+            <Link 
+              href="/shop?type=sneakers" 
+              className="relative h-32 sm:h-48 md:h-64 rounded-md overflow-hidden group block border border-white/10 hover:border-brand-primary transition-colors shadow-lg"
+            >
+              <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors duration-500 z-10" />
+              <Image
+                src={displayCategories?.[0]?.image || brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
+                alt="Shop Sneakers"
+                fill
+                className="object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100"
+              />
+              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-4 text-center">
+                <div className="bg-white/10 p-3 rounded-full backdrop-blur-sm mb-3 group-hover:bg-brand-primary/20 group-hover:text-brand-primary transition-colors border border-white/10 group-hover:border-brand-primary/50">
+                  <Grid className="h-6 w-6 md:h-8 md:w-8 text-white group-hover:text-brand-primary transition-colors" />
+                </div>
+                <h3 className="text-white font-display uppercase tracking-widest text-lg md:text-3xl drop-shadow-lg group-hover:text-brand-primary transition-colors">
+                  Sneakers
+                </h3>
+              </div>
+            </Link>
+
+            {/* Cleats Route */}
+            <Link 
+              href="/shop?type=soccer-cleats" 
+              className="relative h-32 sm:h-48 md:h-64 rounded-md overflow-hidden group block border border-white/10 hover:border-brand-primary transition-colors shadow-lg"
+            >
+              <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors duration-500 z-10" />
+              <Image
+                src={displayCleatCategories?.[0]?.image || brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
+                alt="Shop Soccer Cleats"
+                fill
+                className="object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100"
+              />
+              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-4 text-center">
+                <div className="bg-white/10 p-3 rounded-full backdrop-blur-sm mb-3 group-hover:bg-brand-primary/20 group-hover:text-brand-primary transition-colors border border-white/10 group-hover:border-brand-primary/50">
+                   <Tag className="h-6 w-6 md:h-8 md:w-8 text-white group-hover:text-brand-primary transition-colors" />
+                </div>
+                <h3 className="text-white font-display uppercase tracking-widest text-lg md:text-3xl drop-shadow-lg group-hover:text-brand-primary transition-colors">
+                  Soccer Cleats
+                </h3>
+              </div>
+            </Link>
+          </motion.div>
+        </div>
       </section>
 
       {/* Featured Sneakers Section */}
