@@ -23,8 +23,23 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   metadataBase: new URL(brand.url),
-  title: brand.seo.title,
+  title: {
+    default: brand.seo.title, // Fallback for the homepage
+    template: `%s | ${brand.shortName}`, // Automatically appends brand name to inner pages
+  },
   description: brand.seo.description,
+  keywords: [
+    'Sneakers Kenya',
+    'Football boots Kenya',
+    'Soccer Cleats Nairobi',
+    'Nike Mercurial',
+    'Adidas Predator',
+    'Kickverse KE',
+    'Original sneakers Nairobi',
+    'Buy shoes online Kenya'
+  ],
+  authors: [{ name: brand.name }],
+  creator: brand.name,
   openGraph: {
     title: brand.seo.title,
     description: brand.seo.description,
@@ -38,8 +53,25 @@ export const metadata: Metadata = {
         alt: `${brand.name} preview image`,
       },
     ],
-    locale: 'en_US',
+    locale: 'en_KE', // Updated to Kenyan locale for localized search relevance
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: brand.seo.title,
+    description: brand.seo.description,
+    images: [brand.seo.ogImage],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
   icons: {
     icon: brand.seo.favicon,

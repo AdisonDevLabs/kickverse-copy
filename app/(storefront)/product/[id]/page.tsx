@@ -1,4 +1,4 @@
-// app/product/[id]/page.tsx
+// app/(storefront)/product/[id]/page.tsx
 import { Metadata } from 'next';
 import { brand } from '@/lib/data/brand';
 import ProductDetailsClient from './ProductDetailsClient';
@@ -30,15 +30,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const absoluteImageUrl = previewImage.startsWith('http') 
     ? previewImage 
-    : `${brand.url}${previewImage}`;
+    : `${brand.url.replace(/\/$/, '')}${previewImage.startsWith('/') ? '' : '/'}${previewImage}`;
 
   return {
-    title: `${product.name} | ${brand.name}`,
+    title: product.name, // layout.tsx template will automatically append "| KICKVERSE"
     description: product.description,
     openGraph: {
       title: product.name,
       description: `Order the ${product.name} directly on WhatsApp.`,
-      url: `${brand.url}/product/${id}`,
+      url: `${brand.url}product/${id}`,
       siteName: brand.name,
       images: [
         {
@@ -49,6 +49,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         },
       ],
       type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: product.name,
+      description: `Order the ${product.name} directly on WhatsApp.`,
+      images: [absoluteImageUrl],
     },
   };
 }
@@ -81,13 +87,48 @@ export default async function ProductPage({ params }: Props) {
     .orderBy(sql`CASE WHEN ${products.productType} = ${product.productType} THEN 0 ELSE 1 END, RANDOM()`)
     .limit(8);
 
+  // 4. Construct JSON-LD Schema.org Data for Google Rich Snippets
+  const previewImage = product.images && product.images.length > 0 
+    ? product.images[0] 
+    : product.image;
+
+  const absoluteImageUrl = previewImage.startsWith('http') 
+    ? previewImage 
+    : `${brand.url.replace(/\/$/, '')}${previewImage.startsWith('/') ? '' : '/'}${previewImage}`;
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    image: [absoluteImageUrl],
+    description: product.description,
+    category: product.category,
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'KES',
+      price: product.price,
+      url: `${brand.url}product/${product.id}`,
+      availability: 'https://schema.org/InStock',
+      seller: {
+        '@type': 'Organization',
+        name: brand.name,
+      },
+    },
+  };
+
   return (
-    <ProductDetailsClient 
-      product={product} 
-      relatedProducts={relatedProducts} 
-      recentlyViewed={recentlyViewed}
-      sizeGuides={allSizeGuides}
-      colorMap={allColorMaps}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ProductDetailsClient 
+        product={product} 
+        relatedProducts={relatedProducts} 
+        recentlyViewed={recentlyViewed}
+        sizeGuides={allSizeGuides}
+        colorMap={allColorMaps}
+      />
+    </>
   );
 }
