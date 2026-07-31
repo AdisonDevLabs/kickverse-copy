@@ -1,5 +1,3 @@
-// app/shop/ShopClient.tsx
-
 'use client';
 
 import React, { useState, useEffect, Suspense, useMemo, useRef, useCallback } from 'react';
@@ -8,7 +6,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Filter, ChevronDown, Check, X, SlidersHorizontal, MessageCircle, Search, Heart, Eye, Star, SearchX } from 'lucide-react';
 import { formatPrice } from '@/lib/data';
-// Removed the static 'products' import, keeping static constants
 import { brand } from '@/lib/data/brand';
 import { discoveryChips, filterCategories, searchSuggestions, priceRanges, filterSizes } from '@/lib/data/categories';
 import { motion, AnimatePresence } from 'motion/react';
@@ -64,16 +61,17 @@ function ShopContent({ initialProducts }: { initialProducts: any[] }) {
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    if (rawCategory) {
+    // FIX: Properly handle URL combinations without overwriting state
+    if (rawCategory && rawType) {
       setFilterCategory(getInitialFilterCategory(rawCategory));
       setDiscoveryMode(getInitialDiscoveryMode(rawCategory));
-      // Reset product type if they navigated via a specific category
-      setFilterProductType('All'); 
-    }
-    
-    if (rawType) {
       setFilterProductType(getInitialProductType(rawType));
-      // Reset category if they navigated via a broad product type
+    } else if (rawCategory) {
+      setFilterCategory(getInitialFilterCategory(rawCategory));
+      setDiscoveryMode(getInitialDiscoveryMode(rawCategory));
+      setFilterProductType('All'); 
+    } else if (rawType) {
+      setFilterProductType(getInitialProductType(rawType));
       setFilterCategory('All'); 
     }
   }, [rawCategory, rawType]);
@@ -128,7 +126,7 @@ function ShopContent({ initialProducts }: { initialProducts: any[] }) {
       result = result.filter(p => 
         p.name.toLowerCase().includes(query) || 
         p.category.toLowerCase().includes(query) ||
-        (p.productType && p.productType.toLowerCase().includes(query)) // Add this
+        (p.productType && p.productType.toLowerCase().includes(query)) 
       );
     }
     if (filterProductType && filterProductType !== 'All') {
@@ -142,12 +140,12 @@ function ShopContent({ initialProducts }: { initialProducts: any[] }) {
       const targetCategory = normalizeSlug(filterCategory);
       result = result.filter(p => {
         const prodCategory = normalizeSlug(p.category || '');
-        const prodType = normalizeSlug(p.productType || ''); // Add this
+        const prodType = normalizeSlug(p.productType || ''); 
         
         return prodCategory.includes(targetCategory) || 
                targetCategory.includes(prodCategory) ||
-               prodType.includes(targetCategory) ||  // Add this
-               targetCategory.includes(prodType);    // Add this
+               prodType.includes(targetCategory) || 
+               targetCategory.includes(prodType);   
       });
     }
 
@@ -448,6 +446,12 @@ function ShopContent({ initialProducts }: { initialProducts: any[] }) {
                 <motion.div variants={staggerItem} className="flex items-center bg-white/5 border border-white/10 rounded-md px-3 py-1 text-[10px] text-white uppercase tracking-wider">
                   {filterCategory}
                   <button onClick={() => setFilterCategory('All')} className="ml-2 text-gray-400 hover:text-white"><X className="h-3 w-3" /></button>
+                </motion.div>
+              )}
+              {filterProductType && filterProductType !== 'All' && (
+                <motion.div variants={staggerItem} className="flex items-center bg-white/5 border border-white/10 rounded-md px-3 py-1 text-[10px] text-white uppercase tracking-wider">
+                  Type: {filterProductType}
+                  <button onClick={() => setFilterProductType('All')} className="ml-2 text-gray-400 hover:text-white"><X className="h-3 w-3" /></button>
                 </motion.div>
               )}
               {filterPrice && (
