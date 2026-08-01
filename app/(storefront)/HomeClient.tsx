@@ -87,7 +87,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
         Redesigned Hero Section
         Strictly fits within viewport. Reduced paddings/margins.
       */}
-      <section ref={heroRef} className="relative h-[calc(100svh-96px)] md:h-[calc(100svh-100px)] min-h-[600px] w-full flex flex-col bg-black overflow-hidden">
+      <section ref={heroRef} className="relative h-[calc(100svh-184px)] md:h-[calc(100svh-100px)] min-h-[420px] md:min-h-[600px] w-full flex flex-col bg-black overflow-hidden">
         
         {/* TOP PORTION: Image & Main Content */}
         <div className="relative flex-grow flex flex-col justify-center px-4 sm:px-6 lg:px-16 xl:px-24 py-6 md:py-8 z-0">
