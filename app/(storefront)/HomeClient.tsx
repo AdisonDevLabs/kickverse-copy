@@ -101,7 +101,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             className="hero-image object-cover object-right md:object-center opacity-80 md:opacity-100"
           />
           {/* Mobile dark overlay for guaranteed readability */}
-          <div className="absolute inset-0 bg-black/30 z-0" />
+          <div className="absolute inset-0 bg-black/40 z-0" />
           
           {/* Desktop heavy black gradient on left side fading seamlessly to the image 
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent hidden md:block z-0" />*/}
