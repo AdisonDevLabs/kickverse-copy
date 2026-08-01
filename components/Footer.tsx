@@ -4,7 +4,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Truck, ShieldCheck, Wallet, CheckCircle, MessageCircle, Phone, Send, Instagram, Facebook } from 'lucide-react';
+import { Truck, ShieldCheck, Wallet, CheckCircle, MessageCircle, Send, Instagram, Facebook, Phone } from 'lucide-react';
 import { brand, footerQuickShopLinks, footerSupportLinks } from '@/lib/data/brand';
 import { motion } from 'motion/react';
 import { fadeUp, staggerContainer, staggerItem } from '@/lib/animations';
@@ -79,58 +79,37 @@ export function Footer() {
           <motion.div variants={staggerItem} className="lg:col-span-4">
             <h4 className="font-display text-white text-lg uppercase tracking-wide mb-6">Contact Us</h4>
             
-            <div className="flex flex-col gap-3 mb-6">
-              {/* Sneakers Contact */}
-              <div className="bg-black/40 border border-white/5 rounded-md p-4 group hover:border-brand-primary/40 transition-colors">
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <p className="text-white font-bold text-sm uppercase tracking-widest leading-none mb-1.5">Sneakers</p>
-                    <p className="text-gray-400 text-xs font-mono">0713 625 575</p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <a 
-                    href="https://wa.me/254713625575?text=Hello%20Kickverse%2C%20I%20want%20to%20inquire%20about%20sneakers" 
-                    target="_blank" 
-                    rel="noreferrer" 
-                    className="flex items-center justify-center bg-brand-primary/10 text-brand-primary hover:bg-brand-primary hover:text-black border border-brand-primary/20 py-2 rounded-md text-[10px] font-bold uppercase tracking-widest transition-colors"
-                  >
-                    <MessageCircle className="w-3.5 h-3.5 mr-1.5" /> WhatsApp
+            {/* Departmental Contact Links */}
+            <div className="flex flex-col space-y-6 mb-8">
+              
+              {/* Sneakers */}
+              <div className="flex flex-col space-y-2">
+                <span className="text-white font-bold text-xs uppercase tracking-widest">Sneakers</span>
+                <div className="flex flex-wrap items-center gap-3">
+                  <a href={`tel:${brand.contacts.sneakers.phone}`} className="text-gray-400 hover:text-brand-primary text-sm transition-colors flex items-center group">
+                    <Phone className="w-3.5 h-3.5 mr-1.5 group-hover:text-brand-primary transition-colors" /> {brand.contacts.sneakers.phone}
                   </a>
-                  <a 
-                    href="tel:+254713625575" 
-                    className="flex items-center justify-center bg-white/5 text-white hover:bg-white hover:text-black border border-white/10 py-2 rounded-md text-[10px] font-bold uppercase tracking-widest transition-colors"
-                  >
-                    <Phone className="w-3.5 h-3.5 mr-1.5" /> Call
+                  <span className="text-gray-700 hidden sm:inline-block">|</span>
+                  <a href={`https://wa.me/${brand.contacts.sneakers.whatsapp}`} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-brand-primary text-sm transition-colors flex items-center group">
+                    <MessageCircle className="w-3.5 h-3.5 mr-1.5 group-hover:text-brand-primary transition-colors" /> WhatsApp
                   </a>
                 </div>
               </div>
 
-              {/* Boot Room Kenya Contact */}
-              <div className="bg-black/40 border border-white/5 rounded-md p-4 group hover:border-brand-primary/40 transition-colors">
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <p className="text-white font-bold text-sm uppercase tracking-widest leading-none mb-1.5">Boot Room Kenya</p>
-                    <p className="text-gray-400 text-xs font-mono">0794 584 404</p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <a 
-                    href="https://wa.me/254794584404?text=Hello%20Boot%20Room%20Kenya%2C%20I%20want%20to%20inquire%20about%20soccer%20cleats" 
-                    target="_blank" 
-                    rel="noreferrer" 
-                    className="flex items-center justify-center bg-brand-primary/10 text-brand-primary hover:bg-brand-primary hover:text-black border border-brand-primary/20 py-2 rounded-md text-[10px] font-bold uppercase tracking-widest transition-colors"
-                  >
-                    <MessageCircle className="w-3.5 h-3.5 mr-1.5" /> WhatsApp
+              {/* Boot Room Kenya */}
+              <div className="flex flex-col space-y-2">
+                <span className="text-white font-bold text-xs uppercase tracking-widest">Boot Room Kenya</span>
+                <div className="flex flex-wrap items-center gap-3">
+                  <a href={`tel:${brand.contacts.bootRoom.phone}`} className="text-gray-400 hover:text-brand-primary text-sm transition-colors flex items-center group">
+                    <Phone className="w-3.5 h-3.5 mr-1.5 group-hover:text-brand-primary transition-colors" /> {brand.contacts.bootRoom.phone}
                   </a>
-                  <a 
-                    href="tel:+254794584404" 
-                    className="flex items-center justify-center bg-white/5 text-white hover:bg-white hover:text-black border border-white/10 py-2 rounded-md text-[10px] font-bold uppercase tracking-widest transition-colors"
-                  >
-                    <Phone className="w-3.5 h-3.5 mr-1.5" /> Call
+                  <span className="text-gray-700 hidden sm:inline-block">|</span>
+                  <a href={`https://wa.me/${brand.contacts.bootRoom.whatsapp}`} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-brand-primary text-sm transition-colors flex items-center group">
+                    <MessageCircle className="w-3.5 h-3.5 mr-1.5 group-hover:text-brand-primary transition-colors" /> WhatsApp
                   </a>
                 </div>
               </div>
+
             </div>
 
             {/* Newsletter */}

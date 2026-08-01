@@ -174,7 +174,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 rel="noreferrer"
                 className="h-9 sm:h-12 px-3 sm:px-6 rounded-md bg-brand-primary text-black font-bold uppercase tracking-widest text-[9px] sm:text-xs flex items-center justify-center hover:bg-brand-hover transition-colors shadow-lg shadow-brand-primary/20 flex-1 sm:flex-none"
                >
-                 <MessageCircle className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" /> Order
+                 <MessageCircle className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" /> Order on WhatsApp
                </a>
                <Link 
                 href="/shop" 
@@ -184,69 +184,63 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                </Link>
             </motion.div>
 
-            {/* Choose Your Collection Cards (Moved directly below CTAs) */}
+            {/* Choose Your Collection Cards (Moved directly below CTAs & changed to Circular Style) */}
             <motion.div 
               variants={staggerItem} 
-              className="w-full max-w-sm sm:max-w-lg md:max-w-2xl mt-6 sm:mt-10"
+              className="w-full mt-6 sm:mt-10"
             >
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-                {/* Sneakers Card */}
-                <Link 
-                  href="/shop?type=sneakers" 
-                  className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
-                  
-                  <Image
-                    src={displayCategories?.[0]?.image || brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
-                    alt="Shop Sneakers"
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
-                  />
-                  
-                  <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-4 md:p-5 text-left">
-                    <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full border border-brand-primary flex items-center justify-center mb-1 sm:mb-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-primary w-2.5 h-2.5 sm:w-4 sm:h-4"><path d="M2 14h20.4l-1.9-6H5.5L2 14z"/><path d="M22 14v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4"/><path d="M9 14v4"/><path d="M15 14v4"/></svg>
-                    </div>
-                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-xl md:text-2xl drop-shadow-lg mb-0.5 group-hover:text-brand-primary transition-colors leading-none">
-                      SNEAKERS
-                    </h3>
-                    <p className="text-gray-300 text-[6px] sm:text-[9px] md:text-[10px] font-medium mb-1.5 sm:mb-3 truncate">Lifestyle • Streetwear</p>
-                    <div className="bg-white text-black text-[6px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2 py-1 sm:px-3 sm:py-1.5 rounded-sm w-max flex items-center group-hover:bg-brand-primary transition-colors">
-                      <span className="hidden sm:inline-block mr-1">SHOP</span> <ArrowRight className="sm:ml-1 h-2 w-2 sm:h-2.5 sm:w-2.5" />
-                    </div>
-                  </div>
-                </Link>
+              <div className="flex gap-5 sm:gap-8 md:gap-12">
+                
+                {/* Sneakers Circular Card */}
+                <div className="flex flex-col items-center group">
+                  <Link 
+                    href="/shop?type=sneakers" 
+                    className="block relative w-[32vw] h-[32vw] sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 rounded-full overflow-hidden border-2 sm:border-4 border-white/5 group-hover:border-brand-primary transition-all duration-500 shadow-2xl mb-2.5 sm:mb-4 bg-neutral-900"
+                  >
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
+                    <Image
+                      src={displayCategories?.[0]?.image || brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
+                      alt="Shop Sneakers"
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-700 opacity-90 group-hover:opacity-100"
+                    />
+                  </Link>
+                  <h3 className="font-display uppercase tracking-wider text-[11px] sm:text-base md:text-xl text-white group-hover:text-brand-primary transition-colors text-center mb-1.5 sm:mb-2">
+                    Sneakers
+                  </h3>
+                  <Link 
+                    href="/shop?type=sneakers"
+                    className="text-[7px] sm:text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-400 group-hover:text-white transition-colors flex items-center bg-white/10 px-2.5 py-1 sm:px-4 sm:py-2 rounded-full border border-white/20 group-hover:bg-brand-primary group-hover:text-black group-hover:border-brand-primary"
+                  >
+                    Explore <ArrowRight className="ml-1 sm:ml-2 h-2 w-2 sm:h-3 sm:w-3" />
+                  </Link>
+                </div>
 
-                {/* Cleats Card */}
-                <Link 
-                  href="/shop?type=soccer-cleats" 
-                  className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
-                  
-                  <Image
-                    src={displayCleatCategories?.[0]?.image || brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
-                    alt="Shop Soccer Cleats"
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
-                  />
-                  
-                  <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-4 md:p-5 text-left">
-                    <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full border border-brand-primary flex items-center justify-center mb-1 sm:mb-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-primary w-2.5 h-2.5 sm:w-4 sm:h-4"><circle cx="12" cy="12" r="10"/><path d="M12 12 7.5 9"/><path d="M12 12v5.5"/><path d="M12 12l4.5-3"/><path d="m14 19-2-1.5-2 1.5"/><path d="m5 15 2.5-1.5"/><path d="m19 15-2.5-1.5"/><path d="m10 5 2 1.5 2-1.5"/></svg>
-                    </div>
-                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-xl md:text-2xl drop-shadow-lg mb-0.5 group-hover:text-brand-primary transition-colors leading-none">
-                      CLEATS
-                    </h3>
-                    <p className="text-gray-300 text-[6px] sm:text-[9px] md:text-[10px] font-medium mb-1.5 sm:mb-3 truncate">Matchday • Training</p>
-                    <div className="bg-white text-black text-[6px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2 py-1 sm:px-3 sm:py-1.5 rounded-sm w-max flex items-center group-hover:bg-brand-primary transition-colors">
-                      <span className="hidden sm:inline-block mr-1">SHOP</span> <ArrowRight className="sm:ml-1 h-2 w-2 sm:h-2.5 sm:w-2.5" />
-                    </div>
-                  </div>
-                </Link>
+                {/* Soccer Cleats Circular Card */}
+                <div className="flex flex-col items-center group">
+                  <Link 
+                    href="/shop?type=soccer-cleats" 
+                    className="block relative w-[32vw] h-[32vw] sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 rounded-full overflow-hidden border-2 sm:border-4 border-white/5 group-hover:border-brand-primary transition-all duration-500 shadow-2xl mb-2.5 sm:mb-4 bg-neutral-900"
+                  >
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
+                    <Image
+                      src={displayCleatCategories?.[0]?.image || brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
+                      alt="Shop Soccer Cleats"
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-700 opacity-90 group-hover:opacity-100"
+                    />
+                  </Link>
+                  <h3 className="font-display uppercase tracking-wider text-[11px] sm:text-base md:text-xl text-white group-hover:text-brand-primary transition-colors text-center mb-1.5 sm:mb-2">
+                    Soccer Cleats
+                  </h3>
+                  <Link 
+                    href="/shop?type=soccer-cleats"
+                    className="text-[7px] sm:text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-400 group-hover:text-white transition-colors flex items-center bg-white/10 px-2.5 py-1 sm:px-4 sm:py-2 rounded-full border border-white/20 group-hover:bg-brand-primary group-hover:text-black group-hover:border-brand-primary"
+                  >
+                    Explore <ArrowRight className="ml-1 sm:ml-2 h-2 w-2 sm:h-3 sm:w-3" />
+                  </Link>
+                </div>
+
               </div>
             </motion.div>
 

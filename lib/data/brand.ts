@@ -71,6 +71,16 @@ export const brand = {
   },
 
   whatsappNumber: "254713625575",
+  contacts: {
+    sneakers: {
+      phone: "0713625575",
+      whatsapp: "254713625575"
+    },
+    bootRoom: {
+      phone: "0794584404",
+      whatsapp: "254794584404"
+    }
+  },
   whatsappMessage: {
     general:
       "Hello KICKVERSE KE,\n\nI would like to place an order.\n\nProduct(s):\n\nSize:\nQuantity:\nDelivery Location:\n\nPlease confirm availability and total price.\n\nThank you.",
