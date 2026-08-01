@@ -105,20 +105,17 @@ export default function HomeClient({ initialProducts, initialCategories, initial
           
           {/* Desktop heavy black gradient on left side fading seamlessly to the image */}
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent hidden md:block z-0" />
-          
-          {/* Bottom fade to blend with the next section
-          <div className="absolute inset-x-0 bottom-0 h-24 md:h-32 bg-gradient-to-t from-brand-card to-transparent z-0" /> */}
         </div>
 
-        {/* Content Wrapper */}
+        {/* Content Wrapper - Changed items-start to items-center */}
         <motion.div 
           initial="hidden" animate="visible" variants={staggerContainer}
-          className="relative z-10 max-w-7xl mx-auto w-full flex flex-col items-start text-center px-4 sm:px-6 lg:px-16 xl:px-24"
+          className="relative z-10 max-w-7xl mx-auto w-full flex flex-col items-center text-center px-4 sm:px-6 lg:px-16 xl:px-24"
         >
             {/* Trust Label Pill */}
             <motion.div
               variants={staggerItem}
-              className="inline-flex items-center space-x-1.5 bg-transparent border border-white/20 rounded-full px-2.5 py-1 mb-2 sm:mb-4"
+              className="inline-flex items-center justify-center space-x-1.5 bg-transparent border border-white/20 rounded-full px-2.5 py-1 mb-2 sm:mb-4"
             >
               <ShieldCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-brand-primary" />
               <span className="text-white text-[8px] sm:text-[10px] font-bold tracking-widest uppercase">
@@ -126,11 +123,11 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               </span>
             </motion.div>
 
-            {/* Main Headline */}
-            <div className="overflow-hidden mb-2 sm:mb-3 w-full">
+            {/* Main Headline - Increased text sizes for all breakpoints */}
+            <div className="overflow-hidden mb-2 sm:mb-4 w-full">
               <motion.h1 
                 variants={heroReveal}
-                className="font-display uppercase tracking-wider text-[2rem] sm:text-5xl md:text-6xl lg:text-[5rem] leading-[0.95] text-white drop-shadow-2xl"
+                className="font-display uppercase tracking-wider text-[2.5rem] sm:text-6xl md:text-7xl lg:text-[6.5rem] leading-[0.9] text-white drop-shadow-2xl"
               >
                 {brand.hero?.headlineTop || "HOME OF THE BEST"} <br/> 
                 <span className="text-brand-primary">{brand.hero?.headlineHighlight || "SNEAKERS & CLEATS"}</span>
@@ -140,15 +137,15 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             {/* Subheadline */}
             <motion.p 
               variants={staggerItem}
-              className="text-gray-300 text-[11px] sm:text-sm md:text-base max-w-[280px] sm:max-w-lg mb-3 sm:mb-5 font-medium leading-relaxed drop-shadow-md"
+              className="text-gray-300 text-[11px] sm:text-sm md:text-base max-w-[280px] sm:max-w-lg mb-3 sm:mb-5 font-medium leading-relaxed drop-shadow-md mx-auto"
             >
               {brand.description}
             </motion.p>
             
-            {/* Micro Trust Row */}
+            {/* Micro Trust Row - Added justify-center */}
             <motion.div 
               variants={staggerItem}
-              className="flex flex-wrap items-center gap-y-1 sm:gap-y-2 gap-x-2 sm:gap-x-4 mb-4 sm:mb-6 text-[8px] sm:text-[10px] md:text-xs font-bold uppercase tracking-widest text-white drop-shadow-md"
+              className="flex flex-wrap items-center justify-center gap-y-1 sm:gap-y-2 gap-x-2 sm:gap-x-4 mb-4 sm:mb-6 text-[8px] sm:text-[10px] md:text-xs font-bold uppercase tracking-widest text-white drop-shadow-md"
             >
               <div className="flex items-center">
                 <Truck className="h-2.5 w-2.5 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-brand-primary" /> {brand.trustStatements[0] || "We Deliver countrywide"}
@@ -163,10 +160,10 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               </div>
             </motion.div>
 
-            {/* CTA Section */}
+            {/* CTA Section - Added justify-center */}
             <motion.div 
               variants={staggerItem}
-              className="flex flex-row w-full sm:w-auto gap-2 sm:gap-3"
+              className="flex flex-row justify-center w-full sm:w-auto gap-2 sm:gap-3"
             >
                <a 
                 href={`https://wa.me/${brand.whatsappNumber}`} 
@@ -184,7 +181,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                </Link>
             </motion.div>
 
-            {/* Choose Your Collection Cards (Moved directly below CTAs) */}
+            {/* Choose Your Collection Cards (Internal text remains left-aligned) */}
             <motion.div 
               variants={staggerItem} 
               className="w-full max-w-sm sm:max-w-lg md:max-w-2xl mt-6 sm:mt-10"
@@ -253,7 +250,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
         </motion.div>
       </section>
 
-      {/* Featured Sneakers Section */}
+      {/* Featured Collections Section */}
       <section className="py-12 sm:py-16 md:py-24 bg-brand-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between md:items-end mb-8 sm:mb-12 md:mb-16">
@@ -261,7 +258,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
               className="font-display uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-white"
             >
-              Featured Sneakers
+              Featured Collections
             </motion.h2>
             <motion.p 
               initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
