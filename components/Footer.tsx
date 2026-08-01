@@ -4,7 +4,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Truck, ShieldCheck, Wallet, CheckCircle, MessageCircle, Send, Instagram, Facebook } from 'lucide-react';
+import { Truck, ShieldCheck, Wallet, CheckCircle, MessageCircle, Phone, Send, Instagram, Facebook } from 'lucide-react';
 import { brand, footerQuickShopLinks, footerSupportLinks } from '@/lib/data/brand';
 import { motion } from 'motion/react';
 import { fadeUp, staggerContainer, staggerItem } from '@/lib/animations';
@@ -79,18 +79,59 @@ export function Footer() {
           <motion.div variants={staggerItem} className="lg:col-span-4">
             <h4 className="font-display text-white text-lg uppercase tracking-wide mb-6">Contact Us</h4>
             
-            <a href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent("I'm ready to place an order")}`} target="_blank" rel="noreferrer" className="flex items-center w-full bg-brand-primary text-black p-4 group mb-6 hover:bg-brand-hover transition-colors shadow-[0_0_15px_-3px_rgba(0,0,0,0.3)] rounded-md">
-              <div className="w-10 h-10 bg-black/10 rounded-md flex items-center justify-center mr-4">
-                <MessageCircle className="w-5 h-5 text-black" />
+            <div className="flex flex-col gap-3 mb-6">
+              {/* Sneakers Contact */}
+              <div className="bg-black/40 border border-white/5 rounded-md p-4 group hover:border-brand-primary/40 transition-colors">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <p className="text-white font-bold text-sm uppercase tracking-widest leading-none mb-1.5">Sneakers</p>
+                    <p className="text-gray-400 text-xs font-mono">0713 625 575</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <a 
+                    href="https://wa.me/254713625575?text=Hello%20Kickverse%2C%20I%20want%20to%20inquire%20about%20sneakers" 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="flex items-center justify-center bg-brand-primary/10 text-brand-primary hover:bg-brand-primary hover:text-black border border-brand-primary/20 py-2 rounded-md text-[10px] font-bold uppercase tracking-widest transition-colors"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5 mr-1.5" /> WhatsApp
+                  </a>
+                  <a 
+                    href="tel:+254713625575" 
+                    className="flex items-center justify-center bg-white/5 text-white hover:bg-white hover:text-black border border-white/10 py-2 rounded-md text-[10px] font-bold uppercase tracking-widest transition-colors"
+                  >
+                    <Phone className="w-3.5 h-3.5 mr-1.5" /> Call
+                  </a>
+                </div>
               </div>
-              <div className="flex-1 text-left">
-                <p className="text-black font-bold text-sm uppercase tracking-widest leading-none mb-1">Start Order Instantly</p>
-                <p className="text-black/80 text-xs">Chat on WhatsApp</p>
+
+              {/* Boot Room Kenya Contact */}
+              <div className="bg-black/40 border border-white/5 rounded-md p-4 group hover:border-brand-primary/40 transition-colors">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <p className="text-white font-bold text-sm uppercase tracking-widest leading-none mb-1.5">Boot Room Kenya</p>
+                    <p className="text-gray-400 text-xs font-mono">0794 584 404</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <a 
+                    href="https://wa.me/254794584404?text=Hello%20Boot%20Room%20Kenya%2C%20I%20want%20to%20inquire%20about%20soccer%20cleats" 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="flex items-center justify-center bg-brand-primary/10 text-brand-primary hover:bg-brand-primary hover:text-black border border-brand-primary/20 py-2 rounded-md text-[10px] font-bold uppercase tracking-widest transition-colors"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5 mr-1.5" /> WhatsApp
+                  </a>
+                  <a 
+                    href="tel:+254794584404" 
+                    className="flex items-center justify-center bg-white/5 text-white hover:bg-white hover:text-black border border-white/10 py-2 rounded-md text-[10px] font-bold uppercase tracking-widest transition-colors"
+                  >
+                    <Phone className="w-3.5 h-3.5 mr-1.5" /> Call
+                  </a>
+                </div>
               </div>
-              <div className="w-8 h-8 rounded-full border border-black/30 flex items-center justify-center group-hover:bg-black group-hover:text-brand-primary transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-              </div>
-            </a>
+            </div>
 
             {/* Newsletter */}
             <div className="mt-8 pt-8 border-t border-white/5">
