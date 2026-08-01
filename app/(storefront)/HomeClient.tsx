@@ -83,146 +83,194 @@ export default function HomeClient({ initialProducts, initialCategories, initial
 
   return (
     <div ref={containerRef} className="flex flex-col min-h-screen bg-brand-dark text-white">
-      {/* Hero Section */}
-      <section ref={heroRef} className="relative h-[calc(100svh-96px)] md:h-[calc(100svh-100px)] min-h-[600px] w-full overflow-hidden flex flex-col items-center justify-center text-center px-6 bg-brand-dark">
-        {/* Background Image with Slow Zoom */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src={brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
-            alt="Hero Background"
-            fill
-            priority
-            referrerPolicy="no-referrer"
-            className="hero-image object-cover scale-[1.15]"
-          />
-          {/* Dark Overlay for readability */}
-          <div className="absolute inset-0 bg-black/60 bg-gradient-to-t from-brand-dark via-transparent to-brand-dark/40" />
+      {/* 
+        Redesigned Hero Section
+        Strictly fits within viewport. Reduced paddings/margins.
+      */}
+      <section ref={heroRef} className="relative h-[calc(100svh-96px)] md:h-[calc(100svh-100px)] min-h-[600px] w-full flex flex-col bg-black overflow-hidden">
+        
+        {/* TOP PORTION: Image & Main Content */}
+        <div className="relative flex-grow flex flex-col justify-center px-4 sm:px-6 lg:px-16 xl:px-24 py-6 md:py-8 z-0">
+          
+          {/* Background Image mapped strictly 2/3 right with black gradient blending */}
+          <div className="absolute inset-0 z-0 bg-black">
+            <div className="absolute inset-y-0 right-0 w-full md:w-[75%] h-full">
+              <Image
+                src={brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
+                alt="Hero Background"
+                fill
+                priority
+                referrerPolicy="no-referrer"
+                className="hero-image object-cover object-right md:object-center"
+              />
+            </div>
+            
+            {/* Mobile dark overlay */}
+            <div className="absolute inset-0 bg-black/70 md:hidden z-0" />
+            
+            {/* Desktop heavy black gradient on left 1/3 fading seamlessly to the image */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent hidden md:block z-0" />
+            
+            {/* Fade to solid black at the bottom to merge with cards container 
+            <div className="absolute inset-x-0 bottom-0 h-32 md:h-48 bg-gradient-to-t from-black via-black/80 to-transparent z-0" />*/}
+          </div>
+
+          <motion.div 
+            initial="hidden" animate="visible" variants={staggerContainer}
+            className="relative z-10 max-w-7xl mx-auto w-full flex flex-col items-start text-left"
+          >
+              {/* Trust Label Pill */}
+              <motion.div
+                variants={staggerItem}
+                className="inline-flex items-center space-x-2 bg-transparent border border-white/20 rounded-full px-3 py-1 mb-4"
+              >
+                <ShieldCheck className="h-3.5 w-3.5 text-brand-primary" />
+                <span className="text-white text-[9px] sm:text-[10px] font-bold tracking-widest uppercase">
+                  {brand.hero?.badge || "TESTED, TRUSTED AND APPROVED"}
+                </span>
+              </motion.div>
+
+              {/* Main Headline */}
+              <div className="overflow-hidden mb-3 w-full">
+                <motion.h1 
+                  variants={heroReveal}
+                  className="font-display uppercase tracking-wider text-4xl sm:text-5xl md:text-6xl lg:text-[5rem] leading-[0.95] text-white drop-shadow-2xl"
+                >
+                  {brand.hero?.headlineTop || "HOME OF THE BEST"} <br/> 
+                  <span className="text-brand-primary">{brand.hero?.headlineHighlight || "SNEAKERS & CLEATS"}</span>
+                </motion.h1>
+              </div>
+
+              {/* Subheadline */}
+              <motion.p 
+                variants={staggerItem}
+                className="text-gray-300 text-sm md:text-base max-w-lg mb-5 font-medium leading-relaxed drop-shadow-md"
+              >
+                {brand.description}
+              </motion.p>
+              
+              {/* Micro Trust Row */}
+              <motion.div 
+                variants={staggerItem}
+                className="flex flex-wrap items-center gap-y-2 gap-x-3 sm:gap-x-4 mb-6 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-widest text-white drop-shadow-md"
+              >
+                <div className="flex items-center">
+                  <Truck className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-brand-primary" /> {brand.trustStatements[0] || "We Deliver countrywide"}
+                </div>
+                <span className="text-white/40 hidden sm:block">•</span>
+                <div className="flex items-center">
+                  <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-brand-primary" /> {brand.trustStatements[1] || "Genuine quality"}
+                </div>
+                 <span className="text-white/40 hidden xl:block">•</span>
+                 <div className="hidden sm:flex items-center">
+                  <Wallet className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-brand-primary" /> {brand.trustStatements[2] || "Pay on delivery"}
+                </div>
+              </motion.div>
+
+              {/* CTA Section */}
+              <motion.div 
+                variants={staggerItem}
+                className="flex flex-col sm:flex-row w-full sm:w-auto gap-3"
+              >
+                 <a 
+                  href={`https://wa.me/${brand.whatsappNumber}`} 
+                  target="_blank"
+                  rel="noreferrer"
+                  className="h-10 sm:h-12 px-5 sm:px-6 rounded-md bg-brand-primary text-black font-bold uppercase tracking-widest text-[10px] sm:text-xs flex items-center justify-center hover:bg-brand-hover transition-colors shadow-lg shadow-brand-primary/20"
+                 >
+                   <MessageCircle className="mr-2 h-4 w-4" /> {brand.hero?.ctaPrimary || "ORDER ON WHATSAPP"}
+                 </a>
+                 <Link 
+                  href="/shop" 
+                  className="h-10 sm:h-12 px-5 sm:px-6 rounded-md bg-transparent border border-white text-white font-bold uppercase tracking-widest text-[10px] sm:text-xs flex items-center justify-center hover:bg-white hover:text-black transition-colors"
+                 >
+                   {brand.hero?.ctaSecondary || "SHOP COLLECTION"}
+                 </Link>
+              </motion.div>
+          </motion.div>
         </div>
 
-        <motion.div 
-          initial="hidden" animate="visible" variants={staggerContainer}
-          className="relative z-10 max-w-4xl mx-auto flex flex-col items-center mt-16 md:mt-0"
-        >
-            {/* 1. Trust Label */}
-            <motion.div
-              variants={staggerItem}
-              className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-4 py-2 border border-white/20 mb-8 rounded-md"
-            >
-              <span className="text-white text-[10px] sm:text-xs font-bold tracking-widest uppercase">
-                {brand.hero?.badge || "Premium Products"}
-              </span>
-            </motion.div>
-
-            {/* 2. Main Headline */}
-            <div className="overflow-hidden mb-6 w-full">
-              <motion.h1 
-                variants={heroReveal}
-                className="font-display uppercase tracking-wider text-[4rem] leading-[0.9] sm:text-[6rem] md:text-[8rem] text-white drop-shadow-2xl"
-              >
-                {brand.hero?.headlineTop || "STEP INTO"} <br/> 
-                <span className="text-brand-primary">{brand.hero?.headlineHighlight || "CONFIDENCE"}</span>
-              </motion.h1>
-            </div>
-
-            {/* 3. Subheadline */}
-            <motion.p 
-              variants={staggerItem}
-              className="text-gray-300 text-base sm:text-lg md:text-xl max-w-2xl mb-8 font-medium leading-relaxed drop-shadow-md"
-            >
-              {brand.description}
-            </motion.p>
-            
-            {/* 4. Micro Trust Row wa.me */}
-            <motion.div 
-              variants={staggerItem}
-              className="flex flex-wrap justify-center items-center gap-3 sm:gap-6 mb-12"
-            >
-              <div className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-brand-primary drop-shadow-md">
-                <Truck className="h-4 w-4 mr-2" /> {brand.trustStatements[0] || "Fast Delivery"}
-              </div>
-              <span className="text-brand-primary/40 text-xs hidden sm:block">•</span>
-              <div className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-brand-primary drop-shadow-md">
-                <ShieldCheck className="h-4 w-4 mr-2" /> {brand.trustStatements[1] || "Quality Checked"}
-              </div>
-               <span className="text-brand-primary/40 text-xs hidden sm:block">•</span>
-               <div className="hidden sm:flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-brand-primary drop-shadow-md">
-                <MessageCircle className="h-4 w-4 mr-2" /> {brand.trustStatements[2] || "WhatsApp Support"}
-              </div>
-            </motion.div>
-
-            {/* 5. CTA Section */}
-            <motion.div 
-              variants={staggerItem}
-              className="flex flex-col sm:flex-row w-full sm:w-auto gap-4 justify-center"
-            >
-               <a 
-                href={`https://wa.me/${brand.whatsappNumber}`} 
-                target="_blank"
-                rel="noreferrer"
-                className="h-14 sm:h-16 px-10 rounded-md bg-brand-primary text-black font-bold uppercase tracking-widest text-sm flex items-center justify-center hover:bg-brand-hover transition-colors shadow-lg shadow-brand-primary/40"
-               >
-                 <MessageCircle className="mr-3 h-5 w-5" /> {brand.hero?.ctaPrimary || "Order on WhatsApp"}
-               </a>
-               <Link 
-                href="/shop" 
-                className="h-14 sm:h-16 px-10 rounded-md bg-transparent border-2 border-white text-white font-bold uppercase tracking-widest text-sm flex items-center justify-center hover:bg-white hover:text-black transition-colors"
-               >
-                 {brand.hero?.ctaSecondary || "Shop Collection"}
-               </Link>
-            </motion.div>
-        </motion.div>
-      </section>
-
-      {/* Quick Category Routing (Image-Based) */}
-      <section className="py-8 bg-brand-dark px-6 border-b border-white/5">
-        <div className="max-w-7xl mx-auto">
+        {/* BOTTOM PORTION: Choose Your Collection (Shrunk & Restyled for fit) */}
+        <div className="relative z-20 w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 pb-4 md:pb-8 shrink-0">
           <motion.div 
             initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
-            className="grid grid-cols-2 gap-4 md:gap-6"
+            className="border border-brand-primary/40 bg-black relative p-3 sm:p-4 md:p-6 shadow-[0_0_15px_-3px_rgba(var(--brand-primary-rgb),0.1)]"
           >
-            {/* Sneakers Route */}
-            <Link 
-              href="/shop?type=sneakers" 
-              className="relative h-32 sm:h-48 md:h-64 rounded-md overflow-hidden group block border border-white/10 hover:border-brand-primary transition-colors shadow-lg"
-            >
-              <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors duration-500 z-10" />
-              <Image
-                src={displayCategories?.[0]?.image || brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
-                alt="Shop Sneakers"
-                fill
-                className="object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100"
-              />
-              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-4 text-center">
-                <div className="bg-white/10 p-3 rounded-full backdrop-blur-sm mb-3 group-hover:bg-brand-primary/20 group-hover:text-brand-primary transition-colors border border-white/10 group-hover:border-brand-primary/50">
-                  <Grid className="h-6 w-6 md:h-8 md:w-8 text-white group-hover:text-brand-primary transition-colors" />
-                </div>
-                <h3 className="text-white font-display uppercase tracking-widest text-lg md:text-3xl drop-shadow-lg group-hover:text-brand-primary transition-colors">
-                  Sneakers
-                </h3>
-              </div>
-            </Link>
+            {/* Centered Overlapping Header */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black px-3 sm:px-6 text-center whitespace-nowrap">
+              <p className="text-[7px] sm:text-[8px] md:text-[9px] text-gray-400 font-bold uppercase tracking-[0.3em]">
+                What are you shopping for?
+              </p>
+              <h2 className="text-white font-display uppercase tracking-widest text-lg sm:text-xl md:text-2xl drop-shadow-lg leading-tight">
+                Choose Your Collection
+              </h2>
+            </div>
 
-            {/* Cleats Route */}
-            <Link 
-              href="/shop?type=soccer-cleats" 
-              className="relative h-32 sm:h-48 md:h-64 rounded-md overflow-hidden group block border border-white/10 hover:border-brand-primary transition-colors shadow-lg"
-            >
-              <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors duration-500 z-10" />
-              <Image
-                src={displayCleatCategories?.[0]?.image || brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
-                alt="Shop Soccer Cleats"
-                fill
-                className="object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100"
-              />
-              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-4 text-center">
-                <div className="bg-white/10 p-3 rounded-full backdrop-blur-sm mb-3 group-hover:bg-brand-primary/20 group-hover:text-brand-primary transition-colors border border-white/10 group-hover:border-brand-primary/50">
-                   <Tag className="h-6 w-6 md:h-8 md:w-8 text-white group-hover:text-brand-primary transition-colors" />
+            {/* Locked 2-Column Grid */}
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 pt-3 sm:pt-4">
+              
+              {/* Sneakers Card */}
+              <Link 
+                href="/shop?type=sneakers" 
+                className="relative h-36 sm:h-44 md:h-48 lg:h-44 rounded-md overflow-hidden group block border border-white/5 hover:border-brand-primary transition-all shadow-lg bg-black"
+              >
+                {/* Horizontal Gradient for consistent text readability on the left */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
+                
+                <Image
+                  src={displayCategories?.[0]?.image || brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
+                  alt="Shop Sneakers"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
+                />
+                
+                <div className="absolute inset-0 z-20 flex flex-col justify-end p-3 sm:p-4 md:p-5 text-left">
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full border border-brand-primary flex items-center justify-center mb-1.5 sm:mb-2">
+                    {/* Minimalist Sneaker SVG */}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-primary w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5"><path d="M2 14h20.4l-1.9-6H5.5L2 14z"/><path d="M22 14v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4"/><path d="M9 14v4"/><path d="M15 14v4"/></svg>
+                  </div>
+                  <h3 className="text-white font-display uppercase tracking-widest text-lg sm:text-2xl md:text-3xl drop-shadow-lg mb-0.5 group-hover:text-brand-primary transition-colors leading-none">
+                    SNEAKERS
+                  </h3>
+                  <p className="text-gray-300 text-[8px] sm:text-[10px] md:text-xs font-medium mb-3 sm:mb-4 truncate">Lifestyle • Streetwear</p>
+                  <div className="bg-white text-black text-[7px] sm:text-[9px] md:text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 sm:px-4 sm:py-2 md:px-5 md:py-2.5 rounded-md w-max flex items-center group-hover:bg-brand-primary transition-colors">
+                    <span className="hidden sm:inline-block mr-1">SHOP </span>SNEAKERS <ArrowRight className="ml-1 sm:ml-2 h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                  </div>
                 </div>
-                <h3 className="text-white font-display uppercase tracking-widest text-lg md:text-3xl drop-shadow-lg group-hover:text-brand-primary transition-colors">
-                  Soccer Cleats
-                </h3>
-              </div>
-            </Link>
+              </Link>
+
+              {/* Cleats Card */}
+              <Link 
+                href="/shop?type=soccer-cleats" 
+                className="relative h-36 sm:h-44 md:h-48 lg:h-44 rounded-md overflow-hidden group block border border-white/5 hover:border-brand-primary transition-all shadow-lg bg-black"
+              >
+                {/* Horizontal Gradient for consistent text readability on the left */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
+                
+                <Image
+                  src={displayCleatCategories?.[0]?.image || brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
+                  alt="Shop Soccer Cleats"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
+                />
+                
+                <div className="absolute inset-0 z-20 flex flex-col justify-end p-3 sm:p-4 md:p-5 text-left">
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full border border-brand-primary flex items-center justify-center mb-1.5 sm:mb-2">
+                    {/* Soccer Ball SVG */}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-primary w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5"><circle cx="12" cy="12" r="10"/><path d="M12 12 7.5 9"/><path d="M12 12v5.5"/><path d="M12 12l4.5-3"/><path d="m14 19-2-1.5-2 1.5"/><path d="m5 15 2.5-1.5"/><path d="m19 15-2.5-1.5"/><path d="m10 5 2 1.5 2-1.5"/></svg>
+                  </div>
+                  <h3 className="text-white font-display uppercase tracking-widest text-lg sm:text-2xl md:text-3xl drop-shadow-lg mb-0.5 group-hover:text-brand-primary transition-colors leading-none">
+                    CLEATS
+                  </h3>
+                  <p className="text-gray-300 text-[8px] sm:text-[10px] md:text-xs font-medium mb-3 sm:mb-4 truncate">Matchday • Training</p>
+                  <div className="bg-white text-black text-[7px] sm:text-[9px] md:text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 sm:px-4 sm:py-2 md:px-5 md:py-2.5 rounded-md w-max flex items-center group-hover:bg-brand-primary transition-colors">
+                    <span className="hidden sm:inline-block mr-1">SHOP </span>CLEATS <ArrowRight className="ml-1 sm:ml-2 h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                  </div>
+                </div>
+              </Link>
+            </div>
           </motion.div>
         </div>
       </section>
