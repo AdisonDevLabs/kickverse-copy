@@ -63,9 +63,9 @@ export function NavBar() {
     <>
       <AnnouncementBar />
       {/* Header Container */}
-      <header className={`fixed top-10 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-brand-dark/95 backdrop-blur-md shadow-2xl py-1 border-b border-white/5' : 'bg-transparent py-1 border-b border-white/10'}`}>
+      <header className={`fixed top-8 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-brand-dark/95 backdrop-blur-md shadow-2xl py-1 border-b border-white/5' : 'bg-transparent py-1 border-b border-white/10'}`}>
         <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-14 md:h-[60px] w-full">
+          <div className="flex justify-between items-center h-12 md:h-[55px] w-full">
             
             {/* Left: Logo */}
             <div className="flex-shrink-0 flex items-center z-20">

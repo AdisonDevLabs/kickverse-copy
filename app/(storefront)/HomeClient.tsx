@@ -113,7 +113,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
         {/* Content Wrapper */}
         <motion.div 
           initial="hidden" animate="visible" variants={staggerContainer}
-          className="relative z-10 max-w-7xl mx-auto w-full flex flex-col items-start text-left px-4 sm:px-6 lg:px-16 xl:px-24"
+          className="relative z-10 max-w-7xl mx-auto w-full flex flex-col items-start text-center px-4 sm:px-6 lg:px-16 xl:px-24"
         >
             {/* Trust Label Pill */}
             <motion.div
