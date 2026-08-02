@@ -1,3 +1,4 @@
+// app/(storefront)/shop/ShopClient.tsx
 'use client';
 
 import React, { useState, useEffect, Suspense, useMemo, useRef, useCallback } from 'react';
@@ -18,14 +19,11 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
 
   const rawType = searchParams.get('type');
   
-  
   const getInitialFilterCategory = (cat: string | null) => {
     if (!cat) return 'All';
-    // Reserved modes stay handled by getInitialDiscoveryMode
     if (['deals', 'new-arrivals', 'best-sellers', 'trending'].includes(cat)) {
       return 'All';
     }
-    // Convert hyphens to spaces for display, or return raw slug
     return cat.replace(/-/g, ' ');
   };
 
@@ -36,10 +34,13 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
     return 'all'; 
   };
 
+  // Upgraded to handle the 4 unified UI types
   const getInitialProductType = (typeVal: string | null) => {
     if (!typeVal) return 'All';
     if (typeVal.toLowerCase() === 'sneakers') return 'Sneakers';
     if (typeVal.toLowerCase() === 'soccer-cleats') return 'Soccer Cleats';
+    if (typeVal.toLowerCase() === 'official-shoes') return 'Official Shoes';
+    if (typeVal.toLowerCase() === 'opens-sandals') return 'Opens & Sandals';
     return 'All';
   };
 
@@ -61,7 +62,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    // FIX: Properly handle URL combinations without overwriting state
     if (rawCategory && rawType) {
       setFilterCategory(getInitialFilterCategory(rawCategory));
       setDiscoveryMode(getInitialDiscoveryMode(rawCategory));
@@ -120,7 +120,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
   const sortedAndFilteredProducts = useMemo(() => {
     let result = [...initialProducts];
     
-    // 1. Update the Search Query to check productType
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(p => 
@@ -129,13 +128,27 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
         (p.productType && p.productType.toLowerCase().includes(query)) 
       );
     }
+
+    // Upgraded Logic to seamlessly bridge frontend UI Types with backend D1 schema limitations
     if (filterProductType && filterProductType !== 'All') {
-      result = result.filter(p => 
-        p.productType && p.productType.toLowerCase() === filterProductType.toLowerCase()
-      );
+      result = result.filter(p => {
+        const pType = (p.productType || '').toLowerCase();
+        const pCat = (p.category || '').toLowerCase();
+        const targetType = filterProductType.toLowerCase();
+
+        if (targetType === 'sneakers') {
+          // Exclude officials and sandals from general sneakers
+          return pType === 'sneakers' && pCat !== 'official shoes' && pCat !== 'opens & sandals';
+        } else if (targetType === 'official shoes' || targetType === 'opens & sandals') {
+          // Route these specific sub-types directly to their exact category
+          return pCat === targetType;
+        } else {
+          // Standard fallback (Soccer Cleats)
+          return pType === targetType;
+        }
+      });
     }
 
-    // 2. Update Category Filter to check both category AND productType
     if (filterCategory && filterCategory.toLowerCase() !== 'all') {
       const targetCategory = normalizeSlug(filterCategory);
       result = result.filter(p => {
@@ -241,7 +254,9 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
             {discoveryMode === 'deals' && filterCategory === 'All' ? 'Flash Deals' : 
              discoveryMode === 'just-dropped' && filterCategory === 'All' ? 'New Arrivals' :
              discoveryMode === 'best-sellers' && filterCategory === 'All' ? 'Best Sellers' :
-             filterCategory && filterCategory !== 'All' ? filterCategory : 'Shop Collection'}
+             filterCategory && filterCategory !== 'All' ? filterCategory : 
+             filterProductType !== 'All' ? filterProductType :
+             'Shop Collection'}
           </motion.h1>
           
           <motion.p 
@@ -284,16 +299,15 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
             {/* Discovery & Filter Chips */}
             <div className="flex-1 w-full overflow-x-auto hide-scrollbar flex gap-4 pb-1 md:pb-0 items-center">
               
-              {/* 1. Product Types Group */}
+              {/* 1. Product Types Group (Now includes all 4!) */}
               <div className="flex items-center gap-2 border-r border-white/10 pr-4">
                 <span className="text-[9px] uppercase tracking-widest text-gray-500 font-bold hidden sm:block">Type:</span>
-                {['Sneakers', 'Soccer Cleats'].map((type) => {
+                {['Sneakers', 'Soccer Cleats', 'Official Shoes', 'Opens & Sandals'].map((type) => {
                   const isActive = filterProductType === type;
                   return (
                     <button
                       key={type}
                       onClick={() => {
-                        // Toggle type on/off, and reset collections when switching types
                         setFilterProductType(isActive ? 'All' : type);
                         setFilterCategory('All');
                         setDiscoveryMode('all');
@@ -314,7 +328,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
               <div className="flex items-center gap-2">
                 <span className="text-[9px] uppercase tracking-widest text-gray-500 font-bold hidden sm:block">Collection:</span>
                 {discoveryChips
-                  // Optionally filter out 'sneakers' if it still exists in your discoveryChips array
                   .filter(chip => !['sneakers', 'soccer-cleats'].includes(chip.id))
                   .map((chip) => {
                     const isActive = !searchQuery && (
@@ -409,6 +422,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                   <span className="text-gray-500 mr-2">Showing:</span> 
                   {searchQuery ? `Search Results for "${searchQuery}"` : 
                    filterCategory !== 'All' ? filterCategory :
+                   filterProductType !== 'All' ? filterProductType :
                    discoveryMode === 'deals' ? 'Flash Deals' :
                    discoveryMode === 'all' ? 'All Styles' :
                    discoveryChips.find(c => c.id === discoveryMode)?.context || 'All Styles'}
