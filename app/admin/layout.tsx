@@ -6,7 +6,8 @@ import Link from 'next/link';
 
 // Import Database requirements to pass initial categories
 import { getDb } from '@/lib/db';
-import { categories } from '@/lib/db/schema';
+import { categories, mediaAssets } from '@/lib/db/schema';
+import { desc } from 'drizzle-orm';
 import CategoryManager from './CategoryManager'; 
 import MediaManager from './components/MediaManager';
 
@@ -19,6 +20,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   // Fetch initial categories for the modal
   const db = await getDb();
   const allCategories = await db.select().from(categories);
+  const allMedia = await db.select().from(mediaAssets).orderBy(desc(mediaAssets.id));
 
   async function handleLogout() {
     'use server';
@@ -60,7 +62,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
          {/* 2. Replaced static link with MediaManager Trigger */}
          <div className="flex items-center h-full border-b-2 border-transparent hover:border-brand-primary transition-colors">
-            <MediaManager />
+            <MediaManager initialMedia={allMedia} />
          </div>
          
          <Link href="/admin/colors" className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-brand-primary transition-colors whitespace-nowrap h-full border-b-2 border-transparent hover:border-brand-primary">

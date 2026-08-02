@@ -1,10 +1,11 @@
 // app/admin/media-actions.ts
 'use server';
 
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { getDb } from '@/lib/db';
-import { mediaAssets } from '@/lib/db/schema'; // <-- Added schema import
+import { mediaAssets } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
 const R2_PUBLIC_URL = 'https://cdn.kickverse.co.ke';
@@ -66,6 +67,70 @@ export async function saveMediaAssetsToDb(assets: { id: string, url: string, fil
     return { success: true };
   } catch (error: any) {
     console.error("Database Insert Error:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ACTION: Delete a single unused image from R2 and D1
+export async function deleteMediaAsset(id: string, url: string) {
+  try {
+    const db = await getDb();
+    
+    const urlObj = new URL(url);
+    const key = decodeURIComponent(urlObj.pathname.substring(1));
+    
+    const command = new DeleteObjectCommand({
+      Bucket: "kickverse-copy-images",
+      Key: key,
+    });
+    await S3.send(command);
+    
+    await db.delete(mediaAssets).where(eq(mediaAssets.id, id));
+    
+    revalidatePath('/admin');
+    revalidatePath('/admin/products/new');
+    
+    return { success: true, message: "Asset deleted successfully." };
+  } catch (error: any) {
+    console.error("Delete Media Error:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ACTION: Bulk Delete ALL unused images from R2 and D1
+export async function deleteAllMediaAssets() {
+  try {
+    const db = await getDb();
+    const allAssets = await db.select().from(mediaAssets);
+
+    if (allAssets.length === 0) return { success: true, message: "No unused media to delete." };
+
+    // Delete all from Cloudflare R2 concurrently
+    const deletePromises = allAssets.map(async (asset) => {
+      try {
+        const urlObj = new URL(asset.url);
+        const key = decodeURIComponent(urlObj.pathname.substring(1));
+        const command = new DeleteObjectCommand({
+          Bucket: "kickverse-copy-images",
+          Key: key,
+        });
+        await S3.send(command);
+      } catch (err) {
+        console.error("Failed to delete from R2:", asset.url, err);
+      }
+    });
+
+    await Promise.all(deletePromises);
+
+    // Delete all records from D1 Database
+    await db.delete(mediaAssets);
+
+    revalidatePath('/admin');
+    revalidatePath('/admin/products/new');
+
+    return { success: true, message: `Successfully cleared ${allAssets.length} unused images.` };
+  } catch (error: any) {
+    console.error("Bulk Delete Media Error:", error);
     return { success: false, error: error.message };
   }
 }
