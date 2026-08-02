@@ -10,12 +10,12 @@ type FileStatus = {
   file: File;
   name: string;
   progress: number;
-  status: 'pending' | 'compressing' | 'uploading' | 'completed' | 'failed';
+  status: 'pending' | 'decoding' | 'compressing' | 'uploading' | 'completed' | 'failed';
   retryCount: number;
 };
 
 const MAX_AUTO_RETRIES = 2;
-const BATCH_SIZE = 5; // Safely process 5 images per batch to protect Cloudflare free limits
+const BATCH_SIZE = 5; 
 
 export default function MediaManager() {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,18 +23,18 @@ export default function MediaManager() {
   const [statusText, setStatusText] = useState('');
   const [fileStatuses, setFileStatuses] = useState<FileStatus[]>([]);
 
-  // Calculate smooth overall progress based on individual file states
+  // Calculate smooth overall progress
   const overallProgress = useMemo(() => {
     if (fileStatuses.length === 0) return 0;
     const totalProgressSum = fileStatuses.reduce((acc, file) => {
       if (file.status === 'completed' || file.status === 'failed') return acc + 100;
-      if (file.status === 'compressing') return acc + 10;
-      return acc + (10 + (file.progress * 0.9));
+      if (file.status === 'decoding') return acc + 5; // Added decoding progress weight
+      if (file.status === 'compressing') return acc + 15;
+      return acc + (15 + (file.progress * 0.85));
     }, 0);
     return Math.round(totalProgressSum / fileStatuses.length);
   }, [fileStatuses]);
 
-  // Upload single file with automatic retry logic (Unchanged - works perfectly)
   const uploadSingleFile = async (
     file: File, 
     index: number, 
@@ -86,7 +86,6 @@ export default function MediaManager() {
     return false;
   };
 
-  // NEW BATCHING & WEBP CONVERSION LOGIC
   const processAndUpload = async (filesToProcess: { file: File; index: number }[]) => {
     setIsUploading(true);
     let totalFailed = 0;
@@ -94,14 +93,12 @@ export default function MediaManager() {
     try {
       const totalBatches = Math.ceil(filesToProcess.length / BATCH_SIZE);
 
-      // Loop through files in chunks of BATCH_SIZE
       for (let i = 0; i < filesToProcess.length; i += BATCH_SIZE) {
         const chunk = filesToProcess.slice(i, i + BATCH_SIZE);
         const batchNum = Math.floor(i / BATCH_SIZE) + 1;
 
-        setStatusText(`Converting batch ${batchNum} of ${totalBatches} to WebP...`);
+        setStatusText(`Processing batch ${batchNum} of ${totalBatches}...`);
         
-        // Ensure ALL files are forcefully converted to the highly compressed WebP format
         const compressionOptions = {
           maxSizeMB: 0.3,
           maxWidthOrHeight: 1920,
@@ -111,23 +108,40 @@ export default function MediaManager() {
 
         const compressedItems = await Promise.all(
           chunk.map(async ({ file, index }) => {
-            setFileStatuses(prev => prev.map((fs, j) => j === index ? { ...fs, status: 'compressing' } : fs));
-            
-            // Swap out .heic, .heif, .jpg, .png extensions for .webp
+            let fileToProcess = file;
             const originalNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
             const webpName = `${originalNameWithoutExt}.webp`;
 
-            let finalFile: File;
             try {
-              // Convert and compress utilizing the browser's native canvas API
-              const compressedBlob = await imageCompression(file, compressionOptions);
-              finalFile = new File([compressedBlob], webpName, { type: 'image/webp' });
+              // 1. Intercept Apple HEIC/HEIF formats
+              const isHeic = file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
+              
+              if (isHeic) {
+                setFileStatuses(prev => prev.map((fs, j) => j === index ? { ...fs, status: 'decoding' } : fs));
+                // Dynamically import to prevent Next.js Server-Side build crashes
+                const heic2any = (await import('heic2any')).default;
+                
+                const convertedBlob = await heic2any({
+                  blob: file,
+                  toType: 'image/jpeg',
+                  quality: 0.8
+                });
+                
+                const singleBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+                fileToProcess = new File([singleBlob], `${originalNameWithoutExt}.jpg`, { type: 'image/jpeg' });
+              }
+
+              // 2. Compress and convert to WebP
+              setFileStatuses(prev => prev.map((fs, j) => j === index ? { ...fs, status: 'compressing' } : fs));
+              const compressedBlob = await imageCompression(fileToProcess, compressionOptions);
+              const finalFile = new File([compressedBlob], webpName, { type: 'image/webp' });
+              
+              return { compressed: finalFile, index, originalName: finalFile.name };
             } catch (err) {
-              // Safe Fallback: If a specific old browser fails to decode HEIC, keep original format
-              finalFile = new File([file], file.name, { type: file.type });
+              console.error("Processing failed for file:", file.name, err);
+              // Ultimate Fallback if completely corrupted
+              return { compressed: file, index, originalName: file.name };
             }
-            
-            return { compressed: finalFile, index, originalName: finalFile.name };
           })
         );
 
@@ -136,7 +150,6 @@ export default function MediaManager() {
         const urlResponse = await generatePresignedUrls(fileNames);
 
         if (!urlResponse.success || !urlResponse.urls) {
-          // If the Cloudflare URL fetch fails, mark the batch as failed and continue to next batch
           setFileStatuses(prev => prev.map((fs, j) => chunk.some(c => c.index === j) ? { ...fs, status: 'failed' } : fs));
           totalFailed += chunk.length;
           continue; 
@@ -170,7 +183,6 @@ export default function MediaManager() {
         totalFailed += failedInBatch;
       }
 
-      // Final Completion Checks
       if (totalFailed > 0) {
         setStatusText(`${totalFailed} upload(s) failed. Please click retry.`);
       } else {
@@ -186,7 +198,7 @@ export default function MediaManager() {
       alert(`Upload error: ${error.message}`);
     } finally {
       if (totalFailed > 0) {
-        setIsUploading(false); // Allows the user to click the Retry button
+        setIsUploading(false);
       }
     }
   };
@@ -220,7 +232,6 @@ export default function MediaManager() {
 
     if (failedItems.length === 0) return;
     
-    // Reset statuses of failed items back to pending before retrying
     setFileStatuses(prev => prev.map(fs => fs.status === 'failed' ? { ...fs, status: 'pending', progress: 0 } : fs));
     
     await processAndUpload(failedItems);
@@ -244,7 +255,6 @@ export default function MediaManager() {
 
   return (
     <>
-      {/* Sleek Modal Trigger Button */}
       <button
         onClick={() => setIsOpen(true)}
         className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-brand-primary transition-colors whitespace-nowrap bg-transparent border-none p-0 cursor-pointer h-full"
@@ -252,14 +262,12 @@ export default function MediaManager() {
         <ImagePlus className="w-4 h-4 mr-2" /> Bulk Upload
       </button>
 
-      {/* Modal Overlay */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
           <div 
             className="relative w-full max-w-2xl bg-brand-card border border-white/10 rounded-xl shadow-2xl flex flex-col my-auto animate-in fade-in zoom-in duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header */}
             <div className="flex justify-between items-center p-5 border-b border-white/5 bg-black/20">
               <h2 className="font-display text-lg uppercase tracking-widest text-brand-primary flex items-center">
                 <ImagePlus className="w-5 h-5 mr-3" />
@@ -274,14 +282,12 @@ export default function MediaManager() {
               </button>
             </div>
 
-            {/* Modal Body */}
             <div className="p-6">
               <div className="flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-lg p-8 bg-brand-dark hover:border-brand-primary/50 hover:bg-white/[0.02] transition-all relative group overflow-hidden">
                 
                 <input 
                   type="file" 
                   multiple 
-                  // Updated explicitly accept iPhone HEIC/HEIF and modern Android formats
                   accept="image/jpeg, image/png, image/webp, image/jpg, image/heic, image/heif, .heic, .heif"
                   onChange={handleBulkUpload}
                   disabled={isUploading || fileStatuses.length > 0}
@@ -295,7 +301,7 @@ export default function MediaManager() {
                     </div>
                     <h3 className="font-bold text-sm uppercase tracking-widest text-white mb-2">Bulk Upload Media</h3>
                     <p className="text-xs text-gray-500 text-center max-w-sm leading-relaxed">
-                      Drag & drop images here. Large batches will be processed safely in chunks. Automated retries enabled.
+                      Drag & drop images here. Large batches (including iPhone HEIC files) will be decoded, converted to WebP, and processed safely in chunks.
                     </p>
                   </div>
                 ) : (
@@ -316,7 +322,6 @@ export default function MediaManager() {
                       <span className="text-xl font-display text-brand-primary">{overallProgress}%</span>
                     </div>
                     
-                    {/* Master Progress Bar */}
                     {isUploading && (
                       <div className="w-full mb-6 bg-black/50 rounded-full h-3 border border-white/5 overflow-hidden shadow-inner">
                         <div 
@@ -328,7 +333,6 @@ export default function MediaManager() {
                       </div>
                     )}
 
-                    {/* Scrollable File List Queue */}
                     {visibleFiles.length > 0 && (
                       <div className="w-full space-y-2 max-h-56 overflow-y-auto pr-2 custom-scrollbar border border-white/5 rounded-md p-2 bg-black/20 pointer-events-auto">
                         {visibleFiles.map((file, idx) => (
@@ -340,13 +344,15 @@ export default function MediaManager() {
                             <div className="flex items-center gap-3 w-1/2 justify-end">
                               <div className="flex-1 h-1.5 bg-black rounded-full overflow-hidden">
                                 <div 
-                                  className={`h-full transition-all duration-300 ${file.status === 'failed' ? 'bg-red-500' : 'bg-brand-primary'}`} 
-                                  style={{ width: `${file.status === 'compressing' ? 10 : file.progress}%` }}
+                                  className={`h-full transition-all duration-300 ${file.status === 'failed' ? 'bg-red-500' : file.status === 'decoding' ? 'bg-blue-500' : 'bg-brand-primary'}`} 
+                                  style={{ width: `${file.status === 'decoding' ? 10 : file.status === 'compressing' ? 25 : file.progress}%` }}
                                 ></div>
                               </div>
-                              <span className={`text-[10px] font-bold uppercase tracking-widest min-w-[70px] text-right ${file.status === 'failed' ? 'text-red-400' : 'text-gray-500'}`}>
+                              <span className={`text-[10px] font-bold uppercase tracking-widest min-w-[70px] text-right ${file.status === 'failed' ? 'text-red-400' : file.status === 'decoding' ? 'text-blue-400' : 'text-gray-500'}`}>
                                 {file.status === 'failed' 
                                   ? 'Failed' 
+                                  : file.status === 'decoding'
+                                  ? 'Decoding'
                                   : file.status === 'compressing' 
                                   ? 'Zipping' 
                                   : file.retryCount > 0 
@@ -359,7 +365,6 @@ export default function MediaManager() {
                       </div>
                     )}
                     
-                    {/* Retry Button */}
                     {hasFailures && !isUploading && (
                       <div className="flex items-center justify-between mt-4 pointer-events-auto">
                         <p className="text-[10px] text-gray-500 uppercase tracking-widest">
