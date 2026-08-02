@@ -81,14 +81,14 @@ export default function HomeClient({ initialProducts, initialCategories, initial
     cleatProducts.some((p: any) => p.category === collection.name)
   );
 
-  // 4. Filter Official Shoes and their corresponding categories
-  const officialProducts = initialProducts.filter((p: any) => p.productType === 'Official Shoes');
+  // 4. Filter Official Shoes by Category (since they are saved as Sneakers)
+  const officialProducts = initialProducts.filter((p: any) => p.category === 'Official Shoes');
   const displayOfficialCategories = initialCategories.filter((collection: any) => 
     officialProducts.some((p: any) => p.category === collection.name)
   );
 
-  // 5. Filter Opens & Sandals and their corresponding categories
-  const sandalProducts = initialProducts.filter((p: any) => p.productType === 'Opens & Sandals');
+  // 5. Filter Opens & Sandals by Category (since they are saved as Sneakers)
+  const sandalProducts = initialProducts.filter((p: any) => p.category === 'Opens & Sandals');
   const displaySandalCategories = initialCategories.filter((collection: any) => 
     sandalProducts.some((p: any) => p.category === collection.name)
   );
@@ -212,7 +212,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                   />
-                  <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-4 md:p-5 text-left">
+                  <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-2.5 md:p-3 t-3 text-left">
                     <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full border border-brand-primary flex items-center justify-center mb-1 sm:mb-2">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-primary w-2.5 h-2.5 sm:w-4 sm:h-4"><path d="M2 14h20.4l-1.9-6H5.5L2 14z"/><path d="M22 14v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4"/><path d="M9 14v4"/><path d="M15 14v4"/></svg>
                     </div>
@@ -220,7 +220,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       SNEAKERS
                     </h3>
                     <div className="flex justify-between items-center w-full mt-1.5 sm:mt-2">
-                      <p className="text-gray-300 text-[8px] sm:text-[10px] md:text-[12px] font-medium truncate pr-2">Lifestyle • Streetwear</p>
+                      <p className="text-gray-300 text-[10px] sm:text-[11px] md:text-[12px] font-medium truncate pr-2">Lifestyle • Streetwear</p>
                       <div className="bg-white text-black text-[6px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2 py-1 sm:px-3 sm:py-1.5 rounded-sm w-max flex items-center group-hover:bg-brand-primary transition-colors shrink-0">
                         <span className="hidden sm:inline-block mr-1">SHOP</span> <ArrowRight className="sm:ml-1 h-2 w-2 sm:h-2.5 sm:w-2.5" />
                       </div>
@@ -249,7 +249,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       SOCCER CLEATS
                     </h3>
                     <div className="flex justify-between items-center w-full mt-1.5 sm:mt-2">
-                      <p className="text-gray-300 text-[8px] sm:text-[10px] md:text-[12px] font-medium truncate pr-2">Matchday • Training</p>
+                      <p className="text-gray-300 text-[10px] sm:text-[11px] md:text-[12px] font-medium truncate pr-2">Matchday • Training</p>
                       <div className="bg-white text-black text-[6px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2 py-1 sm:px-3 sm:py-1.5 rounded-sm w-max flex items-center group-hover:bg-brand-primary transition-colors shrink-0">
                         <span className="hidden sm:inline-block mr-1">SHOP</span> <ArrowRight className="sm:ml-1 h-2 w-2 sm:h-2.5 sm:w-2.5" />
                       </div>
@@ -278,7 +278,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       OFFICIAL
                     </h3>
                     <div className="flex justify-between items-center w-full mt-1.5 sm:mt-2">
-                      <p className="text-gray-300 text-[8px] sm:text-[10px] md:text-[12px] font-medium truncate pr-2">Formal • Business</p>
+                      <p className="text-gray-300 text-[10px] sm:text-[11px] md:text-[12px] font-medium truncate pr-2">Formal • Business</p>
                       <div className="bg-white text-black text-[6px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2 py-1 sm:px-3 sm:py-1.5 rounded-sm w-max flex items-center group-hover:bg-brand-primary transition-colors shrink-0">
                         <span className="hidden sm:inline-block mr-1">SHOP</span> <ArrowRight className="sm:ml-1 h-2 w-2 sm:h-2.5 sm:w-2.5" />
                       </div>
@@ -307,7 +307,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       OPENS & SANDALS
                     </h3>
                     <div className="flex justify-between items-center w-full mt-1.5 sm:mt-2">
-                      <p className="text-gray-300 text-[8px] sm:text-[10px] md:text-[12px] font-medium truncate pr-2">Casual • Summer</p>
+                      <p className="text-gray-300 text-[10px] sm:text-[11px] md:text-[12px] font-medium truncate pr-2">Casual • Summer</p>
                       <div className="bg-white text-black text-[6px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2 py-1 sm:px-3 sm:py-1.5 rounded-sm w-max flex items-center group-hover:bg-brand-primary transition-colors shrink-0">
                         <span className="hidden sm:inline-block mr-1">SHOP</span> <ArrowRight className="sm:ml-1 h-2 w-2 sm:h-2.5 sm:w-2.5" />
                       </div>
