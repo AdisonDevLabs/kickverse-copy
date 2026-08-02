@@ -15,6 +15,7 @@ type FileStatus = {
 };
 
 const MAX_AUTO_RETRIES = 2;
+const BATCH_SIZE = 4; // Safely process 4 images at a time to prevent browser crashes & CF limits
 
 export default function MediaManager() {
   const [isOpen, setIsOpen] = useState(false);
@@ -87,70 +88,98 @@ export default function MediaManager() {
 
   const processAndUpload = async (filesToProcess: { file: File; index: number }[]) => {
     setIsUploading(true);
+    const totalBatches = Math.ceil(filesToProcess.length / BATCH_SIZE);
 
     try {
-      setStatusText(`Compressing ${filesToProcess.length} image(s)...`);
-      const compressionOptions = {
-        maxSizeMB: 0.3,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
+      // Process files in sequential chunks to avoid memory spikes and API limits
+      for (let i = 0; i < filesToProcess.length; i += BATCH_SIZE) {
+        const currentBatchNum = Math.floor(i / BATCH_SIZE) + 1;
+        const batch = filesToProcess.slice(i, i + BATCH_SIZE);
+        
+        setStatusText(`Batch ${currentBatchNum}/${totalBatches}: Compressing to WebP...`);
 
-      const compressedItems = await Promise.all(
-        filesToProcess.map(async ({ file, index }) => {
-          setFileStatuses(prev => prev.map((fs, i) => i === index ? { ...fs, status: 'compressing' } : fs));
-          const compressed = await imageCompression(file, compressionOptions);
-          return { compressed, index, originalName: file.name };
-        })
-      );
+        const compressionOptions = {
+          maxSizeMB: 0.3, // Maximum 300KB
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+          fileType: 'image/webp', // Force standard formats to highly optimized WebP
+          initialQuality: 0.85
+        };
 
-      setStatusText('Requesting secure links...');
-      const fileNames = compressedItems.map(item => item.originalName);
-      const urlResponse = await generatePresignedUrls(fileNames);
+        const compressedItems = await Promise.all(
+          batch.map(async ({ file, index }) => {
+            setFileStatuses(prev => prev.map((fs, idx) => idx === index ? { ...fs, status: 'compressing' } : fs));
+            
+            // Compress and transcode
+            const compressedBlob = await imageCompression(file, compressionOptions as any);
+            
+            // Reconstruct as a WebP File object
+            const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+            const webpFileName = `${baseName}.webp`;
+            
+            const compressedFile = new File([compressedBlob], webpFileName, {
+              type: 'image/webp',
+              lastModified: Date.now(),
+            });
 
-      if (!urlResponse.success || !urlResponse.urls) {
-        throw new Error(urlResponse.error || 'Failed to generate upload URLs');
-      }
+            return { compressed: compressedFile, index, originalName: webpFileName };
+          })
+        );
 
-      setStatusText('Uploading to Cloudflare...');
-      const uploadPromises = compressedItems.map((item, urlIdx) => {
-        const urlData = urlResponse.urls![urlIdx];
-        return uploadSingleFile(item.compressed, item.index, urlData.uploadUrl).then(success => ({
-          success,
-          urlData
-        }));
+        setStatusText(`Batch ${currentBatchNum}/${totalBatches}: Securing upload links...`);
+        const fileNames = compressedItems.map(item => item.originalName);
+        const urlResponse = await generatePresignedUrls(fileNames);
+
+        if (!urlResponse.success || !urlResponse.urls) {
+          // If URL generation fails, mark this specific batch as failed and continue to next
+          setFileStatuses(prev => prev.map((fs, idx) => batch.some(b => b.index === idx) ? { ...fs, status: 'failed' } : fs));
+          continue;
+        }
+
+        setStatusText(`Batch ${currentBatchNum}/${totalBatches}: Uploading to Edge...`);
+        const uploadPromises = compressedItems.map((item, urlIdx) => {
+          const urlData = urlResponse.urls![urlIdx];
+          return uploadSingleFile(item.compressed, item.index, urlData.uploadUrl).then(success => ({
+            success,
+            urlData
+          }));
+        });
+
+        const results = await Promise.all(uploadPromises);
+
+        setStatusText(`Batch ${currentBatchNum}/${totalBatches}: Saving records...`);
+        const successfulAssets = results
+          .filter(r => r.success)
+          .map(r => ({
+            id: r.urlData.id,
+            url: r.urlData.publicUrl,
+            fileName: r.urlData.fileName,
+          }));
+
+        if (successfulAssets.length > 0) {
+          await saveMediaAssetsToDb(successfulAssets);
+        }
+      } // End of batch loop
+
+      // Final status check after all batches complete
+      setFileStatuses(prev => {
+        const failedCount = prev.filter(f => f.status === 'failed').length;
+        if (failedCount > 0) {
+          setStatusText(`${failedCount} upload(s) failed after retries`);
+          setIsUploading(false); // Let user retry failed ones
+        } else {
+          setStatusText('All Batches Uploaded Successfully!');
+          setTimeout(() => {
+            setIsUploading(false);
+            setStatusText('');
+            setFileStatuses([]);
+          }, 3000);
+        }
+        return prev;
       });
-
-      const results = await Promise.all(uploadPromises);
-
-      setStatusText('Saving to database...');
-      const successfulAssets = results
-        .filter(r => r.success)
-        .map(r => ({
-          id: r.urlData.id,
-          url: r.urlData.publicUrl,
-          fileName: r.urlData.fileName,
-        }));
-
-      if (successfulAssets.length > 0) {
-        await saveMediaAssetsToDb(successfulAssets);
-      }
-
-      const failedCount = results.filter(r => !r.success).length;
-      if (failedCount > 0) {
-        setStatusText(`${failedCount} upload(s) failed after retries`);
-      } else {
-        setStatusText('Upload Complete!');
-        setTimeout(() => {
-          setIsUploading(false);
-          setStatusText('');
-          setFileStatuses([]);
-        }, 3000);
-      }
 
     } catch (error: any) {
       alert(`Upload error: ${error.message}`);
-    } finally {
       setIsUploading(false);
     }
   };
@@ -174,7 +203,7 @@ export default function MediaManager() {
     const filesToProcess = fileArray.map((file, index) => ({ file, index }));
     await processAndUpload(filesToProcess);
 
-    e.target.value = '';
+    e.target.value = ''; // Reset input so same files can be selected again if needed
   };
 
   const handleRetryFailed = async () => {
@@ -183,6 +212,10 @@ export default function MediaManager() {
       .filter(item => item.status === 'failed');
 
     if (failedItems.length === 0) return;
+    
+    // Reset failed statuses back to pending before processing
+    setFileStatuses(prev => prev.map(fs => fs.status === 'failed' ? { ...fs, status: 'pending', progress: 0, retryCount: 0 } : fs));
+    
     await processAndUpload(failedItems);
   };
 
@@ -238,6 +271,7 @@ export default function MediaManager() {
             <div className="p-6">
               <div className="flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-lg p-8 bg-brand-dark hover:border-brand-primary/50 hover:bg-white/[0.02] transition-all relative group overflow-hidden">
                 
+                {/* Note: Deliberately omitting .heic here so iPhones automatically transcode it to JPEG on upload, which we then convert to WebP */}
                 <input 
                   type="file" 
                   multiple 
@@ -254,7 +288,7 @@ export default function MediaManager() {
                     </div>
                     <h3 className="font-bold text-sm uppercase tracking-widest text-white mb-2">Bulk Upload Media</h3>
                     <p className="text-xs text-gray-500 text-center max-w-sm leading-relaxed">
-                      Drag & drop images here. Automated retries are enabled for network interruptions.
+                      Select images to upload. Files are automatically compressed and converted to highly optimized WebP format.
                     </p>
                   </div>
                 ) : (
@@ -276,13 +310,13 @@ export default function MediaManager() {
                     </div>
                     
                     {/* Master Progress Bar */}
-                    {isUploading && (
+                    {(isUploading || hasFailures) && (
                       <div className="w-full mb-6 bg-black/50 rounded-full h-3 border border-white/5 overflow-hidden shadow-inner">
                         <div 
                           className="h-full bg-brand-primary relative transition-all duration-200 ease-out" 
                           style={{ width: `${overallProgress}%` }}
                         >
-                          <div className="absolute top-0 bottom-0 left-0 right-0 bg-white/20 animate-pulse"></div>
+                          {isUploading && <div className="absolute top-0 bottom-0 left-0 right-0 bg-white/20 animate-pulse"></div>}
                         </div>
                       </div>
                     )}
@@ -308,6 +342,8 @@ export default function MediaManager() {
                                   ? 'Failed' 
                                   : file.status === 'compressing' 
                                   ? 'Zipping' 
+                                  : file.status === 'pending'
+                                  ? 'Queued'
                                   : file.retryCount > 0 
                                   ? `Retry ${file.retryCount}` 
                                   : `${file.progress}%`}
