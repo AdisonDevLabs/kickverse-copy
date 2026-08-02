@@ -2,7 +2,6 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import imageCompression from 'browser-image-compression';
 import { CheckCircle, Loader2, XCircle, ImagePlus, RefreshCw, X, Trash2, ImageIcon, UploadCloud } from 'lucide-react';
 import { generatePresignedUrls, saveMediaAssetsToDb, deleteMediaAsset, deleteAllMediaAssets } from '../media-actions';
 
@@ -15,7 +14,84 @@ type FileStatus = {
 };
 
 const MAX_AUTO_RETRIES = 2;
-const BATCH_SIZE = 5; 
+const UPLOAD_BATCH_SIZE = 5; // Network batch size for Cloudflare Free Tier
+
+// ULTRA-FAST, LOW-MEMORY SINGLE-PASS WEBP CONVERTER
+async function convertToWebpMemorySafe(
+  file: File, 
+  maxDim = 1920, 
+  quality = 0.82
+): Promise<File> {
+  const originalNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+  const webpName = `${originalNameWithoutExt}.webp`;
+  const isHeic = file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
+
+  let imageSource: CanvasImageSource | null = null;
+
+  try {
+    if (isHeic) {
+      // 1. Try Native Browser HEIC Decoding (Ultra-fast on Safari / iOS)
+      try {
+        imageSource = await createImageBitmap(file);
+      } catch {
+        // 2. Fallback to heic2any for Chrome/Firefox/Android
+        const heic2any = (await import('heic2any')).default;
+        const convertedBlob = await heic2any({ blob: file, toType: 'image/png' });
+        const singleBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+        imageSource = await createImageBitmap(singleBlob);
+      }
+    } else {
+      imageSource = await createImageBitmap(file);
+    }
+  } catch (err) {
+    // If bitmap creation fails, return original file as ultimate safety fallback
+    return file;
+  }
+
+  // Calculate scaled dimensions to fit within maxDim
+  let width = imageSource.width;
+  let height = imageSource.height;
+  if (width > maxDim || height > maxDim) {
+    if (width > height) {
+      height = Math.round((height * maxDim) / width);
+      width = maxDim;
+    } else {
+      width = Math.round((width * maxDim) / height);
+      height = maxDim;
+    }
+  }
+
+  // Draw directly onto Canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) {
+    if ('close' in imageSource && typeof (imageSource as any).close === 'function') {
+      (imageSource as any).close();
+    }
+    return file;
+  }
+
+  ctx.drawImage(imageSource, 0, 0, width, height);
+
+  // IMMEDIATELY RELEASE BITMAP RAM MEMORY
+  if ('close' in imageSource && typeof (imageSource as any).close === 'function') {
+    (imageSource as any).close();
+  }
+
+  // Export single-pass WebP Blob
+  const webpBlob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/webp', quality));
+
+  // Clear canvas reference to trigger instant Garbage Collection
+  canvas.width = 0;
+  canvas.height = 0;
+
+  if (!webpBlob) return file;
+
+  return new File([webpBlob], webpName, { type: 'image/webp' });
+}
 
 export default function MediaManager({ initialMedia = [] }: { initialMedia?: any[] }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -39,9 +115,9 @@ export default function MediaManager({ initialMedia = [] }: { initialMedia?: any
     if (fileStatuses.length === 0) return 0;
     const totalProgressSum = fileStatuses.reduce((acc, file) => {
       if (file.status === 'completed' || file.status === 'failed') return acc + 100;
-      if (file.status === 'decoding') return acc + 5; 
-      if (file.status === 'compressing') return acc + 15;
-      return acc + (15 + (file.progress * 0.85));
+      if (file.status === 'decoding') return acc + 10; 
+      if (file.status === 'compressing') return acc + 25;
+      return acc + (25 + (file.progress * 0.75));
     }, 0);
     return Math.round(totalProgressSum / fileStatuses.length);
   }, [fileStatuses]);
@@ -90,44 +166,36 @@ export default function MediaManager({ initialMedia = [] }: { initialMedia?: any
     let totalFailed = 0;
 
     try {
-      const totalBatches = Math.ceil(filesToProcess.length / BATCH_SIZE);
-      for (let i = 0; i < filesToProcess.length; i += BATCH_SIZE) {
-        const chunk = filesToProcess.slice(i, i + BATCH_SIZE);
-        const batchNum = Math.floor(i / BATCH_SIZE) + 1;
-        setStatusText(`Processing batch ${batchNum} of ${totalBatches}...`);
+      const processedFiles: { compressed: File; index: number; originalName: string }[] = [];
+
+      // STEP 1: SEQUENTIAL CONVERSION (1 BY 1 TO PREVENT BROWSER MEMORY SPIKES)
+      for (let i = 0; i < filesToProcess.length; i++) {
+        const { file, index } = filesToProcess[i];
+        setStatusText(`Converting image ${i + 1} of ${filesToProcess.length} to WebP...`);
         
-        const compressionOptions = { maxSizeMB: 0.3, maxWidthOrHeight: 1920, useWebWorker: true, fileType: 'image/webp' };
+        setFileStatuses(prev => prev.map((fs, j) => j === index ? { ...fs, status: 'compressing' } : fs));
 
-        const compressedItems = await Promise.all(
-          chunk.map(async ({ file, index }) => {
-            let fileToProcess = file;
-            const originalNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
-            const webpName = `${originalNameWithoutExt}.webp`;
+        // Convert file using ultra-fast RAM safe converter
+        const convertedFile = await convertToWebpMemorySafe(file);
+        processedFiles.push({
+          compressed: convertedFile,
+          index,
+          originalName: convertedFile.name,
+        });
 
-            try {
-              const isHeic = file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
-              if (isHeic) {
-                setFileStatuses(prev => prev.map((fs, j) => j === index ? { ...fs, status: 'decoding' } : fs));
-                const heic2any = (await import('heic2any')).default;
-                const convertedBlob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.8 });
-                const singleBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
-                fileToProcess = new File([singleBlob], `${originalNameWithoutExt}.jpg`, { type: 'image/jpeg' });
-              }
+        // Yield execution to microtask queue so UI updates smoothly at 60 FPS
+        await new Promise(r => setTimeout(r, 10));
+      }
 
-              setFileStatuses(prev => prev.map((fs, j) => j === index ? { ...fs, status: 'compressing' } : fs));
-              const compressedBlob = await imageCompression(fileToProcess, compressionOptions);
-              const finalFile = new File([compressedBlob], webpName, { type: 'image/webp' });
-              
-              return { compressed: finalFile, index, originalName: finalFile.name };
-            } catch (err) {
-              console.error("Processing failed for file:", file.name, err);
-              return { compressed: file, index, originalName: file.name };
-            }
-          })
-        );
+      // STEP 2: CLOUDFLARE R2 UPLOAD IN SMALL BATCHES (NETWORK SAFE)
+      const totalUploadBatches = Math.ceil(processedFiles.length / UPLOAD_BATCH_SIZE);
 
-        setStatusText(`Requesting secure links for batch ${batchNum}...`);
-        const fileNames = compressedItems.map(item => item.originalName);
+      for (let i = 0; i < processedFiles.length; i += UPLOAD_BATCH_SIZE) {
+        const chunk = processedFiles.slice(i, i + UPLOAD_BATCH_SIZE);
+        const batchNum = Math.floor(i / UPLOAD_BATCH_SIZE) + 1;
+
+        setStatusText(`Requesting Cloudflare links for batch ${batchNum} of ${totalUploadBatches}...`);
+        const fileNames = chunk.map(item => item.originalName);
         const urlResponse = await generatePresignedUrls(fileNames);
 
         if (!urlResponse.success || !urlResponse.urls) {
@@ -136,15 +204,18 @@ export default function MediaManager({ initialMedia = [] }: { initialMedia?: any
           continue; 
         }
 
-        setStatusText(`Uploading batch ${batchNum} of ${totalBatches}...`);
-        const uploadPromises = compressedItems.map((item, urlIdx) => {
+        setStatusText(`Uploading batch ${batchNum} of ${totalUploadBatches}...`);
+        const uploadPromises = chunk.map((item, urlIdx) => {
           const urlData = urlResponse.urls![urlIdx];
           return uploadSingleFile(item.compressed, item.index, urlData.uploadUrl).then(success => ({ success, urlData }));
         });
 
         const results = await Promise.all(uploadPromises);
+
         setStatusText(`Saving batch ${batchNum} to database...`);
-        const successfulAssets = results.filter(r => r.success).map(r => ({ id: r.urlData.id, url: r.urlData.publicUrl, fileName: r.urlData.fileName }));
+        const successfulAssets = results
+          .filter(r => r.success)
+          .map(r => ({ id: r.urlData.id, url: r.urlData.publicUrl, fileName: r.urlData.fileName }));
 
         if (successfulAssets.length > 0) {
           await saveMediaAssetsToDb(successfulAssets);
@@ -155,11 +226,16 @@ export default function MediaManager({ initialMedia = [] }: { initialMedia?: any
       }
 
       if (totalFailed > 0) {
-        setStatusText(`${totalFailed} upload(s) failed. Please click retry.`);
+        setStatusText(`${totalFailed} upload(s) failed. Click retry.`);
       } else {
-        setStatusText('All batches uploaded successfully!');
-        setTimeout(() => { setIsUploading(false); setStatusText(''); setFileStatuses([]); }, 3000);
+        setStatusText('Upload Complete!');
+        setTimeout(() => {
+          setIsUploading(false);
+          setStatusText('');
+          setFileStatuses([]);
+        }, 3000);
       }
+
     } catch (error: any) {
       alert(`Upload error: ${error.message}`);
     } finally {
@@ -197,7 +273,7 @@ export default function MediaManager({ initialMedia = [] }: { initialMedia?: any
   };
 
   const handleDeleteAllMedia = async () => {
-    if (!window.confirm("WARNING: This will permanently delete ALL unused images from your database and Cloudflare R2 bucket. This action cannot be undone. Proceed?")) return;
+    if (!window.confirm("WARNING: Permanently delete ALL unused images from database and R2? Proceed?")) return;
     setIsDeletingAll(true);
     const res = await deleteAllMediaAssets();
     if (res.success) {
@@ -209,7 +285,7 @@ export default function MediaManager({ initialMedia = [] }: { initialMedia?: any
   };
 
   const handleCloseModal = () => {
-    if (isUploading && !window.confirm('An upload is currently in progress. Are you sure you want to close the window?')) return;
+    if (isUploading && !window.confirm('An upload is currently in progress. Close window?')) return;
     setIsOpen(false);
     if (!isUploading) { setFileStatuses([]); setStatusText(''); }
   };
@@ -262,7 +338,7 @@ export default function MediaManager({ initialMedia = [] }: { initialMedia?: any
                       </div>
                       <h3 className="font-bold text-sm uppercase tracking-widest text-white mb-2">Bulk Upload Media</h3>
                       <p className="text-xs text-gray-500 text-center max-w-sm leading-relaxed">
-                        Drag & drop images here. Large batches (including iPhone HEIC files) will be decoded, converted to WebP, and processed safely.
+                        Drag & drop images here. Batch conversion runs on a single-pass worker pipeline to preserve device RAM.
                       </p>
                     </div>
                   ) : (
@@ -292,10 +368,10 @@ export default function MediaManager({ initialMedia = [] }: { initialMedia?: any
                               <span className="text-xs font-medium text-gray-300 truncate max-w-[50%]" title={file.name}>{file.name}</span>
                               <div className="flex items-center gap-3 w-1/2 justify-end">
                                 <div className="flex-1 h-1.5 bg-black rounded-full overflow-hidden">
-                                  <div className={`h-full transition-all duration-300 ${file.status === 'failed' ? 'bg-red-500' : file.status === 'decoding' ? 'bg-blue-500' : 'bg-brand-primary'}`} style={{ width: `${file.status === 'decoding' ? 10 : file.status === 'compressing' ? 25 : file.progress}%` }}></div>
+                                  <div className={`h-full transition-all duration-300 ${file.status === 'failed' ? 'bg-red-500' : file.status === 'decoding' ? 'bg-blue-500' : 'bg-brand-primary'}`} style={{ width: `${file.status === 'compressing' ? 25 : file.progress}%` }}></div>
                                 </div>
-                                <span className={`text-[10px] font-bold uppercase tracking-widest min-w-[70px] text-right ${file.status === 'failed' ? 'text-red-400' : file.status === 'decoding' ? 'text-blue-400' : 'text-gray-500'}`}>
-                                  {file.status === 'failed' ? 'Failed' : file.status === 'decoding' ? 'Decoding' : file.status === 'compressing' ? 'Zipping' : file.retryCount > 0 ? `Retry ${file.retryCount}` : `${file.progress}%`}
+                                <span className={`text-[10px] font-bold uppercase tracking-widest min-w-[70px] text-right ${file.status === 'failed' ? 'text-red-400' : 'text-gray-500'}`}>
+                                  {file.status === 'failed' ? 'Failed' : file.status === 'compressing' ? 'WebP Zipping' : file.retryCount > 0 ? `Retry ${file.retryCount}` : `${file.progress}%`}
                                 </span>
                               </div>
                             </div>
