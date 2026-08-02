@@ -118,7 +118,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               className="inline-flex items-center justify-center space-x-1.5 bg-transparent border border-white/20 rounded-full px-2.5 py-1 mb-2 sm:mb-4"
             >
               <ShieldCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-brand-primary" />
-              <span className="text-white text-[11px] sm:text-[10px] font-bold tracking-widest uppercase">
+              <span className="text-white text-[14px] sm:text-[14px] font-bold tracking-widest uppercase">
                 {brand.hero?.badge || "TESTED, TRUSTED AND APPROVED"}
               </span>
             </motion.div>
@@ -127,7 +127,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             <div className="overflow-hidden mb-2 sm:mb-4 w-full">
               <motion.h1 
                 variants={heroReveal}
-                className="font-display uppercase tracking-wider text-[2.5rem] sm:text-6xl md:text-7xl lg:text-[7.5rem] leading-[0.9] text-white drop-shadow-2xl"
+                className="font-display uppercase tracking-wider text-[2.5rem] sm:text-8xl md:text-9xl lg:text-[7.5rem] leading-[0.9] text-white drop-shadow-2xl"
               >
                 {brand.hero?.headlineTop || "HOME OF THE BEST"} <br/> 
                 <span className="text-brand-primary">{brand.hero?.headlineHighlight || "SNEAKERS & CLEATS"}</span>
