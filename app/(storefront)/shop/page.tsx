@@ -1,5 +1,5 @@
-// app/(storefront)/shop/page.tsx
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 import { getDb } from '@/lib/db';
 import { products } from '@/lib/db/schema';
 import { brand } from '@/lib/data/brand';
@@ -7,9 +7,8 @@ import ShopClient from './ShopClient';
 
 export const revalidate = 60;
 
-// 1. Static SEO Metadata for the Shop Page
 export const metadata: Metadata = {
-  title: 'Shop All Footwear', // Layout template will append "| KICKVERSE"
+  title: 'Shop All Footwear',
   description: 'Browse our complete catalog of authentic sneakers, firm ground soccer cleats, and astro turf boots. Swift delivery across Kenya.',
   openGraph: {
     title: `Shop Collection | ${brand.shortName}`,
@@ -19,14 +18,9 @@ export const metadata: Metadata = {
 };
 
 export default async function ShopPage() {
-  // Wait for the OpenNext / Cloudflare bindings to initialize
   const db = await getDb();
-  
-  // Fetch every single product from the database
   const allProducts = await db.select().from(products);
 
-  // 2. Construct JSON-LD Schema.org Data for the Collection Page
-  // We map through the products to create a structured list for Google crawlers
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -42,14 +36,22 @@ export default async function ShopPage() {
     })),
   };
 
-  // Pass them cleanly down to your interactive UI
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ShopClient initialProducts={allProducts} />
+      {/* Wrap the client component in a Suspense boundary here */}
+      <Suspense 
+        fallback={
+          <div className="min-h-screen flex items-center justify-center bg-brand-dark">
+            <div className="w-8 h-8 rounded-full border-4 border-white/20 border-t-brand-primary animate-spin" />
+          </div>
+        }
+      >
+        <ShopClient initialProducts={allProducts} />
+      </Suspense>
     </>
   );
 }

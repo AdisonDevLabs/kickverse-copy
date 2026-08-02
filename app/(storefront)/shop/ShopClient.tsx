@@ -11,7 +11,7 @@ import { discoveryChips, filterCategories, searchSuggestions, priceRanges, filte
 import { motion, AnimatePresence } from 'motion/react';
 import { staggerContainer, staggerItem, fadeIn, fadeUp } from '@/lib/animations';
 
-function ShopContent({ initialProducts }: { initialProducts: any[] }) {
+export default function ShopClient({ initialProducts }: { initialProducts: any[] }) {
   const searchParams = useSearchParams();
   const rawCategory = searchParams.get('category');
   const normalizeSlug = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -902,13 +902,5 @@ function ShopContent({ initialProducts }: { initialProducts: any[] }) {
       </AnimatePresence>
 
     </div>
-  );
-}
-
-export default function ShopClient({ initialProducts }: { initialProducts: any[] }) {
-  return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-white/20 border-t-brand-primary animate-spin" /></div>}>
-      <ShopContent initialProducts={initialProducts} />
-    </Suspense>
   );
 }
