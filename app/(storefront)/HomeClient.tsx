@@ -81,6 +81,18 @@ export default function HomeClient({ initialProducts, initialCategories, initial
     cleatProducts.some((p: any) => p.category === collection.name)
   );
 
+  // 4. Filter Official Shoes and their corresponding categories
+  const officialProducts = initialProducts.filter((p: any) => p.productType === 'Official Shoes');
+  const displayOfficialCategories = initialCategories.filter((collection: any) => 
+    officialProducts.some((p: any) => p.category === collection.name)
+  );
+
+  // 5. Filter Opens & Sandals and their corresponding categories
+  const sandalProducts = initialProducts.filter((p: any) => p.productType === 'Opens & Sandals');
+  const displaySandalCategories = initialCategories.filter((collection: any) => 
+    sandalProducts.some((p: any) => p.category === collection.name)
+  );
+
   return (
     <div ref={containerRef} className="flex flex-col min-h-screen bg-brand-dark text-white">
       {/* 
@@ -118,7 +130,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               className="inline-flex items-center justify-center space-x-1.5 bg-transparent border border-white/20 rounded-full px-2.5 py-1 mb-2 sm:mb-4"
             >
               <ShieldCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-brand-primary" />
-              <span className="text-white text-[14px] sm:text-[14px] font-bold tracking-widest uppercase">
+              <span className="text-white text-[14px] sm:text-[12px] font-bold tracking-widest uppercase">
                 {brand.hero?.badge || "TESTED, TRUSTED AND APPROVED"}
               </span>
             </motion.div>
@@ -127,7 +139,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             <div className="overflow-hidden mb-2 sm:mb-4 w-full">
               <motion.h1 
                 variants={heroReveal}
-                className="font-display uppercase tracking-wider text-[2.5rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[7.5rem] leading-[0.9] text-white drop-shadow-2xl"
+                className="font-display uppercase tracking-wider text-[4.5rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[7.5rem] leading-[0.9] text-white drop-shadow-2xl"
               >
                 {brand.hero?.headlineTop || "HOME OF THE BEST"} <br/> 
                 <span className="text-brand-primary">{brand.hero?.headlineHighlight || "SNEAKERS & CLEATS"}</span>
@@ -137,7 +149,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             {/* Subheadline */}
             <motion.p 
               variants={staggerItem}
-              className="text-gray-300 text-[11px] sm:text-sm md:text-base max-w-[280px] sm:max-w-lg mb-3 sm:mb-5 font-medium leading-relaxed drop-shadow-md mx-auto"
+              className="text-gray-200 text-[11px] sm:text-sm md:text-base max-w-[280px] sm:max-w-lg mb-3 sm:mb-5 font-medium leading-relaxed drop-shadow-xl shadow-black mx-auto"
             >
               {brand.description}
             </motion.p>
@@ -145,17 +157,17 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             {/* Micro Trust Row - Added justify-center */}
             <motion.div 
               variants={staggerItem}
-              className="flex flex-wrap items-center justify-center gap-y-1 sm:gap-y-2 gap-x-2 sm:gap-x-4 mb-4 sm:mb-6 text-[8px] sm:text-[10px] md:text-xs font-bold uppercase tracking-widest text-white drop-shadow-md"
+              className="flex flex-wrap items-center justify-center gap-y-1 sm:gap-y-2 gap-x-2 sm:gap-x-4 mb-4 sm:mb-6 text-[8px] sm:text-[10px] md:text-xs font-bold uppercase tracking-widest text-white drop-shadow-xl shadow-black"
             >
               <div className="flex items-center">
                 <Truck className="h-2.5 w-2.5 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-brand-primary" /> {brand.trustStatements[0] || "We Deliver countrywide"}
               </div>
-              <span className="text-white/40 hidden sm:block">•</span>
+              <span className="text-white/40 sm:block">•</span>
               <div className="flex items-center">
                 <ShieldCheck className="h-2.5 w-2.5 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-brand-primary" /> {brand.trustStatements[1] || "Genuine quality"}
               </div>
-               <span className="text-white/40 hidden xl:block">•</span>
-               <div className="hidden sm:flex items-center">
+               <span className="text-white/40 xl:block">•</span>
+               <div className=" sm:flex items-center">
                 <Wallet className="h-2.5 w-2.5 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-brand-primary" /> {brand.trustStatements[2] || "Pay on delivery"}
               </div>
             </motion.div>
@@ -181,32 +193,32 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                </Link>
             </motion.div>
 
-            {/* Choose Your Collection Cards (Internal text remains left-aligned) */}
+            {/* Choose Your Collection Cards - Expanded max width to support 4 columns */}
             <motion.div 
               variants={staggerItem} 
-              className="w-full max-w-sm sm:max-w-lg md:max-w-2xl mt-6 sm:mt-10"
+              className="w-full max-w-sm sm:max-w-lg md:max-w-5xl lg:max-w-6xl mt-6 sm:mt-10"
             >
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-                {/* Sneakers Card */}
+              {/* Changed to md:grid-cols-4 for big screens and grid-cols-2 for mobile screens */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+                
+                {/* 1. Sneakers Card */}
                 <Link 
                   href="/shop?type=sneakers" 
                   className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
-                  
                   <Image
                     src={displayCategories?.[0]?.image || brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
                     alt="Shop Sneakers"
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                   />
-                  
                   <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-4 md:p-5 text-left">
                     <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full border border-brand-primary flex items-center justify-center mb-1 sm:mb-2">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-primary w-2.5 h-2.5 sm:w-4 sm:h-4"><path d="M2 14h20.4l-1.9-6H5.5L2 14z"/><path d="M22 14v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4"/><path d="M9 14v4"/><path d="M15 14v4"/></svg>
                     </div>
-                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-xl md:text-2xl drop-shadow-lg mb-0.5 group-hover:text-brand-primary transition-colors leading-none">
+                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-lg lg:text-2xl drop-shadow-lg mb-0.5 group-hover:text-brand-primary transition-colors leading-none">
                       SNEAKERS
                     </h3>
                     <p className="text-gray-300 text-[6px] sm:text-[9px] md:text-[10px] font-medium mb-1.5 sm:mb-3 truncate">Lifestyle • Streetwear</p>
@@ -216,27 +228,25 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   </div>
                 </Link>
 
-                {/* Cleats Card */}
+                {/* 2. Cleats Card */}
                 <Link 
                   href="/shop?type=soccer-cleats" 
                   className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
-                  
                   <Image
                     src={displayCleatCategories?.[0]?.image || brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
                     alt="Shop Soccer Cleats"
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                   />
-                  
                   <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-4 md:p-5 text-left">
                     <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full border border-brand-primary flex items-center justify-center mb-1 sm:mb-2">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-primary w-2.5 h-2.5 sm:w-4 sm:h-4"><circle cx="12" cy="12" r="10"/><path d="M12 12 7.5 9"/><path d="M12 12v5.5"/><path d="M12 12l4.5-3"/><path d="m14 19-2-1.5-2 1.5"/><path d="m5 15 2.5-1.5"/><path d="m19 15-2.5-1.5"/><path d="m10 5 2 1.5 2-1.5"/></svg>
                     </div>
-                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-xl md:text-2xl drop-shadow-lg mb-0.5 group-hover:text-brand-primary transition-colors leading-none">
-                      CLEATS
+                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-lg lg:text-2xl drop-shadow-lg mb-0.5 group-hover:text-brand-primary transition-colors leading-none">
+                      SOCCER CLEATS
                     </h3>
                     <p className="text-gray-300 text-[6px] sm:text-[9px] md:text-[10px] font-medium mb-1.5 sm:mb-3 truncate">Matchday • Training</p>
                     <div className="bg-white text-black text-[6px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2 py-1 sm:px-3 sm:py-1.5 rounded-sm w-max flex items-center group-hover:bg-brand-primary transition-colors">
@@ -244,6 +254,61 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     </div>
                   </div>
                 </Link>
+
+                {/* 3. Official Shoes Card */}
+                <Link 
+                  href="/shop?type=official-shoes" 
+                  className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
+                  <Image
+                    src={displayOfficialCategories?.[0]?.image || brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
+                    alt="Shop Official Shoes"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
+                  />
+                  <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-4 md:p-5 text-left">
+                    <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full border border-brand-primary flex items-center justify-center mb-1 sm:mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-primary w-2.5 h-2.5 sm:w-4 sm:h-4"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    </div>
+                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-lg lg:text-2xl drop-shadow-lg mb-0.5 group-hover:text-brand-primary transition-colors leading-none">
+                      OFFICIAL
+                    </h3>
+                    <p className="text-gray-300 text-[6px] sm:text-[9px] md:text-[10px] font-medium mb-1.5 sm:mb-3 truncate">Formal • Business</p>
+                    <div className="bg-white text-black text-[6px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2 py-1 sm:px-3 sm:py-1.5 rounded-sm w-max flex items-center group-hover:bg-brand-primary transition-colors">
+                      <span className="hidden sm:inline-block mr-1">SHOP</span> <ArrowRight className="sm:ml-1 h-2 w-2 sm:h-2.5 sm:w-2.5" />
+                    </div>
+                  </div>
+                </Link>
+
+                {/* 4. Opens & Sandals Card */}
+                <Link 
+                  href="/shop?type=opens-sandals" 
+                  className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
+                  <Image
+                    src={displaySandalCategories?.[0]?.image || brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
+                    alt="Shop Opens & Sandals"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
+                  />
+                  <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-4 md:p-5 text-left">
+                    <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full border border-brand-primary flex items-center justify-center mb-1 sm:mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-primary w-2.5 h-2.5 sm:w-4 sm:h-4"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                    </div>
+                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-lg lg:text-2xl drop-shadow-lg mb-0.5 group-hover:text-brand-primary transition-colors leading-none">
+                      OPENS & SANDALS
+                    </h3>
+                    <p className="text-gray-300 text-[6px] sm:text-[9px] md:text-[10px] font-medium mb-1.5 sm:mb-3 truncate">Casual • Summer</p>
+                    <div className="bg-white text-black text-[6px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2 py-1 sm:px-3 sm:py-1.5 rounded-sm w-max flex items-center group-hover:bg-brand-primary transition-colors">
+                      <span className="hidden sm:inline-block mr-1">SHOP</span> <ArrowRight className="sm:ml-1 h-2 w-2 sm:h-2.5 sm:w-2.5" />
+                    </div>
+                  </div>
+                </Link>
+
               </div>
             </motion.div>
 
