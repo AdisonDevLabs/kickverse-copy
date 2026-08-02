@@ -101,7 +101,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             className="hero-image object-cover object-right md:object-center opacity-80 md:opacity-100"
           />
           {/* Mobile dark overlay for guaranteed readability */}
-          <div className="absolute inset-0 bg-black/40 z-0" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-black/50 via-black/30 to-transparent z-0" />
           
           {/* Desktop heavy black gradient on left side fading seamlessly to the image 
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent hidden md:block z-0" />*/}
@@ -127,7 +127,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             <div className="overflow-hidden mb-2 sm:mb-4 w-full">
               <motion.h1 
                 variants={heroReveal}
-                className="font-display uppercase tracking-wider text-[2.5rem] sm:text-8xl md:text-9xl lg:text-[7.5rem] leading-[0.9] text-white drop-shadow-2xl"
+                className="font-display uppercase tracking-wider text-[2.5rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[7.5rem] leading-[0.9] text-white drop-shadow-2xl"
               >
                 {brand.hero?.headlineTop || "HOME OF THE BEST"} <br/> 
                 <span className="text-brand-primary">{brand.hero?.headlineHighlight || "SNEAKERS & CLEATS"}</span>
