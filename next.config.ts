@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
   },
   // Allow access to remote image placeholder.
   images: {
+    // 1. Disable Next.js image optimization to save Worker CPU
+    unoptimized: true,
+    // 2. Add modern image formats for better Core Web Vitals
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -33,6 +37,12 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'kickverse.co.ke',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.kickverse.co.ke',
         port: '',
         pathname: '/**',
       }

@@ -84,13 +84,13 @@ export async function requestPasswordReset(formData: FormData) {
 
       // Send the email
       await transporter.sendMail({
-        from: `"Shoe World Admin" <${process.env.SMTP_USER}>`,
+        from: `"Kickverse KE Admin" <${process.env.SMTP_USER}>`,
         to: email,
-        subject: "Shoe World - Admin Password Reset",
+        subject: "Kickverse - Admin Password Reset",
         html: `
           <div style="font-family: sans-serif; max-w: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
             <h2 style="color: #111;">Password Reset Request</h2>
-            <p style="color: #444; line-height: 1.6;">You recently requested to reset the password for your Shoe World Admin account. Click the button below to set a new password.</p>
+            <p style="color: #444; line-height: 1.6;">You recently requested to reset the password for your Kickverse Admin account. Click the button below to set a new password.</p>
             <div style="text-align: center; margin: 30px 0;">
               <a href="${resetLink}" style="background-color: #C6FF00; color: #000; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px; display: inline-block;">
                 Reset Password

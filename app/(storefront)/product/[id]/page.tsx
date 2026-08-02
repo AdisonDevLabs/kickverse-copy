@@ -6,7 +6,7 @@ import { getDb } from '@/lib/db';
 import { products, sizeGuides, colorMap } from '@/lib/db/schema';
 import { eq, and, not, sql } from 'drizzle-orm';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 type Props = {
   params: Promise<{ id: string }>;

@@ -7,7 +7,7 @@ import { getDb } from '@/lib/db';
 import { mediaAssets } from '@/lib/db/schema'; // <-- Added schema import
 import { revalidatePath } from 'next/cache';
 
-const R2_PUBLIC_URL = 'https://pub-f155ba911ca84f60b68320b0d5bb35df.r2.dev';
+const R2_PUBLIC_URL = 'https://cdn.kickverse.co.ke';
 
 const S3 = new S3Client({
   region: "auto",

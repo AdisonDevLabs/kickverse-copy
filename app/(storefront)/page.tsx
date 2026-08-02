@@ -6,7 +6,7 @@ import { brand } from '@/lib/data/brand';
 import HomeClient from './HomeClient';
 
 // 1. Tell Next.js to use Cloudflare's Edge network
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export default async function HomePage() {
   // 2. Await the database initialization

@@ -5,7 +5,7 @@ import { products } from '@/lib/db/schema';
 import { brand } from '@/lib/data/brand';
 import ShopClient from './ShopClient';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 // 1. Static SEO Metadata for the Shop Page
 export const metadata: Metadata = {

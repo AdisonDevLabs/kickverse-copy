@@ -7,7 +7,7 @@ import { products, categories, colorMap, sizeGuides, mediaAssets, productTypeEnu
 import { eq, inArray } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
-const R2_PUBLIC_URL = 'https://pub-f155ba911ca84f60b68320b0d5bb35df.r2.dev'; 
+const R2_PUBLIC_URL = 'https://cdn.kickverse.co.ke'; 
 
 export async function createProduct(formData: FormData) {
   try {
@@ -282,7 +282,7 @@ export async function createCategory(formData: FormData) {
     await env.PRODUCT_IMAGES.put(key, new Uint8Array(await imageFile.arrayBuffer()), { 
         httpMetadata: { contentType: imageFile.type } 
     });
-    const imageUrl = `https://pub-f155ba911ca84f60b68320b0d5bb35df.r2.dev/${key}`;
+    const imageUrl = `https://cdn.kickverse.co.ke/${key}`;
 
     await db.insert(categories).values({ 
         slug, 
@@ -329,7 +329,7 @@ export async function updateCategory(slug: string, formData: FormData) {
       await env.PRODUCT_IMAGES.put(key, new Uint8Array(await imageFile.arrayBuffer()), { 
           httpMetadata: { contentType: imageFile.type } 
       });
-      imageUrl = `https://pub-f155ba911ca84f60b68320b0d5bb35df.r2.dev/${key}`;
+      imageUrl = `https://cdn.kickverse.co.ke/${key}`;
     }
 
     await db.update(categories).set({ 

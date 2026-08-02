@@ -3,6 +3,8 @@ import { getDb } from '@/lib/db';
 import { products } from '@/lib/db/schema';
 import { brand } from '@/lib/data/brand';
 
+export const revalidate = 86400;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = brand.url;
   const db = await getDb();

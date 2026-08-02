@@ -1,5 +1,6 @@
+packages:
+  - .
+
 onlyBuiltDependencies:
   - '@google/genai'
-
-packages:
-  - "."
+  - workerd
