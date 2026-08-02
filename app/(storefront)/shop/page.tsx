@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
-import dynamic from 'next/dynamic';
 import { getDb } from '@/lib/db';
 import { products } from '@/lib/db/schema';
 import { brand } from '@/lib/data/brand';
+import ShopWrapper from './ShopWrapper'; // Import the new wrapper
 
 export const revalidate = 60;
 
@@ -15,16 +15,6 @@ export const metadata: Metadata = {
     url: `${brand.url}shop`,
   },
 };
-
-// 1. Dynamically import ShopClient and strictly disable SSR
-const ShopClient = dynamic(() => import('./ShopClient'), {
-  ssr: false,
-  loading: () => (
-    <div className="min-h-screen flex items-center justify-center bg-brand-dark">
-      <div className="w-8 h-8 rounded-full border-4 border-white/20 border-t-brand-primary animate-spin" />
-    </div>
-  ),
-});
 
 export default async function ShopPage() {
   const db = await getDb();
@@ -51,8 +41,8 @@ export default async function ShopPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {/* 2. Render the dynamic component directly without a Suspense wrapper */}
-      <ShopClient initialProducts={allProducts} />
+      {/* Render the wrapper which safely handles the dynamic client load */}
+      <ShopWrapper initialProducts={allProducts} />
     </>
   );
 }
