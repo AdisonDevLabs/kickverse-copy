@@ -103,8 +103,8 @@ export default function HomeClient({ initialProducts, initialCategories, initial
           {/* Mobile dark overlay for guaranteed readability */}
           <div className="absolute inset-0 bg-black/40 z-0" />
           
-          {/* Desktop heavy black gradient on left side fading seamlessly to the image */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-black/80 via-black/40 to-transparent z-0" />
+          {/* Desktop heavy black gradient on left side fading seamlessly to the image
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-black/80 via-black/40 to-transparent z-0" />*/}
         </div>
 
         {/* Content Wrapper - Changed items-start to items-center */}
