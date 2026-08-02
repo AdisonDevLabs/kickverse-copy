@@ -105,7 +105,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
         {/* Full Section Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
-            src={brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
+            src={brand.hero?.backgroundImage}
             alt="Hero Background"
             fill
             priority
@@ -139,7 +139,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             <div className="overflow-hidden mb-2 sm:mb-4 w-full">
               <motion.h1 
                 variants={heroReveal}
-                className="font-display uppercase tracking-wider text-[4.5rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[7.5rem] leading-[0.9] text-white drop-shadow-2xl"
+                className="font-display uppercase tracking-wider text-[3rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[7.5rem] leading-[0.9] text-white drop-shadow-2xl"
               >
                 {brand.hero?.headlineTop || "HOME OF THE BEST"} <br/> 
                 <span className="text-brand-primary">{brand.hero?.headlineHighlight || "SNEAKERS & CLEATS"}</span>
@@ -206,10 +206,10 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   href="/shop?type=sneakers" 
                   className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
+                  
                   <Image
-                    src={displayCategories?.[0]?.image || brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
+                    src={displayCategories?.[0]?.image || brand.hero?.backgroundImage}
                     alt="Shop Sneakers"
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
@@ -233,10 +233,10 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   href="/shop?type=soccer-cleats" 
                   className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
+                  
                   <Image
-                    src={displayCleatCategories?.[0]?.image || brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
+                    src={displayCleatCategories?.[0]?.image || brand.hero?.backgroundImage}
                     alt="Shop Soccer Cleats"
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
@@ -260,10 +260,10 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   href="/shop?type=official-shoes" 
                   className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
+                  
                   <Image
-                    src={displayOfficialCategories?.[0]?.image || brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
+                    src={displayOfficialCategories?.[0]?.image || brand.hero?.backgroundImage}
                     alt="Shop Official Shoes"
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
@@ -287,10 +287,10 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   href="/shop?type=opens-sandals" 
                   className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
+                  
                   <Image
-                    src={displaySandalCategories?.[0]?.image || brand.hero?.backgroundImage || "/pexels-wedding-maps-130174465-10114295.jpg"}
+                    src={displaySandalCategories?.[0]?.image || brand.hero?.backgroundImage}
                     alt="Shop Opens & Sandals"
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
