@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { getDb } from '@/lib/db';
 import { categories } from '@/lib/db/schema';
 import CategoryManager from './CategoryManager'; 
+import MediaManager from './components/MediaManager';
 
 export const metadata = {
   title: 'Admin Dashboard | Kickverse KE',
@@ -57,9 +58,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <CategoryManager categories={allCategories} />
          </div>
 
-         <Link href="/admin" className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-brand-primary transition-colors whitespace-nowrap h-full border-b-2 border-transparent hover:border-brand-primary">
-           <ImageIcon className="w-4 h-4 mr-2" /> Media Library
-         </Link>
+         {/* 2. Replaced static link with MediaManager Trigger */}
+         <div className="flex items-center h-full border-b-2 border-transparent hover:border-brand-primary transition-colors">
+            <MediaManager />
+         </div>
          
          <Link href="/admin/colors" className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-brand-primary transition-colors whitespace-nowrap h-full border-b-2 border-transparent hover:border-brand-primary">
            <Palette className="w-4 h-4 mr-2" /> Colors

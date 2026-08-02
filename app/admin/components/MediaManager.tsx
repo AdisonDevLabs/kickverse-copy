@@ -204,10 +204,10 @@ export default function MediaManager() {
 
   return (
     <>
-      {/* Sleek Modal Trigger Button */}
+      {/* Sleek Modal Trigger Button - Now styled as a Nav Link */}
       <button
         onClick={() => setIsOpen(true)}
-        className="bg-white/5 hover:bg-white/10 text-white px-5 py-2.5 rounded-md font-bold uppercase tracking-widest text-xs flex items-center transition-colors shrink-0 border border-white/10 shadow-sm"
+        className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-brand-primary transition-colors whitespace-nowrap bg-transparent border-none p-0 cursor-pointer h-full"
       >
         <ImagePlus className="w-4 h-4 mr-2" /> Bulk Upload
       </button>

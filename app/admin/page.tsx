@@ -7,7 +7,6 @@ import { Suspense } from 'react';
 import { Plus, Edit, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import DeleteButton from './DeleteButton';
 import CategoryManager from './CategoryManager';
-import MediaManager from './components/MediaManager';
 import ProductToolbar from './components/ProductToolbar';
 
 export const dynamic = 'force-dynamic';
@@ -84,10 +83,6 @@ export default async function AdminDashboard(props: { searchParams: SearchParams
 
           <div className="hidden lg:flex px-3 border-l border-white/10 items-center h-full">
             <CategoryManager categories={allCategories} />
-          </div>
-
-          <div className="hidden sm:block">
-            <MediaManager />
           </div>
 
           <Link 
