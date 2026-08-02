@@ -220,7 +220,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       SNEAKERS
                     </h3>
                     <div className="flex justify-between items-end w-full">
-                      <p className="text-gray-300 text-[6px] sm:text-[9px] md:text-[10px] font-medium truncate pr-2">Lifestyle • Streetwear</p>
+                      <p className="text-gray-300 text-[8px] sm:text-[10px] md:text-[12px] font-medium truncate pr-2">Lifestyle • Streetwear</p>
                       <div className="bg-white text-black text-[6px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2 py-1 sm:px-3 sm:py-1.5 rounded-sm w-max flex items-center group-hover:bg-brand-primary transition-colors shrink-0">
                         <span className="hidden sm:inline-block mr-1">SHOP</span> <ArrowRight className="sm:ml-1 h-2 w-2 sm:h-2.5 sm:w-2.5" />
                       </div>
@@ -249,7 +249,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       SOCCER CLEATS
                     </h3>
                     <div className="flex justify-between items-end w-full">
-                      <p className="text-gray-300 text-[6px] sm:text-[9px] md:text-[10px] font-medium truncate pr-2">Matchday • Training</p>
+                      <p className="text-gray-300 text-[8px] sm:text-[10px] md:text-[12px] font-medium truncate pr-2">Matchday • Training</p>
                       <div className="bg-white text-black text-[6px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2 py-1 sm:px-3 sm:py-1.5 rounded-sm w-max flex items-center group-hover:bg-brand-primary transition-colors shrink-0">
                         <span className="hidden sm:inline-block mr-1">SHOP</span> <ArrowRight className="sm:ml-1 h-2 w-2 sm:h-2.5 sm:w-2.5" />
                       </div>
@@ -278,7 +278,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       OFFICIAL
                     </h3>
                     <div className="flex justify-between items-end w-full">
-                      <p className="text-gray-300 text-[6px] sm:text-[9px] md:text-[10px] font-medium truncate pr-2">Formal • Business</p>
+                      <p className="text-gray-300 text-[8px] sm:text-[10px] md:text-[12px] font-medium truncate pr-2">Formal • Business</p>
                       <div className="bg-white text-black text-[6px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2 py-1 sm:px-3 sm:py-1.5 rounded-sm w-max flex items-center group-hover:bg-brand-primary transition-colors shrink-0">
                         <span className="hidden sm:inline-block mr-1">SHOP</span> <ArrowRight className="sm:ml-1 h-2 w-2 sm:h-2.5 sm:w-2.5" />
                       </div>
@@ -307,7 +307,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       OPENS & SANDALS
                     </h3>
                     <div className="flex justify-between items-end w-full">
-                      <p className="text-gray-300 text-[6px] sm:text-[9px] md:text-[10px] font-medium truncate pr-2">Casual • Summer</p>
+                      <p className="text-gray-300 text-[8px] sm:text-[10px] md:text-[12px] font-medium truncate pr-2">Casual • Summer</p>
                       <div className="bg-white text-black text-[6px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2 py-1 sm:px-3 sm:py-1.5 rounded-sm w-max flex items-center group-hover:bg-brand-primary transition-colors shrink-0">
                         <span className="hidden sm:inline-block mr-1">SHOP</span> <ArrowRight className="sm:ml-1 h-2 w-2 sm:h-2.5 sm:w-2.5" />
                       </div>
