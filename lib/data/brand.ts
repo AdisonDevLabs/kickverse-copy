@@ -9,7 +9,7 @@ export const brand = {
   logo1: "/android-chrome-512x512.png",
   tagline: "HOME OF THE BEST SNEAKERS & CLEATS",
   description:
-    "Shop with us for Genuine quality and best prices. Tested, trusted and approved.",
+    "Shop with us for Genuine quality and best prices. 100% Verified Secure Shopping",
   location: "Nairobi, Kenya",
   seo: {
     title: "KICKVERSE KE | HOME OF THE BEST SNEAKERS & CLEATS",
