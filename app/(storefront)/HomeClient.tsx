@@ -130,7 +130,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               className="inline-flex items-center justify-center space-x-1.5 bg-transparent border border-white/20 rounded-full px-2.5 py-1 mb-2 sm:mb-4"
             >
               <ShieldCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-brand-primary" />
-              <span className="text-white text-[12px] sm:text-[12px] font-bold tracking-widest uppercase">
+              <span className="text-white text-[10px] sm:text-[10px] font-bold tracking-widest uppercase">
                 {brand.hero?.badge || "TESTED, TRUSTED AND APPROVED"}
               </span>
             </motion.div>
@@ -154,21 +154,19 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               {brand.description}
             </motion.p>
             
-            {/* Micro Trust Row - Added justify-center */}
+            {/* Micro Trust List - Centered vertically */}
             <motion.div 
               variants={staggerItem}
-              className="flex flex-wrap items-center justify-center gap-y-1 sm:gap-y-2 gap-x-2 sm:gap-x-4 mb-4 sm:mb-6 text-[8px] sm:text-[10px] md:text-xs font-bold uppercase tracking-widest text-white drop-shadow-xl shadow-black"
+              className="flex flex-col items-center justify-center gap-y-2 sm:gap-y-3 mb-4 sm:mb-6 text-[9px] sm:text-[11px] md:text-xs font-bold uppercase tracking-widest text-white drop-shadow-xl shadow-black"
             >
               <div className="flex items-center">
-                <Truck className="h-2.5 w-2.5 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-brand-primary" /> {brand.trustStatements[0] || "We Deliver countrywide"}
+                <Truck className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-brand-primary" /> {brand.trustStatements[0] || "We Deliver countrywide"}
               </div>
-              <span className="text-white/40 sm:block">•</span>
               <div className="flex items-center">
-                <ShieldCheck className="h-2.5 w-2.5 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-brand-primary" /> {brand.trustStatements[1] || "Genuine quality"}
+                <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-brand-primary" /> {brand.trustStatements[1] || "Genuine quality"}
               </div>
-               <span className="text-white/40 xl:block">•</span>
-               <div className=" sm:flex items-center">
-                <Wallet className="h-2.5 w-2.5 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-brand-primary" /> {brand.trustStatements[2] || "Pay on delivery"}
+               <div className="flex items-center">
+                <Wallet className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-brand-primary" /> {brand.trustStatements[2] || "Pay on delivery"}
               </div>
             </motion.div>
 
@@ -196,10 +194,10 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             {/* Choose Your Collection Cards - Expanded max width to support 4 columns */}
             <motion.div 
               variants={staggerItem} 
-              className="w-full max-w-sm sm:max-w-lg md:max-w-2xl lg:max-w-6xl mt-6 sm:mt-10"
+              className="w-full max-w-sm sm:max-w-lg md:max-w-5xl lg:max-w-6xl mt-6 sm:mt-10"
             >
-              {/* Changed to lg:grid-cols-4 so tablets (768px) maintain the 2x2 mobile layout */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+              {/* Changed to md:grid-cols-4 for big screens and grid-cols-2 for mobile screens */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
                 
                 {/* 1. Sneakers Card */}
                 <Link 
