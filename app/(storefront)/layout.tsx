@@ -1,4 +1,5 @@
 // app/(storefront)/layout.tsx
+import { Suspense } from 'react';
 import { CartProvider } from '@/lib/CartContext';
 import { NavBar } from '@/components/NavBar';
 import { Footer } from '@/components/Footer';
@@ -7,7 +8,10 @@ import { CartDrawer } from '@/components/CartDrawer';
 export default function StorefrontLayout({children}: {children: React.ReactNode}) {
   return (
     <CartProvider>
-      <NavBar />
+      {/* Wrap the NavBar in a Suspense boundary to isolate useSearchParams() */}
+      <Suspense fallback={<div className="h-[96px] md:h-[100px] w-full bg-brand-dark border-b border-white/5" />}>
+        <NavBar />
+      </Suspense>
       <CartDrawer />
       <main className="flex flex-col min-h-screen pt-[96px] md:pt-[100px] pb-[88px] md:pb-0">
         {children}
