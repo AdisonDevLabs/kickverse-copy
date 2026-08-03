@@ -207,7 +207,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
                   
                   <Image
-                    src={displayCategories?.[0]?.image || brand.hero?.backgroundImage}
+                    src={displayCategories?.[0]?.image || brand.hero?.sneakersImage}
                     alt="Shop Sneakers"
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
@@ -236,7 +236,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
                   
                   <Image
-                    src={displayCleatCategories?.[0]?.image || brand.hero?.backgroundImage}
+                    src={displayCleatCategories?.[0]?.image || brand.hero?.soccerCleatsImage}
                     alt="Shop Soccer Cleats"
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
@@ -265,7 +265,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
                   
                   <Image
-                    src={displayOfficialCategories?.[0]?.image || brand.hero?.backgroundImage}
+                    src={displayOfficialCategories?.[0]?.image || brand.hero?.officialsImage}
                     alt="Shop Official Shoes"
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
@@ -294,7 +294,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
                   
                   <Image
-                    src={displaySandalCategories?.[0]?.image || brand.hero?.backgroundImage}
+                    src={displaySandalCategories?.[0]?.image || brand.hero?.opensSandalsImage}
                     alt="Shop Opens & Sandals"
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"

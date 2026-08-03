@@ -9,7 +9,7 @@ export default function StorefrontLayout({children}: {children: React.ReactNode}
   return (
     <CartProvider>
       {/* Wrap the NavBar in a Suspense boundary to isolate useSearchParams() */}
-      <Suspense fallback={<div className="h-[96px] md:h-[100px] w-full bg-brand-dark border-b border-white/5" />}>
+      <Suspense>
         <NavBar />
       </Suspense>
       <CartDrawer />
