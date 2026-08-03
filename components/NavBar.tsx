@@ -14,6 +14,42 @@ import { AnnouncementBar } from './AnnouncementBar';
 // Apply the same luxury curve used in animations.ts
 const premiumEasing: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
+const SneakerIcon = ({ className }: { className?: string }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <path d="M4 6h5.426a1 1 0 0 1 .863 .496l1.064 1.823a3 3 0 0 0 1.896 1.407l4.677 1.114a4 4 0 0 1 3.074 3.89v2.27a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-10a1 1 0 0 1 1 -1z" />
+    <path d="M14 13l1 -2" />
+  </svg>
+);
+
+const CleatIcon = ({ className }: { className?: string }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    {/* Base shoe shape */}
+    <path d="M4 6h5.426a1 1 0 0 1 .863 .496l1.064 1.823a3 3 0 0 0 1.896 1.407l4.677 1.114a4 4 0 0 1 3.074 3.89v2.27a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-10a1 1 0 0 1 1 -1z" />
+    {/* Swoosh/Detail line */}
+    <path d="M14 13l1 -2" />
+    {/* Cleat studs on the bottom */}
+    <path d="M6 20v2 M10 20v2 M14 20v2 M18 20v2" />
+  </svg>
+);
+
 export function NavBar() {
   const { cartCount, setIsCartOpen } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -399,7 +435,7 @@ export function NavBar() {
           {/* 2. Sneakers */}
           <Link href="/shop?type=sneakers" className={`relative flex flex-col items-center space-y-1 w-16 p-1 rounded-md transition-all ${isTabActive('/shop', 'sneakers') ? 'text-brand-primary' : 'text-gray-400 hover:text-white'}`}>
             {isTabActive('/shop', 'sneakers') && <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-brand-primary rounded-full"></div>}
-            <Grid className="h-5 w-5" />
+            <SneakerIcon className="h-5 w-5" />
             <span className="text-[9px] font-medium tracking-wide uppercase">Sneakers</span>
           </Link>
           
@@ -423,7 +459,7 @@ export function NavBar() {
           {/* 4. Soccer Cleats */}
           <Link href="/shop?type=soccer-cleats" className={`relative flex flex-col items-center space-y-1 w-16 p-1 rounded-md transition-all ${isTabActive('/shop', 'soccer-cleats') ? 'text-brand-primary' : 'text-gray-400 hover:text-white'}`}>
             {isTabActive('/shop', 'soccer-cleats') && <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-brand-primary rounded-full"></div>}
-            <Tag className="h-5 w-5" />
+            <CleatIcon className="h-5 w-5" />
             <span className="text-[8px] sm:text-[9px] font-medium tracking-wide uppercase text-center w-full whitespace-nowrap">
               Soccer Cleats
             </span>
