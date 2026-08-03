@@ -128,14 +128,13 @@ export default function NewFormClient({ initialCategories, initialMedia, product
       file
     }));
     setSelectedImages(prev => [...prev, ...newImages]);
-    e.target.value = ''; // reset input
+    e.target.value = ''; 
   };
 
   const removeImage = (indexToRemove: number) => {
     setSelectedImages(prev => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
-  // Drag and Drop Logic
   const onDragStart = (idx: number) => setDraggedIdx(idx);
   
   const onDragOver = (e: React.DragEvent, idx: number) => {
@@ -151,7 +150,6 @@ export default function NewFormClient({ initialCategories, initialMedia, product
 
   const onDragEnd = () => setDraggedIdx(null);
 
-  // --- UPDATED SUBMISSION LOGIC WITH DIRECT CLIENT UPLOAD ---
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (selectedImages.length === 0) {
@@ -160,17 +158,30 @@ export default function NewFormClient({ initialCategories, initialMedia, product
     }
     setIsSubmitting(true);
     setStatus(null);
-    setSubmitPhase('Converting images...');
+    setSubmitPhase('Preparing payload...');
 
     try {
-      const formData = new FormData(e.currentTarget);
-      formData.set('category', selectedCategory); 
-      
+      // 1. Parse synchronously BEFORE async operations to prevent Next.js from
+      // destroying the DOM form transition context and aborting the request.
+      const rawFormData = new FormData(e.currentTarget);
+      const formValues = {
+        name: rawFormData.get('name') as string,
+        productType: rawFormData.get('productType') as string,
+        price: rawFormData.get('price') as string,
+        originalPrice: rawFormData.get('originalPrice') as string,
+        sizes: rawFormData.get('sizes') as string,
+        colors: rawFormData.get('colors') as string,
+        isNewArrival: rawFormData.get('isNewArrival') === 'on',
+        isBestSeller: rawFormData.get('isBestSeller') === 'on',
+        isFlashDeal: rawFormData.get('isFlashDeal') === 'on',
+        description: rawFormData.get('description') as string,
+      };
+
       const filesToUpload = selectedImages.filter(img => img.source === 'file');
       const uploadedUrls = new Map<string, string>();
 
       if (filesToUpload.length > 0) {
-        // Step 1: Compress & Convert
+        setSubmitPhase('Converting images...');
         const convertedFiles = [];
         for (const item of filesToUpload) {
           if (item.file) {
@@ -179,7 +190,6 @@ export default function NewFormClient({ initialCategories, initialMedia, product
           }
         }
 
-        // Step 2: Request Upload Links
         setSubmitPhase('Requesting upload links...');
         const fileNames = convertedFiles.map(f => f.converted.name);
         const urlResponse = await generatePresignedUrls(fileNames);
@@ -188,7 +198,6 @@ export default function NewFormClient({ initialCategories, initialMedia, product
           throw new Error(urlResponse.error || 'Failed to generate upload URLs');
         }
 
-        // Step 3: Direct Upload to R2
         setSubmitPhase('Uploading to Cloudflare...');
         const uploadPromises = convertedFiles.map(async (item, idx) => {
           const urlData = urlResponse.urls![idx];
@@ -210,7 +219,6 @@ export default function NewFormClient({ initialCategories, initialMedia, product
         await Promise.all(uploadPromises);
       }
 
-      // Step 4: Finalize payload using standard library parsing to bypass server uploads
       setSubmitPhase('Saving product...');
       const imageLayout: any[] = [];
 
@@ -220,7 +228,6 @@ export default function NewFormClient({ initialCategories, initialMedia, product
         } else if (img.source === 'file') {
           const uploadedUrl = uploadedUrls.get(img.id);
           if (uploadedUrl) {
-            // Treat as library so action.ts just pushes the URL to D1 without uploading
             imageLayout.push({ type: 'library', url: uploadedUrl });
           } else {
             throw new Error('Missing uploaded URL for a file');
@@ -228,9 +235,23 @@ export default function NewFormClient({ initialCategories, initialMedia, product
         }
       }
 
-      formData.set('imageLayout', JSON.stringify(imageLayout));
-      
-      const response = await createProduct(formData);
+      // 2. Build a brand-new FormData object to pass to the Server Action.
+      // This completely severs Next.js's link to the original DOM form.
+      const finalFormData = new FormData();
+      finalFormData.append('name', formValues.name);
+      finalFormData.append('productType', formValues.productType);
+      finalFormData.append('category', selectedCategory);
+      finalFormData.append('price', formValues.price);
+      if (formValues.originalPrice) finalFormData.append('originalPrice', formValues.originalPrice);
+      finalFormData.append('sizes', formValues.sizes);
+      finalFormData.append('colors', formValues.colors);
+      if (formValues.isNewArrival) finalFormData.append('isNewArrival', 'on');
+      if (formValues.isBestSeller) finalFormData.append('isBestSeller', 'on');
+      if (formValues.isFlashDeal) finalFormData.append('isFlashDeal', 'on');
+      if (formValues.description) finalFormData.append('description', formValues.description);
+      finalFormData.append('imageLayout', JSON.stringify(imageLayout));
+
+      const response = await createProduct(finalFormData);
       
       setStatus({
         success: response.success,
@@ -268,13 +289,11 @@ export default function NewFormClient({ initialCategories, initialMedia, product
       <div className="flex-1 min-h-0 overflow-auto scrollbar-hide bg-brand-card rounded-md border border-white/5">
         <form onSubmit={handleSubmit} className="space-y-6 p-4 sm:p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* 1. Product Name */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Product Name</label>
               <input type="text" name="name" required className="w-full bg-brand-dark border border-white/10 rounded-md px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors" />
             </div>
 
-            {/* 2. NEW: Product Type Selector */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Product Type</label>
               <select 
@@ -287,7 +306,6 @@ export default function NewFormClient({ initialCategories, initialMedia, product
               </select>
             </div>
 
-            {/* 3. Category Selector */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Collection / Brand</label>
               {isAddingCategory ? (
@@ -368,7 +386,6 @@ export default function NewFormClient({ initialCategories, initialMedia, product
             <textarea name="description" rows={4} className="w-full bg-brand-dark border border-white/10 rounded-md px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors"></textarea>
           </div>
 
-          {/* Unified Product Images Uploader */}
           <div className="bg-brand-dark p-6 rounded-md border border-white/5 space-y-4">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-2">
               <label className="text-xs font-bold uppercase tracking-widest text-gray-400">Product Images</label>
@@ -413,14 +430,12 @@ export default function NewFormClient({ initialCategories, initialMedia, product
                     >
                       <img src={img.url} alt="Product" className="w-full h-full object-cover pointer-events-none" />
                       
-                      {/* Main Image Badge */}
                       {idx === 0 && (
                         <div className="absolute bottom-0 inset-x-0 bg-brand-primary text-black text-[10px] font-bold text-center py-1.5 uppercase tracking-widest">
                           ★ Main Image
                         </div>
                       )}
                       
-                      {/* Remove Button */}
                       <button 
                         type="button" 
                         onClick={() => removeImage(idx)} 
@@ -441,7 +456,6 @@ export default function NewFormClient({ initialCategories, initialMedia, product
         </form>
       </div>
 
-      {/* Embedded Media Library Selector Modal */}
       {isMediaModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
           <div className="bg-brand-card w-full max-w-5xl h-[85vh] rounded-md border border-white/10 flex flex-col shadow-2xl">
