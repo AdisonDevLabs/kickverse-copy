@@ -252,23 +252,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
           initial="hidden" animate="visible" variants={staggerContainer}
           className="max-w-7xl mx-auto relative z-10 flex flex-col items-center text-center lg:items-start lg:text-left"
         >
-          
-          <motion.nav 
-            variants={staggerItem}
-            className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-500 mb-6"
-          >
-            <Link href="/" className="hover:text-white transition-colors">Home</Link>
-            <span className="mx-2 text-white/20">/</span>
-            <span className="text-white">Shop</span>
-          </motion.nav>
-
-          <motion.div 
-            variants={staggerItem}
-            className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-brand-primary mb-3"
-          >
-            Discover Our Collection
-          </motion.div>
-
           <motion.h1 
             variants={staggerItem}
             className="font-display font-black uppercase tracking-wide text-4xl sm:text-5xl md:text-6xl text-white mb-4 leading-none"
@@ -280,23 +263,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
              filterProductType !== 'All' ? filterProductType :
              'Shop Collection'}
           </motion.h1>
-          
-          <motion.p 
-            variants={staggerItem}
-            className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-lg mx-auto lg:mx-0"
-          >
-            {brand.description}
-          </motion.p>
-
-          <motion.div 
-            variants={staggerItem}
-            className="mt-8 pt-6 border-t border-white/5 w-full flex flex-wrap justify-center lg:justify-start gap-4 sm:gap-6"
-          >
-             <span className="flex items-center text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-gray-400"><Check className="w-3 h-3 mr-1.5 text-brand-primary" /> {brand.trustStatements[0] || "Fast Delivery"}</span>
-             <span className="flex items-center text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-gray-400"><Check className="w-3 h-3 mr-1.5 text-brand-primary" /> {brand.trustStatements[2] || "WhatsApp Ordering"}</span>
-             <span className="flex items-center text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-gray-400"><Check className="w-3 h-3 mr-1.5 text-brand-primary" /> {brand.trustStatements[1] || "Quality Checked"}</span>
-             <span className="flex items-center text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-gray-400"><Check className="w-3 h-3 mr-1.5 text-brand-primary" /> {brand.trustStatements[3] || "Secure Ordering"}</span>
-          </motion.div>
           
         </motion.div>
       </div>

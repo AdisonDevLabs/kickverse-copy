@@ -417,6 +417,14 @@ export default function MediaManager({ initialMedia = [] }: { initialMedia?: any
                       localMedia.map((m: any) => (
                         <div key={m.id} className="relative aspect-square rounded-md overflow-hidden border-2 border-transparent hover:border-white/30 transition-all group bg-brand-dark">
                           <img src={m.url} alt={m.fileName} loading="lazy" className="w-full h-full object-cover" />
+                          
+                          {/* Exact Filename Label Component Added Here */}
+                          <div className="absolute bottom-0 left-0 right-0 bg-black/70 px-2 py-1.5 backdrop-blur-sm">
+                            <p className="text-[10px] text-gray-300 truncate" title={m.fileName}>
+                              {m.fileName}
+                            </p>
+                          </div>
+
                           <button
                             onClick={() => handleDeleteMedia(m.id, m.url)}
                             disabled={isDeletingId === m.id || isDeletingAll}
