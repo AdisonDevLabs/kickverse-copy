@@ -3,9 +3,9 @@
 
 import React, { useState } from 'react';
 import { createProduct, createQuickCategory } from '../../actions';
+import { generatePresignedUrls } from '../../media-actions';
 import { CheckCircle, ArrowLeft, Plus, X, Image as ImageIcon, GripHorizontal } from 'lucide-react';
 import Link from 'next/link';
-import imageCompression from 'browser-image-compression'; // <-- Add this import
 
 type ProductImage = {
   id: string; // Unique local ID for dragging
@@ -15,8 +15,74 @@ type ProductImage = {
   mediaId?: string; // ID to delete from mediaAssets once published
 };
 
+// ULTRA-FAST, LOW-MEMORY SINGLE-PASS WEBP CONVERTER
+async function convertToWebpMemorySafe(file: File, maxDim = 1920, quality = 0.82): Promise<File> {
+  const originalNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+  const webpName = `${originalNameWithoutExt}.webp`;
+  const isHeic = file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
+
+  let imageSource: CanvasImageSource | null = null;
+
+  try {
+    if (isHeic) {
+      try {
+        imageSource = await createImageBitmap(file);
+      } catch {
+        const heic2any = (await import('heic2any')).default;
+        const convertedBlob = await heic2any({ blob: file, toType: 'image/png' });
+        const singleBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+        imageSource = await createImageBitmap(singleBlob);
+      }
+    } else {
+      imageSource = await createImageBitmap(file);
+    }
+  } catch (err) {
+    return file;
+  }
+
+  let width = imageSource.width;
+  let height = imageSource.height;
+  if (width > maxDim || height > maxDim) {
+    if (width > height) {
+      height = Math.round((height * maxDim) / width);
+      width = maxDim;
+    } else {
+      width = Math.round((width * maxDim) / height);
+      height = maxDim;
+    }
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) {
+    if ('close' in imageSource && typeof (imageSource as any).close === 'function') {
+      (imageSource as any).close();
+    }
+    return file;
+  }
+
+  ctx.drawImage(imageSource, 0, 0, width, height);
+
+  if ('close' in imageSource && typeof (imageSource as any).close === 'function') {
+    (imageSource as any).close();
+  }
+
+  const webpBlob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/webp', quality));
+
+  canvas.width = 0;
+  canvas.height = 0;
+
+  if (!webpBlob) return file;
+
+  return new File([webpBlob], webpName, { type: 'image/webp' });
+}
+
 export default function NewFormClient({ initialCategories, initialMedia, productTypes }: { initialCategories: any[], initialMedia: any[], productTypes: readonly string[] }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitPhase, setSubmitPhase] = useState<string | null>(null);
   const [status, setStatus] = useState<{ success?: boolean; message?: string } | null>(null);
 
   // Category State
@@ -85,7 +151,7 @@ export default function NewFormClient({ initialCategories, initialMedia, product
 
   const onDragEnd = () => setDraggedIdx(null);
 
-  // --- UPDATED SUBMISSION LOGIC ---
+  // --- UPDATED SUBMISSION LOGIC WITH DIRECT CLIENT UPLOAD ---
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (selectedImages.length === 0) {
@@ -94,56 +160,93 @@ export default function NewFormClient({ initialCategories, initialMedia, product
     }
     setIsSubmitting(true);
     setStatus(null);
+    setSubmitPhase('Converting images...');
 
-    const formData = new FormData(e.currentTarget);
-    formData.set('category', selectedCategory); 
-    
-    const imageLayout: any[] = [];
-    let fileIndex = 0;
+    try {
+      const formData = new FormData(e.currentTarget);
+      formData.set('category', selectedCategory); 
+      
+      const filesToUpload = selectedImages.filter(img => img.source === 'file');
+      const uploadedUrls = new Map<string, string>();
 
-    // Define the exact same compression options from your MediaManager
-    const compressionOptions = {
-      maxSizeMB: 0.3,
-      maxWidthOrHeight: 1920,
-      useWebWorker: true,
-    };
-
-    // Use a for...of loop to handle the async compression properly
-    for (const img of selectedImages) {
-      if (img.source === 'library') {
-        imageLayout.push({ type: 'library', url: img.url, mediaId: img.mediaId });
-      } else if (img.source === 'file' && img.file) {
-        imageLayout.push({ type: 'file', fileIndex });
-        
-        try {
-          // Compress the file dynamically
-          const compressedFile = await imageCompression(img.file, compressionOptions);
-          // Pass the original filename explicitly to ensure the R2 key generates correctly
-          formData.append('imageFiles', compressedFile, img.file.name);
-        } catch (error) {
-          console.error("Compression failed, using original fallback", error);
-          formData.append('imageFiles', img.file);
+      if (filesToUpload.length > 0) {
+        // Step 1: Compress & Convert
+        const convertedFiles = [];
+        for (const item of filesToUpload) {
+          if (item.file) {
+            const converted = await convertToWebpMemorySafe(item.file);
+            convertedFiles.push({ id: item.id, converted });
+          }
         }
-        
-        fileIndex++;
-      }
-    }
 
-    formData.set('imageLayout', JSON.stringify(imageLayout));
-    
-    const response = await createProduct(formData);
-    
-    setStatus({
-      success: response.success,
-      message: response.success ? response.message : response.error
-    });
-    
-    if (response.success) {
-      (e.target as HTMLFormElement).reset();
-      setSelectedImages([]);
+        // Step 2: Request Upload Links
+        setSubmitPhase('Requesting upload links...');
+        const fileNames = convertedFiles.map(f => f.converted.name);
+        const urlResponse = await generatePresignedUrls(fileNames);
+        
+        if (!urlResponse.success || !urlResponse.urls) {
+          throw new Error(urlResponse.error || 'Failed to generate upload URLs');
+        }
+
+        // Step 3: Direct Upload to R2
+        setSubmitPhase('Uploading to Cloudflare...');
+        const uploadPromises = convertedFiles.map(async (item, idx) => {
+          const urlData = urlResponse.urls![idx];
+          await new Promise<void>((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('PUT', urlData.uploadUrl);
+            xhr.setRequestHeader('Content-Type', item.converted.type);
+            xhr.onload = () => {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                uploadedUrls.set(item.id, urlData.publicUrl);
+                resolve();
+              } else reject(new Error(`Upload failed: ${xhr.status}`));
+            };
+            xhr.onerror = () => reject(new Error('Network error during upload'));
+            xhr.send(item.converted);
+          });
+        });
+
+        await Promise.all(uploadPromises);
+      }
+
+      // Step 4: Finalize payload using standard library parsing to bypass server uploads
+      setSubmitPhase('Saving product...');
+      const imageLayout: any[] = [];
+
+      for (const img of selectedImages) {
+        if (img.source === 'library') {
+          imageLayout.push({ type: 'library', url: img.url, mediaId: img.mediaId });
+        } else if (img.source === 'file') {
+          const uploadedUrl = uploadedUrls.get(img.id);
+          if (uploadedUrl) {
+            // Treat as library so action.ts just pushes the URL to D1 without uploading
+            imageLayout.push({ type: 'library', url: uploadedUrl });
+          } else {
+            throw new Error('Missing uploaded URL for a file');
+          }
+        }
+      }
+
+      formData.set('imageLayout', JSON.stringify(imageLayout));
+      
+      const response = await createProduct(formData);
+      
+      setStatus({
+        success: response.success,
+        message: response.success ? response.message : response.error
+      });
+      
+      if (response.success) {
+        (e.target as HTMLFormElement).reset();
+        setSelectedImages([]);
+      }
+    } catch (error: any) {
+      setStatus({ success: false, message: error.message || 'An error occurred' });
+    } finally {
+      setIsSubmitting(false);
+      setSubmitPhase(null);
     }
-    
-    setIsSubmitting(false);
   };
 
   return (
@@ -282,7 +385,7 @@ export default function NewFormClient({ initialCategories, initialMedia, product
                 </button>
                 <label className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-md text-[10px] font-bold uppercase tracking-widest transition-colors flex items-center cursor-pointer">
                   <Plus className="w-4 h-4 mr-2" /> Upload Files
-                  <input type="file" multiple accept="image/jpeg, image/png, image/webp, image/jpg" className="hidden" onChange={handleFileSelect} />
+                  <input type="file" multiple accept="image/jpeg, image/png, image/webp, image/jpg, image/heic, image/heif, .heic, .heif" className="hidden" onChange={handleFileSelect} />
                 </label>
               </div>
             </div>
@@ -333,7 +436,7 @@ export default function NewFormClient({ initialCategories, initialMedia, product
           </div>
 
           <button type="submit" disabled={isSubmitting} className="w-full h-14 bg-brand-primary text-black font-bold uppercase tracking-widest rounded-md hover:bg-brand-hover transition-colors disabled:opacity-50 flex items-center justify-center mt-6">
-            {isSubmitting ? 'Uploading & Publishing...' : 'Publish Product'}
+            {isSubmitting ? (submitPhase || 'Publishing...') : 'Publish Product'}
           </button>
         </form>
       </div>

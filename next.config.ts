@@ -50,7 +50,8 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
-      bodySizeLimit: '5mb', // Increased from the default 1mb limit
+      bodySizeLimit: '5mb',
+      allowedOrigins: ['kickverse.co.ke', '*.kickverse.co.ke', 'localhost:3000'],
     },
   },
   output: 'standalone',
