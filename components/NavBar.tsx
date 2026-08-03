@@ -1,11 +1,9 @@
-// components/NavBar.tsx
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { Search, ShoppingBag, X, Home, Grid, Tag, MessageCircle } from 'lucide-react';
 import { useCart } from '@/lib/CartContext';
 import { motion, AnimatePresence } from 'motion/react';
@@ -35,6 +33,7 @@ export function NavBar() {
   // Active route tracking
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const isTabActive = (path: string, queryType?: string) => {
     if (!pathname) return false;
@@ -42,6 +41,14 @@ export function NavBar() {
       return pathname === path && (searchParams?.get('type') === queryType || searchParams?.get('category') === queryType);
     }
     return pathname === path && !searchParams?.get('type') && !searchParams?.get('category');
+  };
+
+  const handleSearchSubmit = (query: string) => {
+    if (!query.trim()) return;
+    setIsSearchOpen(false);
+    setIsDesktopSearchOpen(false);
+    setSearchQuery('');
+    router.push(`/shop?q=${encodeURIComponent(query.trim())}`);
   };
 
   useEffect(() => {
@@ -239,6 +246,9 @@ export function NavBar() {
                           className="w-full bg-brand-dark text-white border border-white/5 rounded-md pl-10 pr-4 py-3 text-base focus:outline-none focus:border-brand-primary transition-colors"
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleSearchSubmit(searchQuery);
+                          }}
                           autoFocus
                         />
                       </div>
@@ -246,7 +256,11 @@ export function NavBar() {
                         <p className="text-[10px] uppercase tracking-widest text-brand-primary mb-3 font-bold">Suggested</p>
                         <div className="flex flex-wrap gap-y-3 gap-2">
                           {navSearchSuggestions.map((suggestion, idx) => (
-                            <span key={idx} className="text-sm bg-white/5 hover:bg-white/10 px-4 py-2 cursor-pointer transition-colors text-white rounded-md">
+                            <span 
+                              key={idx} 
+                              onClick={() => handleSearchSubmit(suggestion)}
+                              className="text-sm bg-white/5 hover:bg-white/10 px-4 py-2 cursor-pointer transition-colors text-white rounded-md"
+                            >
                               {suggestion}
                             </span>
                           ))}
@@ -287,6 +301,9 @@ export function NavBar() {
                           className="w-full bg-brand-dark/95 text-white border border-white/20 rounded-full pl-9 pr-8 py-2 text-sm focus:outline-none focus:border-brand-primary transition-colors backdrop-blur-md"
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleSearchSubmit(searchQuery);
+                          }}
                           autoFocus
                         />
                         <button 

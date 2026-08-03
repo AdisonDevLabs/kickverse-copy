@@ -87,11 +87,15 @@ export const brand = {
   },
   socialLinks: {
     instagram: "https://instagram.com/kickverse.ke_",
-    tiktok: "https://www.tiktok.com/@kickverse_",
+    facebook: "https://facebook.com/", // Add your FB link here later
+    tiktok: "https://www.tiktok.com/@kickverse_?_r=1&_t=ZS-98UxHbNXiWS",
+    tiktokBootRoom: "https://www.tiktok.com/@bootroomkenya?_r=1&_t=ZS-98UxJXGo06H",
+    tiktokSoleKraft: "https://www.tiktok.com/@solekraft?_r=1&_t=ZS-98UxNemc1X3",
+    whatsappCommunity: "https://chat.whatsapp.com/DZMzWpLnP9WDFjZ4PCrENq"
   },
   deliveryInfo: {
     standard: "Small delivery fee charged for orders outside CBD & Doorstep deliveries.",
-    nairobi: "FREE DELIVERY ANYWHERE WITHIN NAIROBI CBD",
+    nairobi: "Complimentary delivery exclusively within the Nairobi CBD",
   },
   trustStatements: [
     "We Deliver countrywide",
@@ -109,8 +113,8 @@ export const brand = {
       description: "We Deliver countrywide."
     },
     {
-      title: "Free CBD Delivery",
-      description: "FREE DELIVERY ANYWHERE WITHIN NAIROBI CBD."
+      title: "Nairobi CBD Delivery",
+      description: "Enjoy complimentary delivery exclusively within the Nairobi CBD boundaries."
     },
     {
       title: "Pay after Delivery",
@@ -168,14 +172,14 @@ export const cartTrustFeatures = [
 export const footerQuickShopLinks = [
   { label: "Sneakers", href: "/shop?type=sneakers" },
   { label: "Soccer Cleats", href: "/shop?type=soccer-cleats" },
-  { label: "New Arrivals", href: "/shop?category=new-arrivals" },
-  { label: "Best Sellers", href: "/shop?category=best-sellers" },
+  { label: "Official Shoes", href: "/shop?category=official-shoes" },
+  { label: "Opens & Sandals", href: "/shop?category=opens-sandals" },
 ];
 
 export const footerSupportLinks = [
-  { label: "How to Order", href: "/how-to-order" },
-  { label: "Delivery Info", href: "/delivery" },
-  { label: "Size Guide", href: "/size-guide" },
-  { label: "Returns & Exchanges", href: "/returns" },
-  { label: "FAQ", href: "/faq" },
+  { label: "How to Order", href: "/policies#how-to-order" },
+  { label: "Delivery Info", href: "/policies#delivery" },
+  { label: "Size Guide", href: "/policies#size-guide" },
+  { label: "Returns & Exchanges", href: "/policies#returns" },
+  { label: "FAQ", href: "/policies#faq" },
 ];

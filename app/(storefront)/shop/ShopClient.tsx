@@ -1,4 +1,3 @@
-// app/(storefront)/shop/ShopClient.tsx
 'use client';
 
 import React, { useState, useEffect, Suspense, useMemo, useRef, useCallback } from 'react';
@@ -18,6 +17,9 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
   const normalizeSlug = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
 
   const rawType = searchParams.get('type');
+  const rawQuery = searchParams.get('q');
+  const rawBrand = searchParams.get('brand');
+  const rawModel = searchParams.get('model');
   
   const getInitialFilterCategory = (cat: string | null) => {
     if (!cat) return 'All';
@@ -34,7 +36,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
     return 'all'; 
   };
 
-  // Upgraded to handle the 4 unified UI types
   const getInitialProductType = (typeVal: string | null) => {
     if (!typeVal) return 'All';
     if (typeVal.toLowerCase() === 'sneakers') return 'Sneakers';
@@ -49,7 +50,13 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
   const [filterPrice, setFilterPrice] = useState<string | null>(null);
   const [filterSize, setFilterSize] = useState<string | null>(null);
   
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState<string>(() => {
+    if (rawQuery) return rawQuery;
+    if (rawBrand) return rawBrand.replace(/-/g, ' ');
+    if (rawModel) return rawModel.replace(/-/g, ' ');
+    return '';
+  });
+  
   const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
   const [sortOption, setSortOption] = useState('default');
   const [discoveryMode, setDiscoveryMode] = useState<string>(() => getInitialDiscoveryMode(rawCategory));
@@ -62,6 +69,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
+    // 1. Handle Categories & Types
     if (rawCategory && rawType) {
       setFilterCategory(getInitialFilterCategory(rawCategory));
       setDiscoveryMode(getInitialDiscoveryMode(rawCategory));
@@ -74,7 +82,25 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
       setFilterProductType(getInitialProductType(rawType));
       setFilterCategory('All'); 
     }
-  }, [rawCategory, rawType]);
+
+    // 2. Handle Search, Brands, and Models overriding state via Navigation
+    if (rawQuery) {
+      setSearchQuery(rawQuery);
+      if (!rawCategory && !rawType) {
+        setFilterCategory('All');
+        setFilterProductType('All');
+      }
+    } else if (rawBrand) {
+      setSearchQuery(rawBrand.replace(/-/g, ' '));
+    } else if (rawModel) {
+      setSearchQuery(rawModel.replace(/-/g, ' '));
+    } else {
+      // If navigating to a URL strictly from a category/type navlink, clear previous search
+      if (rawCategory || rawType) {
+        setSearchQuery('');
+      }
+    }
+  }, [rawCategory, rawType, rawQuery, rawBrand, rawModel]);
 
   useEffect(() => {
     setVisibleCount(8);
@@ -129,7 +155,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
       );
     }
 
-    // Upgraded Logic to seamlessly bridge frontend UI Types with backend D1 schema limitations
     if (filterProductType && filterProductType !== 'All') {
       result = result.filter(p => {
         const pType = (p.productType || '').toLowerCase();
@@ -137,13 +162,10 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
         const targetType = filterProductType.toLowerCase();
 
         if (targetType === 'sneakers') {
-          // Exclude officials and sandals from general sneakers
           return pType === 'sneakers' && pCat !== 'official shoes' && pCat !== 'opens & sandals';
         } else if (targetType === 'official shoes' || targetType === 'opens & sandals') {
-          // Route these specific sub-types directly to their exact category
           return pCat === targetType;
         } else {
-          // Standard fallback (Soccer Cleats)
           return pType === targetType;
         }
       });
@@ -299,7 +321,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
             {/* Discovery & Filter Chips */}
             <div className="flex-1 w-full overflow-x-auto hide-scrollbar flex gap-4 pb-1 md:pb-0 items-center">
               
-              {/* 1. Product Types Group (Now includes all 4!) */}
+              {/* 1. Product Types Group */}
               <div className="flex items-center gap-2 border-r border-white/10 pr-4">
                 <span className="text-[9px] uppercase tracking-widest text-gray-500 font-bold hidden sm:block">Type:</span>
                 {['Sneakers', 'Soccer Cleats', 'Official Shoes', 'Opens & Sandals'].map((type) => {

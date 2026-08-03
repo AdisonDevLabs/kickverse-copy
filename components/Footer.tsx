@@ -2,21 +2,14 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { Truck, ShieldCheck, Wallet, CheckCircle, MessageCircle, Send, Instagram, Facebook, Phone } from 'lucide-react';
+import { Truck, ShieldCheck, Wallet, CheckCircle, MessageCircle, Instagram, Facebook, Phone, Users } from 'lucide-react';
 import { brand, footerQuickShopLinks, footerSupportLinks } from '@/lib/data/brand';
 import { motion } from 'motion/react';
 import { fadeUp, staggerContainer, staggerItem } from '@/lib/animations';
 
 export function Footer() {
-  const [isSubscribed, setIsSubscribed] = useState(false);
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubscribed(true);
-    // In production, integrate your email API here
-  };
 
   return (
     <footer className="bg-brand-dark border-t border-white/10 pt-20 pb-8 relative z-20">
@@ -28,7 +21,7 @@ export function Footer() {
           
           {/* Brand Section */}
           <motion.div variants={staggerItem} className="lg:col-span-4 flex flex-col items-start text-left">
-            <Link href="/" className="font-display font-black text-3xl tracking-tighter text-white uppercase mb-4 block">
+            <Link href="/" aria-label="Go to Kickverse Homepage" className="font-display font-black text-3xl tracking-tighter text-white uppercase mb-4 block">
                {brand.name.split(' ')[0]}
                <span className="text-brand-primary">
                  {brand.name.split(' ').length > 1 ? ' ' + brand.name.split(' ')[1] : ''}
@@ -38,19 +31,19 @@ export function Footer() {
               {brand.description}
             </p>
             <div className="inline-flex items-center text-brand-primary text-xs font-bold tracking-widest uppercase bg-brand-primary/10 px-3 py-1.5 border border-brand-primary/20 mb-8 rounded-md">
-               <CheckCircle className="w-3 h-3 mr-2" /> Trusted by customers nationwide
+               <CheckCircle className="w-3 h-3 mr-2" aria-hidden="true" /> Trusted by customers nationwide
             </div>
             
             {/* Trust Badges */}
             <div className="flex flex-wrap gap-4 mt-auto">
               <div className="flex items-center text-gray-500">
-                <Truck className="w-4 h-4 mr-1.5 text-brand-primary" /> <span className="text-[10px] font-bold uppercase tracking-wider">{brand.deliveryInfo.standard}</span>
+                <Truck className="w-4 h-4 mr-1.5 text-brand-primary" aria-hidden="true" /> <span className="text-[10px] font-bold uppercase tracking-wider">{brand.deliveryInfo.standard}</span>
               </div>
               <div className="flex items-center text-gray-500">
-                <ShieldCheck className="w-4 h-4 mr-1.5 text-brand-primary" /> <span className="text-[10px] font-bold uppercase tracking-wider">Quality Checked</span>
+                <ShieldCheck className="w-4 h-4 mr-1.5 text-brand-primary" aria-hidden="true" /> <span className="text-[10px] font-bold uppercase tracking-wider">Quality Checked</span>
               </div>
               <div className="flex items-center text-gray-500">
-                <Wallet className="w-4 h-4 mr-1.5 text-brand-primary" /> <span className="text-[10px] font-bold uppercase tracking-wider">Affordable</span>
+                <Wallet className="w-4 h-4 mr-1.5 text-brand-primary" aria-hidden="true" /> <span className="text-[10px] font-bold uppercase tracking-wider">Affordable</span>
               </div>
             </div>
           </motion.div>
@@ -75,7 +68,7 @@ export function Footer() {
             </ul>
           </motion.div>
 
-          {/* Contact & Newsletter */}
+          {/* Contact & Community */}
           <motion.div variants={staggerItem} className="lg:col-span-4">
             <h4 className="font-display text-white text-lg uppercase tracking-wide mb-6">Contact Us</h4>
             
@@ -86,12 +79,12 @@ export function Footer() {
               <div className="flex flex-col space-y-2">
                 <span className="text-white font-bold text-xs uppercase tracking-widest">Sneakers</span>
                 <div className="flex flex-wrap items-center gap-3">
-                  <a href={`tel:${brand.contacts.sneakers.phone}`} className="text-gray-400 hover:text-brand-primary text-sm transition-colors flex items-center group">
-                    <Phone className="w-3.5 h-3.5 mr-1.5 group-hover:text-brand-primary transition-colors" /> {brand.contacts.sneakers.phone}
+                  <a href={`tel:${brand.contacts.sneakers.phone}`} aria-label="Call Sneakers Department" className="text-gray-400 hover:text-brand-primary text-sm transition-colors flex items-center group">
+                    <Phone className="w-3.5 h-3.5 mr-1.5 group-hover:text-brand-primary transition-colors" aria-hidden="true" /> {brand.contacts.sneakers.phone}
                   </a>
                   <span className="text-gray-700 hidden sm:inline-block">|</span>
-                  <a href={`https://wa.me/${brand.contacts.sneakers.whatsapp}`} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-brand-primary text-sm transition-colors flex items-center group">
-                    <MessageCircle className="w-3.5 h-3.5 mr-1.5 group-hover:text-brand-primary transition-colors" /> WhatsApp
+                  <a href={`https://wa.me/${brand.contacts.sneakers.whatsapp}`} target="_blank" rel="noreferrer" aria-label="WhatsApp Sneakers Department" className="text-gray-400 hover:text-brand-primary text-sm transition-colors flex items-center group">
+                    <MessageCircle className="w-3.5 h-3.5 mr-1.5 group-hover:text-brand-primary transition-colors" aria-hidden="true" /> WhatsApp
                   </a>
                 </div>
               </div>
@@ -100,43 +93,81 @@ export function Footer() {
               <div className="flex flex-col space-y-2">
                 <span className="text-white font-bold text-xs uppercase tracking-widest">Boot Room Kenya</span>
                 <div className="flex flex-wrap items-center gap-3">
-                  <a href={`tel:${brand.contacts.bootRoom.phone}`} className="text-gray-400 hover:text-brand-primary text-sm transition-colors flex items-center group">
-                    <Phone className="w-3.5 h-3.5 mr-1.5 group-hover:text-brand-primary transition-colors" /> {brand.contacts.bootRoom.phone}
+                  <a href={`tel:${brand.contacts.bootRoom.phone}`} aria-label="Call Boot Room Kenya Department" className="text-gray-400 hover:text-brand-primary text-sm transition-colors flex items-center group">
+                    <Phone className="w-3.5 h-3.5 mr-1.5 group-hover:text-brand-primary transition-colors" aria-hidden="true" /> {brand.contacts.bootRoom.phone}
                   </a>
                   <span className="text-gray-700 hidden sm:inline-block">|</span>
-                  <a href={`https://wa.me/${brand.contacts.bootRoom.whatsapp}`} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-brand-primary text-sm transition-colors flex items-center group">
-                    <MessageCircle className="w-3.5 h-3.5 mr-1.5 group-hover:text-brand-primary transition-colors" /> WhatsApp
+                  <a href={`https://wa.me/${brand.contacts.bootRoom.whatsapp}`} target="_blank" rel="noreferrer" aria-label="WhatsApp Boot Room Kenya Department" className="text-gray-400 hover:text-brand-primary text-sm transition-colors flex items-center group">
+                    <MessageCircle className="w-3.5 h-3.5 mr-1.5 group-hover:text-brand-primary transition-colors" aria-hidden="true" /> WhatsApp
                   </a>
                 </div>
               </div>
 
             </div>
 
-            {/* Newsletter */}
+            {/* WhatsApp Community */}
             <div className="mt-8 pt-8 border-t border-white/5">
-              <h4 className="font-bold text-white text-sm uppercase tracking-wider mb-2">Join Our VIP List</h4>
-              <p className="text-gray-400 text-xs mb-4">Get early access to new arrivals and exclusive deals.</p>
+              <h4 className="font-bold text-white text-sm uppercase tracking-wider mb-2">Join Our Community</h4>
+              <p className="text-gray-400 text-xs mb-4">Get early access to new arrivals, exclusive flash deals, and restock updates.</p>
               
-              {isSubscribed ? (
-                 <div className="bg-brand-primary/10 border border-brand-primary/20 rounded-md p-4 flex items-center text-brand-primary">
-                   <CheckCircle className="w-5 h-5 mr-3" />
-                   <span className="text-sm font-bold uppercase tracking-widest">You're on the list!</span>
-                 </div>
-              ) : (
-                <form className="flex w-full" onSubmit={handleSubscribe}>
-                  <input type="email" required placeholder="Your email address" className="bg-brand-card text-white border border-white/10 px-4 py-3 w-full text-sm focus:outline-none focus:border-brand-primary rounded-l-md placeholder:text-gray-600 transition-colors" />
-                  <button type="submit" className="bg-brand-primary text-black px-4 py-3 font-bold text-sm hover:bg-brand-hover transition-colors flex items-center justify-center min-w-[50px] rounded-r-md">
-                    <Send className="w-4 h-4" />
-                  </button>
-                </form>
-              )}
+              <a 
+                href={brand.socialLinks.whatsappCommunity}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Join Kickverse WhatsApp Community"
+                className="w-full bg-brand-primary/10 border border-brand-primary/30 text-brand-primary hover:bg-brand-primary hover:text-black hover:border-brand-primary px-4 py-3.5 font-bold text-xs uppercase tracking-widest transition-all flex items-center justify-center rounded-md group"
+              >
+                <Users className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" aria-hidden="true" />
+                Join on WhatsApp
+              </a>
             </div>
 
-            {/* Socials */}
-            <div className="mt-8 flex items-center gap-4">
-              <a href={brand.socialLinks.tiktok} target="_blank" rel="noreferrer" className="text-gray-500 hover:text-white transition-colors flex items-center text-xs font-bold tracking-wider uppercase group rounded-md">
-                TikTok
-              </a>
+            {/* Circular Icons Socials Grid */}
+            <div className="mt-8 pt-8 border-t border-white/5">
+              <h4 className="font-bold text-white text-sm uppercase tracking-wider mb-5">Follow Us</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                
+                {/* Instagram */}
+                <a href={brand.socialLinks.instagram} target="_blank" rel="noreferrer" aria-label="Follow Kickverse on Instagram" className="flex items-center text-gray-400 hover:text-white transition-colors group">
+                  <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center mr-3 group-hover:bg-brand-primary group-hover:text-black transition-colors shrink-0">
+                    <Instagram className="w-4 h-4" aria-hidden="true" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Instagram</span>
+                </a>
+
+                {/* Facebook */}
+                <a href={brand.socialLinks.facebook} target="_blank" rel="noreferrer" aria-label="Follow Kickverse on Facebook" className="flex items-center text-gray-400 hover:text-white transition-colors group">
+                  <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center mr-3 group-hover:bg-brand-primary group-hover:text-black transition-colors shrink-0">
+                    <Facebook className="w-4 h-4" aria-hidden="true" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Facebook</span>
+                </a>
+
+                {/* Kickverse TikTok */}
+                <a href={brand.socialLinks.tiktok} target="_blank" rel="noreferrer" aria-label="Follow Kickverse KE on TikTok" className="flex items-center text-gray-400 hover:text-white transition-colors group">
+                  <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center mr-3 group-hover:bg-brand-primary group-hover:text-black transition-colors shrink-0">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Kickverse KE</span>
+                </a>
+
+                {/* Boot Room TikTok */}
+                <a href={brand.socialLinks.tiktokBootRoom} target="_blank" rel="noreferrer" aria-label="Follow Boot Room Kenya on TikTok" className="flex items-center text-gray-400 hover:text-white transition-colors group">
+                  <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center mr-3 group-hover:bg-brand-primary group-hover:text-black transition-colors shrink-0">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Boot Room</span>
+                </a>
+
+                {/* Sole Kraft TikTok */}
+                <a href={brand.socialLinks.tiktokSoleKraft} target="_blank" rel="noreferrer" aria-label="Follow Sole Kraft on TikTok" className="flex items-center text-gray-400 hover:text-white transition-colors group">
+                  <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center mr-3 group-hover:bg-brand-primary group-hover:text-black transition-colors shrink-0">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Sole Kraft</span>
+                </a>
+
+              </div>
             </div>
           </motion.div>
           

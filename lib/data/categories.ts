@@ -8,19 +8,20 @@ export interface Category {
   span?: string;
 }
 
+// These act as fallbacks if the database is empty
 export const categories: Category[] = [
   {
-    name: "Men's Shoes",
-    slug: "mens-shoes",
+    name: "Official Shoes",
+    slug: "official-shoes",
     label: "Trending Now",
     image: "/Minimalist All-White Derbies.png",
     span: "md:col-span-2",
   },
   {
-    name: "Women's Heels",
-    slug: "womens-heels",
+    name: "Opens & Sandals",
+    slug: "opens-sandals",
     label: "Best Sellers",
-    image: "/Pearl & Rhinestone Luxury Statement Heels.png",
+    image: "/Rugged Terrain Adventure Sandals.png",
     span: "md:col-span-2",
   },
   {
@@ -31,9 +32,9 @@ export const categories: Category[] = [
     span: "md:col-span-2",
   },
   {
-    name: "Men's Clothing",
-    slug: "mens-clothing",
-    label: "Everyday Comfort",
+    name: "Soccer Cleats",
+    slug: "soccer-cleats",
+    label: "Pitch Ready",
     image: "/FIFA World Cup 2026 Splash Graphic Tee.jpg",
     span: "md:col-span-2",
   },
@@ -49,11 +50,28 @@ export const discoveryChips = [
   { id: 'premium-styles', label: '✨ Premium Styles', context: 'Premium Collection' },
 ];
 
-export const filterCategories = ['All', 'Sneakers', 'Mules', 'Jordan', 'Air max'];
+// UPDATED: Now matches your actual inventory types for the Advanced Filter Drawer
+export const filterCategories = [
+  'All', 
+  'Sneakers', 
+  'Soccer Cleats', 
+  'Official Shoes', 
+  'Opens & Sandals', 
+  'Jordan', 
+  'Air Max'
+];
 
-export const searchSuggestions = ['Trending Sneakers', 'Best Selling Heels', 'Office Shoes', 'Party Wear', 'Budget Picks'];
+// UPDATED: Fixes the search bar placeholder suggestions
+export const searchSuggestions = [
+  'Trending Sneakers', 
+  'Soccer Cleats', 
+  'Official Shoes', 
+  'Sandals', 
+  'Budget Picks'
+];
 
-export const navSearchSuggestions = ['Sneakers', 'Heels', 'New Arrivals'];
+// UPDATED: Fixes the mobile search menu quick links
+export const navSearchSuggestions = ['Sneakers', 'Cleats', 'New Arrivals'];
 
 export const navLinksData = [
   { label: "Home", href: "/", baseTextClass: "text-white", hoverTextClass: "hover:text-[#C6FF00]", underlineClass: "bg-[#C6FF00]", isLive: false },
@@ -65,4 +83,4 @@ export const navLinksData = [
 
 export const priceRanges = ['Under 2,000', '2,000 - 4,000', 'Over 4,000'];
 
-export const filterSizes = ['34', '35', '36', '37', '38', '39', '40', '41', '42', '43', "44"];
+export const filterSizes = ['34', '35', '36', '37', '38', '39', '40', '41', '42', '43', "44", "45"];
