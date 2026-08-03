@@ -474,6 +474,14 @@ export default function NewFormClient({ initialCategories, initialMedia, product
                         className={`relative aspect-square rounded-md overflow-hidden cursor-pointer border-2 transition-all ${isSelected ? 'border-brand-primary' : 'border-transparent hover:border-white/30'}`}
                       >
                         <img src={m.url} alt={m.fileName} loading="lazy" className="w-full h-full object-cover" />
+                        
+                        {/* Exact Filename Label */}
+                        <div className="absolute bottom-0 left-0 right-0 bg-black/70 px-2 py-1.5 backdrop-blur-sm">
+                          <p className="text-[10px] text-gray-300 truncate" title={m.fileName}>
+                            {m.fileName}
+                          </p>
+                        </div>
+
                         {isSelected && (
                           <div className="absolute inset-0 bg-brand-primary/20 flex items-center justify-center backdrop-blur-[1px]">
                             <CheckCircle className="w-8 h-8 text-brand-primary drop-shadow-md" />
