@@ -116,7 +116,7 @@ export async function deleteAllMediaAssets() {
         });
         await S3.send(command);
       } catch (err) {
-        console.error("Failed to delete from R2:", asset.url, err);
+        console.error("Failed to delete from cloud", asset.url, err);
       }
     });
 

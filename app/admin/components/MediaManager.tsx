@@ -261,7 +261,7 @@ export default function MediaManager({ initialMedia = [] }: { initialMedia?: any
   };
 
   const handleDeleteMedia = async (id: string, url: string) => {
-    if (!window.confirm("WARNING: Permanently delete this image from your database and Cloudflare R2?")) return;
+    if (!window.confirm("WARNING: Permanently delete this image from your database and Cloudflare cloud?")) return;
     setIsDeletingId(id);
     const res = await deleteMediaAsset(id, url);
     if (res.success) {
@@ -273,7 +273,7 @@ export default function MediaManager({ initialMedia = [] }: { initialMedia?: any
   };
 
   const handleDeleteAllMedia = async () => {
-    if (!window.confirm("WARNING: Permanently delete ALL unused images from database and R2? Proceed?")) return;
+    if (!window.confirm("WARNING: Permanently delete ALL unused images from database and cloud? Proceed?")) return;
     setIsDeletingAll(true);
     const res = await deleteAllMediaAssets();
     if (res.success) {
