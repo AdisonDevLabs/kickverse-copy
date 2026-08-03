@@ -82,7 +82,8 @@ export function NavBar() {
                   alt={`${brand.name} Logo`} 
                   width={44} 
                   height={44} 
-                  className="rounded-full object-cover border border-white/10 w-8 h-8 sm:w-9 sm:h-9 md:w-11 md:h-11"
+                  // Added bg-white, object-contain, and padding so transparent logos are fully visible and readable
+                  className="bg-white rounded-full object-contain p-0.5 border border-white/20 w-8 h-8 sm:w-9 sm:h-9 md:w-11 md:h-11 shadow-sm"
                 />
               </Link>
             </div>

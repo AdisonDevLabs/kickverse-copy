@@ -29,14 +29,60 @@ export const metadata: Metadata = {
   },
   description: brand.seo.description,
   keywords: [
+    // Core Brand & General Shoe Shopping
+    'Kickverse KE',
+    'Kickverse Kenya',
+    'Buy shoes online Kenya',
+    'Best shoe shops in Nairobi',
+    'Shoe delivery Nairobi',
+    'Online shoe store Kenya',
+    'Affordable shoes Nairobi CBD',
+
+    // Sneakers & Streetwear
     'Sneakers Kenya',
+    'Original sneakers Nairobi',
+    'Best sneaker shops Nairobi',
+    'Sneaker plug Kenya',
+    'Latest trending sneakers in Kenya',
+    'Buy Nike Air Force 1 Nairobi',
+    'Jordan retro sneakers Kenya',
+    'Adidas Yeezy Nairobi',
+    'Streetwear shoes Kenya',
+    'Ladies sneakers online Kenya',
+    'Affordable kicks Nairobi',
+
+    // Soccer Cleats & Football Boots
     'Football boots Kenya',
     'Soccer Cleats Nairobi',
-    'Nike Mercurial',
-    'Adidas Predator',
-    'Kickverse KE',
-    'Original sneakers Nairobi',
-    'Buy shoes online Kenya'
+    'Buy soccer boots in Kenya',
+    'Nike Mercurial Vapor Kenya',
+    'Adidas Predator Nairobi',
+    'Cheap football boots Nairobi CBD',
+    'Puma Future soccer cleats Kenya',
+    'Kids football boots Kenya',
+    'Astroturf football shoes Nairobi',
+
+    // Official & Formal Shoes
+    'Buy official shoes online Kenya',
+    'Men\'s official shoes Nairobi',
+    'Ladies official office shoes Kenya',
+    'Leather formal shoes Kenya',
+    'Oxford and Derby shoes Nairobi',
+    'Men\'s loafers online Kenya',
+    'Gentlemen shoes Nairobi',
+    'Corporate footwear Kenya',
+    'Black formal shoes for work Kenya',
+
+    // Open Shoes, Sandals & Slides
+    'Ladies open shoes Kenya',
+    'Flat sandals for ladies Nairobi',
+    'Buy men\'s open shoes online Kenya',
+    'Leather sandals men Kenya',
+    'Summer slides and slippers Nairobi',
+    'Heeled sandals online Kenya',
+    'Gladiator sandals Nairobi',
+    'Casual slippers Kenya',
+    'Maasai sandals Kenya online'
   ],
   authors: [{ name: brand.name }],
   creator: brand.name,

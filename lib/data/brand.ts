@@ -5,7 +5,7 @@ export const brand = {
   name: "KICKVERSE KE",
   url: "https://kickverse.co.ke/",
   shortName: "KICKVERSE",
-  logo: "/brand-logo.jpeg",
+  logo: "/kickverse.png",
   logo1: "/android-chrome-512x512.png",
   tagline: "HOME OF THE BEST SNEAKERS & CLEATS",
   description:
@@ -14,7 +14,7 @@ export const brand = {
   seo: {
     title: "KICKVERSE KE | HOME OF THE BEST SNEAKERS & CLEATS",
     description: "Shop with us for Genuine quality and best prices.",
-    ogImage: "/brand-logo.jpeg",
+    ogImage: "/kickverse.png",
     favicon: "/favicon.ico",
     appleIcon: "/apple-touch-icon.png",
   },
