@@ -247,14 +247,17 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
   return (
     <div className="bg-brand-dark min-h-screen text-white">
       {/* Page Header */}
-      <div className="bg-brand-card pt-8 md:pt-12 pb-8 px-6 border-b border-white/5 relative">
+      <div className="bg-brand-card pt-10 md:pt-16 pb-10 px-6 border-b border-white/5 relative overflow-hidden">
+        {/* Subtle background glow for visual hierarchy */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-full bg-brand-primary/5 blur-3xl rounded-full pointer-events-none"></div>
+        
         <motion.div 
           initial="hidden" animate="visible" variants={staggerContainer}
           className="max-w-7xl mx-auto relative z-10 flex flex-col items-center text-center lg:items-start lg:text-left"
         >
           <motion.h1 
             variants={staggerItem}
-            className="font-display font-black uppercase tracking-wide text-4xl sm:text-5xl md:text-6xl text-white mb-4 leading-none"
+            className="font-display font-black uppercase tracking-wide text-4xl sm:text-5xl md:text-6xl text-white mb-2 leading-none"
           >
             {discoveryMode === 'deals' && filterCategory === 'All' ? 'Flash Deals' : 
              discoveryMode === 'just-dropped' && filterCategory === 'All' ? 'New Arrivals' :
@@ -263,220 +266,216 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
              filterProductType !== 'All' ? filterProductType :
              'Shop Collection'}
           </motion.h1>
-          
+          <motion.p variants={staggerItem} className="text-gray-400 text-sm md:text-base max-w-lg">
+            Discover the latest trends, premium styles, and unbeatable deals curated just for you.
+          </motion.p>
         </motion.div>
       </div>
 
-      {/* Search & Quick Filter Bar */}
-      <div className="sticky top-0 z-40 bg-brand-card/95 backdrop-blur-md border-b border-white/5 py-3 md:py-4 transition-all">
+      {/* Refined Navigation & Controls Bar */}
+      <div className="sticky top-0 z-40 bg-brand-dark/95 backdrop-blur-md border-b border-white/10 shadow-sm transition-all py-4">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row md:items-center gap-3">
+          
+          {/* Row 1: Search, Sort, and Advanced Filters */}
+          <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center mb-5">
             
             {/* Search Input */}
-            <div className="relative w-full md:w-64 lg:w-72 flex-shrink-0">
+            <div className="relative w-full lg:max-w-md flex-shrink-0">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input 
                 type="text" 
-                placeholder="Search styles..." 
+                placeholder="Search sneakers, cleats, or brands..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-brand-dark text-white border border-white/10 rounded-md pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-brand-primary transition-colors"
+                className="w-full bg-white/5 text-white border border-white/10 rounded-full pl-12 pr-10 py-3 text-sm focus:outline-none focus:border-brand-primary focus:bg-white/10 transition-all shadow-inner placeholder:text-gray-500"
               />
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            </div>
-            
-            {/* Discovery & Filter Chips */}
-            <div className="flex-1 w-full overflow-x-auto hide-scrollbar flex gap-4 pb-1 md:pb-0 items-center">
-              
-              {/* 1. Product Types Group */}
-              <div className="flex items-center gap-2 border-r border-white/10 pr-4">
-                <span className="text-[9px] uppercase tracking-widest text-gray-500 font-bold hidden sm:block">Type:</span>
-                {['Sneakers', 'Soccer Cleats', 'Official Shoes', 'Opens & Sandals'].map((type) => {
-                  const isActive = filterProductType === type;
-                  return (
-                    <button
-                      key={type}
-                      onClick={() => {
-                        setFilterProductType(isActive ? 'All' : type);
-                        setFilterCategory('All');
-                        setDiscoveryMode('all');
-                      }}
-                      className={`whitespace-nowrap px-4 py-1.5 rounded-md text-[10px] sm:text-xs font-bold tracking-widest transition-colors ${
-                        isActive
-                          ? 'bg-brand-primary text-black shadow-lg shadow-brand-primary/20'
-                          : 'bg-brand-dark text-gray-300 hover:bg-white/10 hover:text-white border border-white/5'
-                      }`}
-                    >
-                      {type}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* 2. Collections / Categories Group */}
-              <div className="flex items-center gap-2">
-                <span className="text-[9px] uppercase tracking-widest text-gray-500 font-bold hidden sm:block">Collection:</span>
-                {discoveryChips
-                  .filter(chip => !['sneakers', 'soccer-cleats'].includes(chip.id))
-                  .map((chip) => {
-                    const isActive = !searchQuery && (
-                      normalizeSlug(filterCategory) === normalizeSlug(chip.id) ||
-                      (discoveryMode === chip.id && filterCategory === 'All')
-                    );
-
-                    return (
-                      <button
-                        key={chip.id}
-                        onClick={() => { 
-                          clearAllFilters(); 
-                          setFilterCategory(chip.id.replace(/-/g, ' '));
-                        }}
-                        className={`whitespace-nowrap px-4 py-1.5 rounded-md text-[10px] sm:text-xs font-bold tracking-widest transition-colors ${
-                          isActive
-                            ? 'bg-white text-black shadow-lg shadow-white/20'
-                            : 'bg-brand-dark text-gray-400 hover:bg-white/10 hover:text-white border border-white/5'
-                        }`}
-                      >
-                        {chip.label}
-                      </button>
-                    );
-                })}
-              </div>
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
 
-            {/* Desktop Actions */}
-            <div className="hidden md:flex items-center gap-3 flex-shrink-0">
-              <div className="relative">
+            {/* Sort & Filter Controls */}
+            <div className="flex items-center gap-3 w-full lg:w-auto">
+              <div className="relative flex-1 lg:w-56">
                 <select
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value)}
-                  className="appearance-none bg-brand-dark border border-white/10 px-4 py-2 pr-8 rounded-md text-[10px] uppercase font-bold tracking-widest text-white focus:outline-none focus:border-white/50 cursor-pointer"
+                  className="w-full appearance-none bg-white/5 border border-white/10 px-5 py-3 pr-10 rounded-full text-xs font-bold uppercase tracking-widest text-white focus:outline-none focus:border-brand-primary cursor-pointer transition-all hover:bg-white/10"
                 >
-                  <option className="bg-brand-dark text-white" value="default">Default</option>
-                  <option className="bg-brand-dark text-white" value="trending-now">Trending Now</option>
-                  <option className="bg-brand-dark text-white" value="best-selling">Best Selling</option>
-                  <option className="bg-brand-dark text-white" value="new-arrivals">New Arrivals</option>
+                  <option className="bg-brand-dark text-white" value="default">Sort: Default</option>
+                  <option className="bg-brand-dark text-white" value="trending-now">Sort: Trending Now</option>
+                  <option className="bg-brand-dark text-white" value="best-selling">Sort: Best Selling</option>
+                  <option className="bg-brand-dark text-white" value="new-arrivals">Sort: New Arrivals</option>
                   <option className="bg-brand-dark text-white" value="price-low">Price: Low to High</option>
                   <option className="bg-brand-dark text-white" value="price-high">Price: High to Low</option>
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-gray-500" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-gray-400" />
               </div>
+              
               <button 
                 onClick={() => setIsAdvancedFiltersOpen(true)}
-                className="flex items-center space-x-2 text-xs font-bold text-white uppercase tracking-widest bg-brand-dark hover:bg-white/10 border border-white/10 px-4 py-2 rounded-md transition-colors"
+                className="flex items-center justify-center space-x-2 bg-brand-primary text-black px-6 py-3 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-brand-hover transition-colors shadow-lg shadow-brand-primary/20 flex-shrink-0"
               >
-                <Filter className="h-3 w-3" />
-                <span>Filters</span>
+                <Filter className="h-4 w-4" />
+                <span className="hidden sm:inline">Filters</span>
+                {hasActiveFilters && (
+                  <span className="ml-1 h-2 w-2 rounded-full bg-black block"></span>
+                )}
               </button>
             </div>
           </div>
-          
-          {/* Mobile Actions */}
-          <div className="md:hidden flex items-center justify-between mt-2 pt-2 border-t border-white/5">
-              <div className="relative flex-1 mr-2">
-                <select
-                  value={sortOption}
-                  onChange={(e) => setSortOption(e.target.value)}
-                  className="w-full appearance-none bg-transparent border-none py-1 pr-8 text-xs font-bold uppercase tracking-widest text-white focus:outline-none"
-                >
-                  <option className="bg-brand-dark text-white" value="default">Default</option>
-                  <option className="bg-brand-dark text-white" value="trending-now">Trending Now</option>
-                  <option className="bg-brand-dark text-white" value="best-selling">Best Selling</option>
-                  <option className="bg-brand-dark text-white" value="new-arrivals">New Arrivals</option>
-                  <option className="bg-brand-dark text-white" value="price-low">Price: Low to High</option>
-                  <option className="bg-brand-dark text-white" value="price-high">Price: High to Low</option>
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-gray-500" />
-              </div>
-              <button 
-                onClick={() => setIsAdvancedFiltersOpen(true)}
-                className="flex items-center space-x-2 text-xs font-bold text-white uppercase tracking-widest py-1 pl-4 border-l border-white/10"
-              >
-                <Filter className="h-3 w-3" />
-                <span>Filters</span>
-              </button>
+
+          {/* Row 2: Scrollable Pill Navigation for Types & Collections */}
+          <div className="flex items-center overflow-x-auto hide-scrollbar gap-3 pb-2 -mx-6 px-6 lg:mx-0 lg:px-0">
+            <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold hidden md:block mr-2 flex-shrink-0">
+              Explore:
+            </span>
+
+            {/* 1. Product Types Group */}
+            <div className="flex items-center gap-2 flex-nowrap border-r border-white/10 pr-3 mr-1">
+              {['Sneakers', 'Soccer Cleats', 'Official Shoes', 'Opens & Sandals'].map((type) => {
+                const isActive = filterProductType === type;
+                return (
+                  <button
+                    key={type}
+                    onClick={() => {
+                      setFilterProductType(isActive ? 'All' : type);
+                      setFilterCategory('All');
+                      setDiscoveryMode('all');
+                    }}
+                    className={`whitespace-nowrap px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
+                      isActive
+                        ? 'bg-white text-black shadow-md shadow-white/10'
+                        : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border border-white/5'
+                    }`}
+                  >
+                    {type}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* 2. Collections Group */}
+            <div className="flex items-center gap-2 flex-nowrap">
+              {discoveryChips
+                .filter(chip => !['sneakers', 'soccer-cleats'].includes(chip.id))
+                .map((chip) => {
+                  const isActive = !searchQuery && (
+                    normalizeSlug(filterCategory) === normalizeSlug(chip.id) ||
+                    (discoveryMode === chip.id && filterCategory === 'All')
+                  );
+
+                  return (
+                    <button
+                      key={chip.id}
+                      onClick={() => { 
+                        clearAllFilters(); 
+                        setFilterCategory(chip.id.replace(/-/g, ' '));
+                      }}
+                      className={`whitespace-nowrap px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
+                        isActive
+                          ? 'bg-brand-primary text-black shadow-md shadow-brand-primary/20'
+                          : 'bg-transparent text-gray-400 hover:bg-white/5 hover:text-white border border-white/10'
+                      }`}
+                    >
+                      {chip.label}
+                    </button>
+                  );
+              })}
+            </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex-1 w-full">
-          {/* Active Discovery State */}
-          <motion.div 
-            initial="hidden" animate="visible" variants={fadeIn}
-            className="flex flex-wrap items-center justify-between mb-4"
-          >
-             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <div className="text-sm font-medium text-white flex items-center">
-                  <span className="text-gray-500 mr-2">Showing:</span> 
-                  {searchQuery ? `Search Results for "${searchQuery}"` : 
-                   filterCategory !== 'All' ? filterCategory :
-                   filterProductType !== 'All' ? filterProductType :
-                   discoveryMode === 'deals' ? 'Flash Deals' :
-                   discoveryMode === 'all' ? 'All Styles' :
-                   discoveryChips.find(c => c.id === discoveryMode)?.context || 'All Styles'}
-                </div>
-                <div className="hidden sm:block w-1 h-1 rounded-full bg-white/20"></div>
-                <div className="text-sm font-medium text-white flex items-center">
-                  <span className="text-gray-500 mr-2">Sorted by:</span>
-                  {sortOption === 'default' ? 'Default' :
-                   sortOption === 'trending-now' ? 'Trending Now' :
-                   sortOption === 'best-selling' ? 'Best Selling' :
-                   sortOption === 'new-arrivals' ? 'New Arrivals' :
-                   sortOption === 'price-low' ? 'Price: Low to High' : 'Price: High to Low'}
-                </div>
-             </div>
-             
-             <div className="text-xs font-bold uppercase tracking-widest text-gray-500 mt-2 sm:mt-0">
-               {sortedAndFilteredProducts.length} {sortedAndFilteredProducts.length === 1 ? 'Product' : 'Products'}
-             </div>
-          </motion.div>
-
-          {/* Active Filter Summary */}
-          {hasActiveFilters && (
+          
+          {/* Active Discovery State & Filter Summary */}
+          <div className="mb-8 flex flex-col gap-4">
+            
+            {/* Top Line: Showing info & Count */}
             <motion.div 
-              initial="hidden" animate="visible" variants={staggerContainer}
-              className="flex flex-wrap items-center gap-2 mb-4 pb-4 border-b border-white/5"
+              initial="hidden" animate="visible" variants={fadeIn}
+              className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-white/5 pb-4"
             >
-              <motion.span variants={staggerItem} className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mr-2">Filters:</motion.span>
-              {searchQuery && (
-                <motion.div variants={staggerItem} className="flex items-center bg-white/5 border border-white/10 rounded-md px-3 py-1 text-[10px] text-white uppercase tracking-wider">
-                  &quot;{searchQuery}&quot;
-                  <button onClick={() => setSearchQuery('')} className="ml-2 text-gray-400 hover:text-white"><X className="h-3 w-3" /></button>
-                </motion.div>
-              )}
-              {filterCategory && filterCategory !== 'All' && (
-                <motion.div variants={staggerItem} className="flex items-center bg-white/5 border border-white/10 rounded-md px-3 py-1 text-[10px] text-white uppercase tracking-wider">
-                  {filterCategory}
-                  <button onClick={() => setFilterCategory('All')} className="ml-2 text-gray-400 hover:text-white"><X className="h-3 w-3" /></button>
-                </motion.div>
-              )}
-              {filterProductType && filterProductType !== 'All' && (
-                <motion.div variants={staggerItem} className="flex items-center bg-white/5 border border-white/10 rounded-md px-3 py-1 text-[10px] text-white uppercase tracking-wider">
-                  Type: {filterProductType}
-                  <button onClick={() => setFilterProductType('All')} className="ml-2 text-gray-400 hover:text-white"><X className="h-3 w-3" /></button>
-                </motion.div>
-              )}
-              {filterPrice && (
-                <motion.div variants={staggerItem} className="flex items-center bg-white/5 border border-white/10 rounded-md px-3 py-1 text-[10px] text-white uppercase tracking-wider">
-                  {filterPrice}
-                  <button onClick={() => setFilterPrice(null)} className="ml-2 text-gray-400 hover:text-white"><X className="h-3 w-3" /></button>
-                </motion.div>
-              )}
-              {filterSize && (
-                <motion.div variants={staggerItem} className="flex items-center bg-white/5 border border-white/10 rounded-md px-3 py-1 text-[10px] text-white uppercase tracking-wider">
-                  Size: {filterSize}
-                  <button onClick={() => setFilterSize(null)} className="ml-2 text-gray-400 hover:text-white"><X className="h-3 w-3" /></button>
-                </motion.div>
-              )}
-              <motion.button 
-                variants={staggerItem}
-                onClick={clearAllFilters}
-                className="text-[10px] text-white hover:text-brand-primary transition-colors uppercase tracking-widest font-bold ml-2 underline underline-offset-4"
-              >
-                Clear All
-              </motion.button>
+               <div className="text-lg md:text-xl font-display text-white">
+                  {searchQuery ? (
+                    <>Results for <span className="text-brand-primary">"{searchQuery}"</span></>
+                  ) : (
+                    <>
+                      Viewing <span className="text-brand-primary">
+                        {filterCategory !== 'All' ? filterCategory :
+                         filterProductType !== 'All' ? filterProductType :
+                         discoveryMode === 'deals' ? 'Flash Deals' :
+                         discoveryMode === 'all' ? 'All Styles' :
+                         discoveryChips.find(c => c.id === discoveryMode)?.context || 'All Styles'}
+                      </span>
+                    </>
+                  )}
+               </div>
+               
+               <div className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-500 bg-white/5 px-4 py-2 rounded-full inline-flex w-max items-center border border-white/5">
+                 {sortedAndFilteredProducts.length} {sortedAndFilteredProducts.length === 1 ? 'Product' : 'Products'} Found
+               </div>
             </motion.div>
-          )}
+
+            {/* Bottom Line: Active Filter Tags */}
+            <AnimatePresence>
+              {hasActiveFilters && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }} 
+                  animate={{ opacity: 1, height: 'auto' }} 
+                  exit={{ opacity: 0, height: 0 }}
+                  className="flex flex-wrap items-center gap-2"
+                >
+                  <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mr-1">Active:</span>
+                  
+                  {searchQuery && (
+                    <div className="flex items-center bg-white/10 border border-white/20 rounded-full pl-3 pr-1 py-1 text-[10px] text-white uppercase tracking-wider">
+                      "{searchQuery}"
+                      <button onClick={() => setSearchQuery('')} className="ml-2 p-1 bg-black/20 rounded-full text-gray-300 hover:text-white hover:bg-black/40 transition-colors"><X className="h-3 w-3" /></button>
+                    </div>
+                  )}
+                  {filterCategory && filterCategory !== 'All' && (
+                    <div className="flex items-center bg-white/10 border border-white/20 rounded-full pl-3 pr-1 py-1 text-[10px] text-white uppercase tracking-wider">
+                      {filterCategory}
+                      <button onClick={() => setFilterCategory('All')} className="ml-2 p-1 bg-black/20 rounded-full text-gray-300 hover:text-white hover:bg-black/40 transition-colors"><X className="h-3 w-3" /></button>
+                    </div>
+                  )}
+                  {filterProductType && filterProductType !== 'All' && (
+                    <div className="flex items-center bg-white/10 border border-white/20 rounded-full pl-3 pr-1 py-1 text-[10px] text-white uppercase tracking-wider">
+                      Type: {filterProductType}
+                      <button onClick={() => setFilterProductType('All')} className="ml-2 p-1 bg-black/20 rounded-full text-gray-300 hover:text-white hover:bg-black/40 transition-colors"><X className="h-3 w-3" /></button>
+                    </div>
+                  )}
+                  {filterPrice && (
+                    <div className="flex items-center bg-white/10 border border-white/20 rounded-full pl-3 pr-1 py-1 text-[10px] text-white uppercase tracking-wider">
+                      {filterPrice}
+                      <button onClick={() => setFilterPrice(null)} className="ml-2 p-1 bg-black/20 rounded-full text-gray-300 hover:text-white hover:bg-black/40 transition-colors"><X className="h-3 w-3" /></button>
+                    </div>
+                  )}
+                  {filterSize && (
+                    <div className="flex items-center bg-white/10 border border-white/20 rounded-full pl-3 pr-1 py-1 text-[10px] text-white uppercase tracking-wider">
+                      Size: {filterSize}
+                      <button onClick={() => setFilterSize(null)} className="ml-2 p-1 bg-black/20 rounded-full text-gray-300 hover:text-white hover:bg-black/40 transition-colors"><X className="h-3 w-3" /></button>
+                    </div>
+                  )}
+                  
+                  <button 
+                    onClick={clearAllFilters}
+                    className="text-[10px] text-gray-400 hover:text-brand-primary transition-colors uppercase tracking-widest font-bold ml-2 underline underline-offset-4"
+                  >
+                    Clear All
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* Product Grid */}
           {isLoading ? (
