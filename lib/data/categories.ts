@@ -42,12 +42,12 @@ export const categories: Category[] = [
 
 export const heroCategories = categories.slice(0, 5);
 
-export const discoveryChips = [
+export const discoveryChips = [/*
   { id: 'trending', label: '🔥 Trending', context: 'Trending Styles' },
   { id: 'best-sellers', label: '⭐ Best Sellers', context: 'Best Sellers' },
   { id: 'just-dropped', label: '🆕 Just Dropped', context: 'New Arrivals' },
   { id: 'budget-picks', label: '💰 Budget Picks', context: 'Budget Friendly' },
-  { id: 'premium-styles', label: '✨ Premium Styles', context: 'Premium Collection' },
+  { id: 'premium-styles', label: '✨ Premium Styles', context: 'Premium Collection' },*/
 ];
 
 // UPDATED: Now matches your actual inventory types for the Advanced Filter Drawer
