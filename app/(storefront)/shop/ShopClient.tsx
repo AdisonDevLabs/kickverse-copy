@@ -247,7 +247,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
   return (
     <div className="bg-brand-dark min-h-screen text-white">
       {/* Page Header */}
-      <div className="bg-brand-card pt-10 md:pt-16 pb-10 px-6 border-b border-white/5 relative overflow-hidden">
+      <div className="bg-brand-card pt-4 md:pt-6 pb-4 px-6 border-b border-white/5 relative overflow-hidden">
         {/* Subtle background glow for visual hierarchy */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-full bg-brand-primary/5 blur-3xl rounded-full pointer-events-none"></div>
         
@@ -257,7 +257,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
         >
           <motion.h1 
             variants={staggerItem}
-            className="font-display font-black uppercase tracking-wide text-4xl sm:text-5xl md:text-6xl text-white mb-2 leading-none"
+            className="font-display font-black uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl text-white leading-none"
           >
             {discoveryMode === 'deals' && filterCategory === 'All' ? 'Flash Deals' : 
              discoveryMode === 'just-dropped' && filterCategory === 'All' ? 'New Arrivals' :
@@ -270,11 +270,11 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
       </div>
 
       {/* Refined Navigation & Controls Bar */}
-      <div className="sticky top-0 z-40 bg-brand-dark/95 backdrop-blur-md border-b border-white/10 shadow-sm transition-all py-4">
+      <div className="sticky top-0 z-40 bg-brand-dark/95 backdrop-blur-md border-b border-white/10 shadow-sm transition-all py-2">
         <div className="max-w-7xl mx-auto px-6">
           
           {/* Row 1: Search, Sort, and Advanced Filters */}
-          <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center mb-5">
+          <div className="flex flex-col lg:flex-row gap-3 justify-between items-start lg:items-center mb-3">
             
             {/* Search Input */}
             <div className="relative w-full lg:max-w-md flex-shrink-0">
@@ -389,16 +389,16 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex-1 w-full">
           
           {/* Active Discovery State & Filter Summary */}
-          <div className="mb-8 flex flex-col gap-4">
+          <div className="mb-4 flex flex-col gap-2">
             
             {/* Top Line: Showing info & Count */}
             <motion.div 
               initial="hidden" animate="visible" variants={fadeIn}
-              className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-white/5 pb-4"
+              className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-white/5 pb-2"
             >
                <div className="text-lg md:text-xl font-display text-white">
                   {searchQuery ? (
