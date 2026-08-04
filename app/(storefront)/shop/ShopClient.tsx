@@ -266,9 +266,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
              filterProductType !== 'All' ? filterProductType :
              'Shop Collection'}
           </motion.h1>
-          <motion.p variants={staggerItem} className="text-gray-400 text-sm md:text-base max-w-lg">
-            Discover the latest trends, premium styles, and unbeatable deals curated just for you.
-          </motion.p>
         </motion.div>
       </div>
 
@@ -360,7 +357,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
               })}
             </div>
 
-            {/* 2. Collections Group */}
+            {/* 2. Collections Group
             <div className="flex items-center gap-2 flex-nowrap">
               {discoveryChips
                 .filter(chip => !['sneakers', 'soccer-cleats'].includes(chip.id))
@@ -387,7 +384,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                     </button>
                   );
               })}
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
