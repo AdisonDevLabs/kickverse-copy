@@ -2,8 +2,84 @@
 
 import React, { useState } from 'react';
 import { X, Trash2, Tag, Upload, FolderPlus, Edit, CheckCircle } from 'lucide-react';
-import imageCompression from 'browser-image-compression';
 import { createCategory, updateCategory, deleteCategory } from './actions';
+
+// ULTRA-FAST, LOW-MEMORY SINGLE-PASS WEBP CONVERTER (Ported from MediaManager)
+async function convertToWebpMemorySafe(
+  file: File, 
+  maxDim = 1920, 
+  quality = 0.82
+): Promise<File> {
+  const originalNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+  const webpName = `${originalNameWithoutExt}.webp`;
+  const isHeic = file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
+
+  let imageSource: CanvasImageSource | null = null;
+
+  try {
+    if (isHeic) {
+      // 1. Try Native Browser HEIC Decoding (Ultra-fast on Safari / iOS)
+      try {
+        imageSource = await createImageBitmap(file);
+      } catch {
+        // 2. Fallback to heic2any for Chrome/Firefox/Android
+        const heic2any = (await import('heic2any')).default;
+        const convertedBlob = await heic2any({ blob: file, toType: 'image/png' });
+        const singleBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+        imageSource = await createImageBitmap(singleBlob);
+      }
+    } else {
+      imageSource = await createImageBitmap(file);
+    }
+  } catch (err) {
+    // If bitmap creation fails, return original file as ultimate safety fallback
+    return file;
+  }
+
+  // Calculate scaled dimensions to fit within maxDim
+  let width = imageSource.width;
+  let height = imageSource.height;
+  if (width > maxDim || height > maxDim) {
+    if (width > height) {
+      height = Math.round((height * maxDim) / width);
+      width = maxDim;
+    } else {
+      width = Math.round((width * maxDim) / height);
+      height = maxDim;
+    }
+  }
+
+  // Draw directly onto Canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) {
+    if ('close' in imageSource && typeof (imageSource as any).close === 'function') {
+      (imageSource as any).close();
+    }
+    return file;
+  }
+
+  ctx.drawImage(imageSource, 0, 0, width, height);
+
+  // IMMEDIATELY RELEASE BITMAP RAM MEMORY
+  if ('close' in imageSource && typeof (imageSource as any).close === 'function') {
+    (imageSource as any).close();
+  }
+
+  // Export single-pass WebP Blob
+  const webpBlob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/webp', quality));
+
+  // Clear canvas reference to trigger instant Garbage Collection
+  canvas.width = 0;
+  canvas.height = 0;
+
+  if (!webpBlob) return file;
+
+  return new File([webpBlob], webpName, { type: 'image/webp' });
+}
 
 export default function CategoryManager({ categories }: { categories: any[] }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,23 +109,12 @@ export default function CategoryManager({ categories }: { categories: any[] }) {
     const formData = new FormData(e.currentTarget);
     const imageFile = formData.get('image') as File;
 
-    // Compress category image to ~300KB before upload
+    // Convert and compress category image using the WebP memory safe pipeline
     if (imageFile && imageFile.size > 0) {
       try {
-        const options = {
-          maxSizeMB: 0.3, // 300KB limit
-          maxWidthOrHeight: 1920,
-          useWebWorker: true,
-        };
-
-        const compressedBlob = await imageCompression(imageFile, options);
-        const compressedFile = new File([compressedBlob], imageFile.name, {
-          type: imageFile.type,
-          lastModified: Date.now(),
-        });
-
-        // Replace the raw file in FormData with the compressed file
-        formData.set('image', compressedFile);
+        const convertedFile = await convertToWebpMemorySafe(imageFile);
+        // Replace the raw file in FormData with the compressed WebP file
+        formData.set('image', convertedFile);
       } catch (error) {
         console.error('Image compression failed:', error);
       }
@@ -138,7 +203,7 @@ export default function CategoryManager({ categories }: { categories: any[] }) {
                 <input 
                   type="file" 
                   name="image" 
-                  accept="image/jpeg, image/png, image/webp, image/jpg" 
+                  accept="image/jpeg, image/png, image/webp, image/jpg, image/heic, image/heif, .heic, .heif" 
                   required={!editSlug}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
                 />

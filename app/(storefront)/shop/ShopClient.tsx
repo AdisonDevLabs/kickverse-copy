@@ -232,12 +232,11 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
     return result;
   }, [searchQuery, filterCategory, filterProductType, filterPrice, filterSize, discoveryMode, sortOption, initialProducts]);
 
-  const hasActiveFilters = (filterCategory && filterCategory !== 'All') || (filterProductType && filterProductType !== 'All') || filterPrice || filterSize || searchQuery || sortOption !== 'default' || discoveryMode !== 'all';
+  const hasActiveFilters = (filterCategory && filterCategory !== 'All') || filterPrice || filterSize || searchQuery || sortOption !== 'default' || discoveryMode !== 'all';
 
   const clearAllFilters = () => {
     setSearchQuery('');
     setFilterCategory('All');
-    setFilterProductType('All');
     setFilterPrice(null);
     setFilterSize(null);
     setDiscoveryMode('all');
@@ -278,13 +277,13 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
             
             {/* Search Input */}
             <div className="relative w-full lg:max-w-md flex-shrink-0">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input 
                 type="text" 
                 placeholder="Search sneakers, cleats, or brands..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white/5 text-white border border-white/10 rounded-full pl-12 pr-10 py-3 text-sm focus:outline-none focus:border-brand-primary focus:bg-white/10 transition-all shadow-inner placeholder:text-gray-500"
+                className="w-full bg-white/5 text-white border border-white/10 rounded-full pl-12 pr-10 py-2 text-sm focus:outline-none focus:border-brand-primary focus:bg-white/10 transition-all shadow-inner placeholder:text-gray-500"
               />
               {searchQuery && (
                 <button 
@@ -302,7 +301,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                 <select
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value)}
-                  className="w-full appearance-none bg-white/5 border border-white/10 px-5 py-3 pr-10 rounded-full text-xs font-bold uppercase tracking-widest text-white focus:outline-none focus:border-brand-primary cursor-pointer transition-all hover:bg-white/10"
+                  className="w-full appearance-none bg-white/5 border border-white/10 px-5 py-2 pr-10 rounded-full text-xs font-bold uppercase tracking-widest text-white focus:outline-none focus:border-brand-primary cursor-pointer transition-all hover:bg-white/10"
                 >
                   <option className="bg-brand-dark text-white" value="default">Sort: Default</option>
                   <option className="bg-brand-dark text-white" value="trending-now">Sort: Trending Now</option>
@@ -316,7 +315,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
               
               <button 
                 onClick={() => setIsAdvancedFiltersOpen(true)}
-                className="flex items-center justify-center space-x-2 bg-brand-primary text-black px-6 py-3 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-brand-hover transition-colors shadow-lg shadow-brand-primary/20 flex-shrink-0"
+                className="flex items-center justify-center space-x-2 bg-brand-primary text-black px-6 py-2 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-brand-hover transition-colors shadow-lg shadow-brand-primary/20 flex-shrink-0"
               >
                 <Filter className="h-4 w-4" />
                 <span className="hidden sm:inline">Filters</span>
@@ -389,89 +388,69 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-4">
+      <div className="max-w-7xl mx-auto px-6 py-2">
         <div className="flex-1 w-full">
           
           {/* Active Discovery State & Filter Summary */}
-          <div className="mb-4 flex flex-col gap-2">
-            
-            {/* Top Line: Showing info & Count */}
+          <div className="mb-4">
             <motion.div 
               initial="hidden" animate="visible" variants={fadeIn}
-              className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-white/5 pb-2"
+              className="flex items-center justify-between gap-3 border-b border-white/5 pb-2"
             >
-               <div className="text-lg md:text-xl font-display text-white">
-                  {searchQuery ? (
-                    <>Results for <span className="text-brand-primary">"{searchQuery}"</span></>
-                  ) : (
-                    <>
-                      Viewing <span className="text-brand-primary">
-                        {filterCategory !== 'All' ? filterCategory :
-                         filterProductType !== 'All' ? filterProductType :
-                         discoveryMode === 'deals' ? 'Flash Deals' :
-                         discoveryMode === 'all' ? 'All Styles' :
-                         discoveryChips.find(c => c.id === discoveryMode)?.context || 'All Styles'}
-                      </span>
-                    </>
+              
+              {/* Left Side: Active Filter Tags (Scrollable on mobile to preserve side-by-side layout) */}
+              <div className="flex-1 overflow-x-auto hide-scrollbar">
+                <AnimatePresence>
+                  {hasActiveFilters && (
+                    <motion.div 
+                      initial={{ opacity: 0 }} 
+                      animate={{ opacity: 1 }} 
+                      exit={{ opacity: 0 }}
+                      className="flex items-center gap-2 w-max"
+                    >
+                      <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mr-1">Active:</span>
+                      
+                      {searchQuery && (
+                        <div className="flex items-center bg-white/10 border border-white/20 rounded-full pl-3 pr-1 py-1 text-[10px] text-white uppercase tracking-wider whitespace-nowrap">
+                          "{searchQuery}"
+                          <button onClick={() => setSearchQuery('')} className="ml-2 p-1 bg-black/20 rounded-full text-gray-300 hover:text-white hover:bg-black/40 transition-colors"><X className="h-3 w-3" /></button>
+                        </div>
+                      )}
+                      {filterCategory && filterCategory !== 'All' && (
+                        <div className="flex items-center bg-white/10 border border-white/20 rounded-full pl-3 pr-1 py-1 text-[10px] text-white uppercase tracking-wider whitespace-nowrap">
+                          {filterCategory}
+                          <button onClick={() => setFilterCategory('All')} className="ml-2 p-1 bg-black/20 rounded-full text-gray-300 hover:text-white hover:bg-black/40 transition-colors"><X className="h-3 w-3" /></button>
+                        </div>
+                      )}
+                      {filterPrice && (
+                        <div className="flex items-center bg-white/10 border border-white/20 rounded-full pl-3 pr-1 py-1 text-[10px] text-white uppercase tracking-wider whitespace-nowrap">
+                          {filterPrice}
+                          <button onClick={() => setFilterPrice(null)} className="ml-2 p-1 bg-black/20 rounded-full text-gray-300 hover:text-white hover:bg-black/40 transition-colors"><X className="h-3 w-3" /></button>
+                        </div>
+                      )}
+                      {filterSize && (
+                        <div className="flex items-center bg-white/10 border border-white/20 rounded-full pl-3 pr-1 py-1 text-[10px] text-white uppercase tracking-wider whitespace-nowrap">
+                          Size: {filterSize}
+                          <button onClick={() => setFilterSize(null)} className="ml-2 p-1 bg-black/20 rounded-full text-gray-300 hover:text-white hover:bg-black/40 transition-colors"><X className="h-3 w-3" /></button>
+                        </div>
+                      )}
+                      
+                      <button 
+                        onClick={clearAllFilters}
+                        className="text-[10px] text-gray-400 hover:text-brand-primary transition-colors uppercase tracking-widest font-bold ml-2 underline underline-offset-4 whitespace-nowrap"
+                      >
+                        Clear All
+                      </button>
+                    </motion.div>
                   )}
-               </div>
-               
-               <div className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-500 bg-white/5 px-4 py-2 rounded-full inline-flex w-max items-center border border-white/5">
-                 {sortedAndFilteredProducts.length} {sortedAndFilteredProducts.length === 1 ? 'Product' : 'Products'} Found
-               </div>
-            </motion.div>
+                </AnimatePresence>
+              </div>
 
-            {/* Bottom Line: Active Filter Tags */}
-            <AnimatePresence>
-              {hasActiveFilters && (
-                <motion.div 
-                  initial={{ opacity: 0, height: 0 }} 
-                  animate={{ opacity: 1, height: 'auto' }} 
-                  exit={{ opacity: 0, height: 0 }}
-                  className="flex flex-wrap items-center gap-2"
-                >
-                  <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mr-1">Active:</span>
-                  
-                  {searchQuery && (
-                    <div className="flex items-center bg-white/10 border border-white/20 rounded-full pl-3 pr-1 py-1 text-[10px] text-white uppercase tracking-wider">
-                      "{searchQuery}"
-                      <button onClick={() => setSearchQuery('')} className="ml-2 p-1 bg-black/20 rounded-full text-gray-300 hover:text-white hover:bg-black/40 transition-colors"><X className="h-3 w-3" /></button>
-                    </div>
-                  )}
-                  {filterCategory && filterCategory !== 'All' && (
-                    <div className="flex items-center bg-white/10 border border-white/20 rounded-full pl-3 pr-1 py-1 text-[10px] text-white uppercase tracking-wider">
-                      {filterCategory}
-                      <button onClick={() => setFilterCategory('All')} className="ml-2 p-1 bg-black/20 rounded-full text-gray-300 hover:text-white hover:bg-black/40 transition-colors"><X className="h-3 w-3" /></button>
-                    </div>
-                  )}
-                  {filterProductType && filterProductType !== 'All' && (
-                    <div className="flex items-center bg-white/10 border border-white/20 rounded-full pl-3 pr-1 py-1 text-[10px] text-white uppercase tracking-wider">
-                      Type: {filterProductType}
-                      <button onClick={() => setFilterProductType('All')} className="ml-2 p-1 bg-black/20 rounded-full text-gray-300 hover:text-white hover:bg-black/40 transition-colors"><X className="h-3 w-3" /></button>
-                    </div>
-                  )}
-                  {filterPrice && (
-                    <div className="flex items-center bg-white/10 border border-white/20 rounded-full pl-3 pr-1 py-1 text-[10px] text-white uppercase tracking-wider">
-                      {filterPrice}
-                      <button onClick={() => setFilterPrice(null)} className="ml-2 p-1 bg-black/20 rounded-full text-gray-300 hover:text-white hover:bg-black/40 transition-colors"><X className="h-3 w-3" /></button>
-                    </div>
-                  )}
-                  {filterSize && (
-                    <div className="flex items-center bg-white/10 border border-white/20 rounded-full pl-3 pr-1 py-1 text-[10px] text-white uppercase tracking-wider">
-                      Size: {filterSize}
-                      <button onClick={() => setFilterSize(null)} className="ml-2 p-1 bg-black/20 rounded-full text-gray-300 hover:text-white hover:bg-black/40 transition-colors"><X className="h-3 w-3" /></button>
-                    </div>
-                  )}
-                  
-                  <button 
-                    onClick={clearAllFilters}
-                    className="text-[10px] text-gray-400 hover:text-brand-primary transition-colors uppercase tracking-widest font-bold ml-2 underline underline-offset-4"
-                  >
-                    Clear All
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+              {/* Right Side: Product Count (Pinned, never shrinks) */}
+              <div className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-500 bg-white/5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full inline-flex items-center border border-white/5 flex-shrink-0 whitespace-nowrap">
+                 {sortedAndFilteredProducts.length} {sortedAndFilteredProducts.length === 1 ? 'Product' : 'Products'} Found
+              </div>
+            </motion.div>
           </div>
 
           {/* Product Grid */}
@@ -672,7 +651,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
       </div>
 
       {/* Persistent WhatsApp Floating CTA */}
-      <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end">
+      <div className="fixed bottom-10 right-4 z-40 flex flex-col items-end">
         <a 
           href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(`Hello ${brand.name}, I'm interested in ordering from your website. Could you assist me with availability, options, and delivery? Thank you.`)}`}
           target="_blank" rel="noreferrer"
