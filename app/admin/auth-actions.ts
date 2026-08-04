@@ -6,7 +6,7 @@ import { users } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { cookies } from 'next/headers';
 import nodemailer from 'nodemailer';
-import { genSalt, hash, compare } from 'bcrypt-ts';
+import { genSaltSync, hashSync, compareSync } from 'bcrypt-ts';
 import { brand } from '@/lib/data/brand';
 
 export async function loginAdmin(formData: FormData) {
@@ -15,18 +15,17 @@ export async function loginAdmin(formData: FormData) {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    const anyUserExists = await db.select().from(users).limit(1);
+    const allUsers = await db.select().from(users);
 
     // ONE-TIME SETUP: If no users exist, the first login creates the admin account
-    if (anyUserExists.length === 0) {
-      // 3. Use async hashing
-      const salt = await genSalt(10);
-      const passwordHash = await hash(password, salt);
+    if (allUsers.length === 0) {
+      const salt = genSaltSync(10);
+      const hash = hashSync(password, salt);
       
       await db.insert(users).values({
         id: `u-${Date.now()}`,
         email,
-        passwordHash, // Use the async hash
+        passwordHash: hash,
       });
       
       const cookieStore = await cookies();
@@ -35,12 +34,8 @@ export async function loginAdmin(formData: FormData) {
     }
 
     // Normal Login Flow
-    // 4. Query ONLY the specific user by email
-    const targetedUsers = await db.select().from(users).where(eq(users.email, email)).limit(1);
-    const user = targetedUsers[0];
-
-    // 5. Use async compare to prevent blocking the Node.js thread
-    if (!user || !(await compare(password, user.passwordHash))) {
+    const user = allUsers.find(u => u.email === email);
+    if (!user || !compareSync(password, user.passwordHash)) {
       throw new Error('Invalid email or password');
     }
 
@@ -129,12 +124,11 @@ export async function resetPassword(formData: FormData) {
       throw new Error('Invalid or expired reset token');
     }
 
-    // 1. Swapped to asynchronous salt and hashing to prevent event loop blocking
-    const salt = await genSalt(10);
-    const passwordHash = await hash(newPassword, salt);
+    const salt = genSaltSync(10);
+    const hash = hashSync(newPassword, salt);
 
     await db.update(users)
-      .set({ passwordHash: passwordHash, resetToken: null, resetTokenExpiry: null })
+      .set({ passwordHash: hash, resetToken: null, resetTokenExpiry: null })
       .where(eq(users.id, user.id));
 
     return { success: true, message: 'Password updated successfully. You can now log in.' };
