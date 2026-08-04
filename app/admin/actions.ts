@@ -32,7 +32,8 @@ export async function createProduct(formData: FormData) {
           const file = imageFiles[item.fileIndex];
           if (file && file.size > 0) {
             const key = `products/${Date.now()}-unified-${file.name.replace(/\s+/g, '-')}`;
-            await env.PRODUCT_IMAGES.put(key, new Uint8Array(await file.arrayBuffer()), { httpMetadata: { contentType: file.type } });
+            // OPTIMIZATION: Pipe stream directly to R2 to bypass CPU memory buffering
+            await env.PRODUCT_IMAGES.put(key, file.stream(), { httpMetadata: { contentType: file.type } });
             finalImagesArray.push(`${R2_PUBLIC_URL}/${key}`);
           }
         }
@@ -47,7 +48,8 @@ export async function createProduct(formData: FormData) {
         if (!mainImageFile || mainImageFile.size === 0) throw new Error('Main image is required');
 
         const mainImageKey = `products/${Date.now()}-main-${mainImageFile.name.replace(/\s+/g, '-')}`;
-        await env.PRODUCT_IMAGES.put(mainImageKey, new Uint8Array(await mainImageFile.arrayBuffer()), { httpMetadata: { contentType: mainImageFile.type } });
+        // OPTIMIZATION: Pipe stream directly to R2
+        await env.PRODUCT_IMAGES.put(mainImageKey, mainImageFile.stream(), { httpMetadata: { contentType: mainImageFile.type } });
         mainImageUrl = `${R2_PUBLIC_URL}/${mainImageKey}`;
       }
 
@@ -64,7 +66,8 @@ export async function createProduct(formData: FormData) {
       if (validGalleryFiles.length > 0) {
         const uploadPromises = validGalleryFiles.map(async (file) => {
           const key = `products/${Date.now()}-gallery-${file.name.replace(/\s+/g, '-')}`;
-          await env.PRODUCT_IMAGES.put(key, new Uint8Array(await file.arrayBuffer()), { httpMetadata: { contentType: file.type } });
+          // OPTIMIZATION: Pipe stream directly to R2
+          await env.PRODUCT_IMAGES.put(key, file.stream(), { httpMetadata: { contentType: file.type } });
           return `${R2_PUBLIC_URL}/${key}`;
         });
         const newGalleryUrls = await Promise.all(uploadPromises);
@@ -146,7 +149,8 @@ export async function updateProduct(id: string, formData: FormData) {
           const file = imageFiles[item.fileIndex];
           if (file && file.size > 0) {
             const key = `products/${Date.now()}-unified-${file.name.replace(/\s+/g, '-')}`;
-            await env.PRODUCT_IMAGES.put(key, new Uint8Array(await file.arrayBuffer()), { httpMetadata: { contentType: file.type } });
+            // OPTIMIZATION: Pipe stream directly to R2
+            await env.PRODUCT_IMAGES.put(key, file.stream(), { httpMetadata: { contentType: file.type } });
             finalImagesArray.push(`${R2_PUBLIC_URL}/${key}`);
           }
         }
@@ -163,7 +167,8 @@ export async function updateProduct(id: string, formData: FormData) {
         const mainImageFile = formData.get('mainImage') as File;
         if (mainImageFile && mainImageFile.size > 0) {
           const mainImageKey = `products/${Date.now()}-main-${mainImageFile.name.replace(/\s+/g, '-')}`;
-          await env.PRODUCT_IMAGES.put(mainImageKey, new Uint8Array(await mainImageFile.arrayBuffer()), { httpMetadata: { contentType: mainImageFile.type } });
+          // OPTIMIZATION: Pipe stream directly to R2
+          await env.PRODUCT_IMAGES.put(mainImageKey, mainImageFile.stream(), { httpMetadata: { contentType: mainImageFile.type } });
           finalMainImageUrl = `${R2_PUBLIC_URL}/${mainImageKey}`;
         }
       }
@@ -181,7 +186,8 @@ export async function updateProduct(id: string, formData: FormData) {
       if (validGalleryFiles.length > 0) {
         const uploadPromises = validGalleryFiles.map(async (file) => {
           const key = `products/${Date.now()}-gallery-${file.name.replace(/\s+/g, '-')}`;
-          await env.PRODUCT_IMAGES.put(key, new Uint8Array(await file.arrayBuffer()), { httpMetadata: { contentType: file.type } });
+          // OPTIMIZATION: Pipe stream directly to R2
+          await env.PRODUCT_IMAGES.put(key, file.stream(), { httpMetadata: { contentType: file.type } });
           return `${R2_PUBLIC_URL}/${key}`;
         });
         const directGalleryUrls = await Promise.all(uploadPromises);
@@ -279,7 +285,8 @@ export async function createCategory(formData: FormData) {
     }
 
     const key = `categories/${slug}-${Date.now()}`;
-    await env.PRODUCT_IMAGES.put(key, new Uint8Array(await imageFile.arrayBuffer()), { 
+    // OPTIMIZATION: Pipe stream directly to R2
+    await env.PRODUCT_IMAGES.put(key, imageFile.stream(), { 
         httpMetadata: { contentType: imageFile.type } 
     });
     const imageUrl = `https://cdn.kickverse.co.ke/${key}`;
@@ -326,7 +333,8 @@ export async function updateCategory(slug: string, formData: FormData) {
     
     if (imageFile && imageFile.size > 0) {
       const key = `categories/${slug}-${Date.now()}`;
-      await env.PRODUCT_IMAGES.put(key, new Uint8Array(await imageFile.arrayBuffer()), { 
+      // OPTIMIZATION: Pipe stream directly to R2
+      await env.PRODUCT_IMAGES.put(key, imageFile.stream(), { 
           httpMetadata: { contentType: imageFile.type } 
       });
       imageUrl = `https://cdn.kickverse.co.ke/${key}`;

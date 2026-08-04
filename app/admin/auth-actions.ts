@@ -6,8 +6,55 @@ import { users } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { cookies } from 'next/headers';
 import nodemailer from 'nodemailer';
-import { genSaltSync, hashSync, compareSync } from 'bcrypt-ts';
 import { brand } from '@/lib/data/brand';
+
+// --- ZERO-DEPENDENCY NATIVE CRYPTO UTILS (Worker & Edge Safe) ---
+function buf2hex(buffer: ArrayBuffer) {
+  return Array.from(new Uint8Array(buffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+function hex2buf(hexString: string) {
+  const bytes = new Uint8Array(Math.ceil(hexString.length / 2));
+  for (let i = 0; i < bytes.length; i++) {
+    bytes[i] = parseInt(hexString.substring(i * 2, i * 2 + 2), 16);
+  }
+  return bytes;
+}
+
+async function hashPassword(password: string, saltHex?: string) {
+  const encoder = new TextEncoder();
+  const salt = saltHex ? hex2buf(saltHex) : crypto.getRandomValues(new Uint8Array(16));
+  
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(password),
+    { name: 'PBKDF2' },
+    false,
+    ['deriveBits']
+  );
+  
+  const derivedKey = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+    keyMaterial,
+    256
+  );
+  
+  return `${buf2hex(salt.buffer)}:${buf2hex(derivedKey)}`;
+}
+
+async function verifyPassword(password: string, storedHash: string) {
+  // Gracefully handle old bcrypt hashes by failing the auth check cleanly
+  if (!storedHash || !storedHash.includes(':')) return false; 
+  
+  const [saltStr, originalHash] = storedHash.split(':');
+  if (!saltStr || !originalHash) return false;
+
+  const computed = await hashPassword(password, saltStr);
+  return computed.split(':')[1] === originalHash;
+}
+// ----------------------------------------------------------------
 
 export async function loginAdmin(formData: FormData) {
   try {
@@ -19,8 +66,7 @@ export async function loginAdmin(formData: FormData) {
 
     // ONE-TIME SETUP: If no users exist, the first login creates the admin account
     if (allUsers.length === 0) {
-      const salt = genSaltSync(10);
-      const hash = hashSync(password, salt);
+      const hash = await hashPassword(password);
       
       await db.insert(users).values({
         id: `u-${Date.now()}`,
@@ -35,7 +81,7 @@ export async function loginAdmin(formData: FormData) {
 
     // Normal Login Flow
     const user = allUsers.find(u => u.email === email);
-    if (!user || !compareSync(password, user.passwordHash)) {
+    if (!user || !(await verifyPassword(password, user.passwordHash))) {
       throw new Error('Invalid email or password');
     }
 
@@ -104,7 +150,6 @@ export async function requestPasswordReset(formData: FormData) {
       });
     }
 
-    // Always return success even if email isn't found to prevent email enumeration attacks
     return { success: true, message: 'If that email exists, a reset link has been sent.' };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -124,8 +169,7 @@ export async function resetPassword(formData: FormData) {
       throw new Error('Invalid or expired reset token');
     }
 
-    const salt = genSaltSync(10);
-    const hash = hashSync(newPassword, salt);
+    const hash = await hashPassword(newPassword);
 
     await db.update(users)
       .set({ passwordHash: hash, resetToken: null, resetTokenExpiry: null })

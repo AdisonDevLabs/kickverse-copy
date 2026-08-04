@@ -30,7 +30,7 @@
 			"bucket_name": "kickverse-copy-images",
 			"binding": "PRODUCT_IMAGES",
 			"remote": true
-		},
+		}
 	],
 	"images": {
 		// Enable image optimization
