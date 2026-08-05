@@ -1,5 +1,5 @@
 // lib/data/brand.ts
-import { Truck, MessageCircle, Star, Sparkles, Tag, CheckCircle, ShieldCheck } from 'lucide-react';
+import { Truck, Package, Star, Sparkles, Tag, CheckCircle, ShieldCheck } from 'lucide-react';
 
 export const brand = {
   name: "KICKVERSE KE",
@@ -159,9 +159,9 @@ Thank you.`,
 };
 
 export const announcementMessages = [
+  { text: "Call/WhatsApp: 0713625575/0794584404", icon: Sparkles },
   { text: "We Deliver countrywide", icon: Truck },
-  { text: "Comes Boxed & Well Packed", icon: MessageCircle },
-  { text: "HOME OF THE BEST SNEAKERS & CLEATS", icon: Sparkles },
+  { text: "Comes Boxed & Well Packed", icon: Package },
   { text: "Tested, trusted and approved", icon: Star },
   { text: "Order and Pay on delivery", icon: Tag },
 ];
@@ -170,7 +170,7 @@ export const cartTrustFeatures = [
   { text: "We Deliver countrywide", icon: Truck },
   { text: "Genuine quality", icon: CheckCircle },
   { text: "Tested, trusted and approved", icon: ShieldCheck },
-  { text: "Order and Pay on delivery", icon: MessageCircle },
+  { text: "Order and Pay on delivery", icon: Package },
 ];
 
 export const footerQuickShopLinks = [

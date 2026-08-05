@@ -3,7 +3,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Truck, MessageCircle, Star, Sparkles, Tag } from 'lucide-react';
+import { Truck, Package, Star, Sparkles, Tag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { brand, announcementMessages as messages } from '@/lib/data/brand';
 
@@ -47,21 +47,21 @@ export function AnnouncementBar() {
       {/* Desktop Split View */}
       <div className="hidden md:flex w-full items-center justify-between max-w-7xl mx-auto px-4 font-semibold text-sm">
         <div className="flex items-center space-x-2">
-          <Truck className="h-4 w-4" />
+          <Sparkles className="h-4 w-4" />
           <span>{messages[0].text}</span>
         </div>
         <div className="flex items-center space-x-2">
-          <Sparkles className="h-4 w-4" />
+          <Truck className="h-4 w-4" />
+          <span>{messages[1].text}</span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Package className="h-4 w-4" />
           <span>{messages[2].text}</span>
         </div>
-        <a href={`https://wa.me/${brand.whatsappNumber}`}
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center space-x-2 cursor-pointer hover:opacity-70 transition-opacity"
-        >
-          <MessageCircle className="h-4 w-4" />
-          <span>Order via WhatsApp</span>
-        </a>
+        <div className="flex items-center space-x-2">
+          <Tag className="h-4 w-4" />
+          <span>{messages[4].text}</span>
+        </div>
       </div>
     </div>
   );
