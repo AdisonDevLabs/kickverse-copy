@@ -13,7 +13,7 @@ export default function StorefrontLayout({children}: {children: React.ReactNode}
         <NavBar />
       </Suspense>
       <CartDrawer />
-      <main className="flex flex-col min-h-screen pt-[96px] md:pt-[100px] pb-[88px] md:pb-0">
+      <main className="flex flex-col min-h-screen pt-[89px] md:pt-[100px] pb-[88px] md:pb-0">
         {children}
       </main>
       <Footer />

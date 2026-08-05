@@ -5,7 +5,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-// 1. Update your motion import to include useAnimationFrame and useMotionValue
 import { motion, useAnimationFrame, useMotionValue } from 'motion/react';
 import { fadeUp, fadeLeft, heroReveal, staggerContainer, staggerItem } from '@/lib/animations';
 import { ArrowRight, Star, ShoppingBag, Truck, ShieldCheck, Clock, MessageCircle, Flame, Eye, Zap, Sparkles, Wallet, CheckCircle, Heart, Tag, Grid } from 'lucide-react';
@@ -21,7 +20,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
   // --- DRAGGABLE MARQUEE STATE ---
   const carouselRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
-  const halfWidthRef = useRef(0);
+  const copyWidthRef = useRef(0); // Holds the exact pixel width of 1 copy (including gaps)
   const isPausedRef = useRef(false);
   const interactionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -69,7 +68,6 @@ export default function HomeClient({ initialProducts, initialCategories, initial
     return `${d.toString().padStart(2, '0')}d : ${h.toString().padStart(2, '0')}h : ${m.toString().padStart(2, '0')}m : ${s.toString().padStart(2, '0')}s`;
   };
 
-  // 1. Filter using the live database props instead of dummyProducts
   const sneakerProducts = initialProducts.filter((p: any) => p.productType === 'Sneakers');
 
   const newArrivals = initialProducts.filter((p: any) => p.isNewArrival).slice(0, 4);
@@ -80,39 +78,49 @@ export default function HomeClient({ initialProducts, initialCategories, initial
     sneakerProducts.some((p: any) => p.category === collection.name)
   );
   
-  // Fallback in case no products are mapped yet
   const displayCategories = sneakerCategories.length > 0 ? sneakerCategories : initialCategories;
 
-  // 3. Filter Soccer Cleats and their corresponding categories
   const cleatProducts = initialProducts.filter((p: any) => p.productType === 'Soccer Cleats');
   const displayCleatCategories = initialCategories.filter((collection: any) => 
     cleatProducts.some((p: any) => p.category === collection.name)
   );
 
-  // 4. Filter Official Shoes by Category (since they are saved as Sneakers)
   const officialProducts = initialProducts.filter((p: any) => p.category === 'Official Shoes');
   const displayOfficialCategories = initialCategories.filter((collection: any) => 
     officialProducts.some((p: any) => p.category === collection.name)
   );
 
-  // 5. Filter Opens & Sandals by Category (since they are saved as Sneakers)
   const sandalProducts = initialProducts.filter((p: any) => p.category === 'Opens & Sandals');
   const displaySandalCategories = initialCategories.filter((collection: any) => 
     sandalProducts.some((p: any) => p.category === collection.name)
   );
 
-  // --- NEW: Featured Collections Infinite Scroll Setup ---
+  // --- FEATURED COLLECTIONS INFINITE SCROLL SETUP ---
   useEffect(() => {
     const measure = () => {
-      if (carouselRef.current) {
-        // Because the array is duplicated 4 times below, exactly half the 
-        // scrollWidth represents an identical seamless loop point
-        halfWidthRef.current = carouselRef.current.scrollWidth / 2;
+      if (carouselRef.current && carouselRef.current.children.length > 0) {
+        const children = carouselRef.current.children;
+        const numItemsPerCopy = displayCategories.length;
+        
+        // Ensure items are actually rendered
+        if (children.length < numItemsPerCopy * 2 || numItemsPerCopy === 0) return;
+        
+        // We measure the offset difference between the first item of Copy 1 and first item of Copy 2.
+        // This gives us the EXACT pixel width of one full copy, including any flex gaps.
+        const firstItem = children[0] as HTMLElement;
+        const nextCopyFirstItem = children[numItemsPerCopy] as HTMLElement;
+        const exactCopyWidth = nextCopyFirstItem.offsetLeft - firstItem.offsetLeft;
+        
+        copyWidthRef.current = exactCopyWidth;
+        
+        // Initial shift: start looking at the 2nd copy so the user can immediately swipe right without hitting blank space.
+        if (x.get() === 0 && exactCopyWidth > 0) {
+           x.set(-exactCopyWidth);
+        }
       }
     };
     
     measure();
-    // Re-measure after a tiny delay to ensure layouts/images are fully resolved
     const timeoutId = setTimeout(measure, 200);
     window.addEventListener('resize', measure);
     
@@ -120,20 +128,32 @@ export default function HomeClient({ initialProducts, initialCategories, initial
       clearTimeout(timeoutId);
       window.removeEventListener('resize', measure);
     };
-  }, [displayCategories]);
+  }, [displayCategories, x]);
 
   useAnimationFrame((time, delta) => {
-    if (isPausedRef.current || halfWidthRef.current === 0) return;
+    if (copyWidthRef.current === 0) return;
 
     let currentX = x.get();
     
-    // Wrap to [-halfWidth, 0] seamlessly before moving
-    const wrap = (val: number, max: number) => ((val % max) + max) % max;
-    currentX = -wrap(-currentX, halfWidthRef.current);
+    // 1. Move automatically ONLY if not paused
+    if (!isPausedRef.current) {
+      const speedPxPerMs = 0.02; // Slower, better UX
+      currentX -= speedPxPerMs * delta;
+    }
 
-    // Speed: ~20px per second (Change 0.02 to adjust speed. Lower = slower)
-    const speedPxPerMs = 0.02; 
-    x.set(currentX - (speedPxPerMs * delta));
+    // 2. Wrap boundaries ALWAYS run (even during a manual drag pause)
+    const L = copyWidthRef.current;
+    
+    // Modulo math to ensure `currentX` ALWAYS stays safely clamped within the middle two cloned copies [-2L, -L]
+    const wrap = (v: number, max: number) => ((v % max) + max) % max;
+    const wrappedX = wrap(currentX + 2 * L, L) - 2 * L;
+
+    // Apply wrapped position securely to catch over-swiping seamlessly
+    if (wrappedX !== currentX) {
+       x.set(wrappedX);
+    } else if (!isPausedRef.current) {
+       x.set(currentX); 
+    }
   });
 
   const handleInteractionStart = () => {
@@ -145,7 +165,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
     if (interactionTimeoutRef.current) clearTimeout(interactionTimeoutRef.current);
     interactionTimeoutRef.current = setTimeout(() => {
       isPausedRef.current = false;
-    }, 3000); // 3-second hold before auto-scroll resumes
+    }, 3000); // 3-second hold
   };
 
   return (
@@ -401,10 +421,9 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             
             <motion.div 
               ref={carouselRef}
-              className="flex w-max gap-3 sm:gap-4 md:gap-6 cursor-grab active:cursor-grabbing"
+              className="flex w-max gap-3 sm:gap-4 md:gap-6 cursor-grab active:cursor-grabbing relative"
               style={{ x }}
               drag="x"
-              // Tracks all forms of interaction to pause the marquee reliably
               onDragStart={handleInteractionStart}
               onDragEnd={handleInteractionEnd}
               onPointerDown={handleInteractionStart}
@@ -413,14 +432,13 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               onHoverStart={handleInteractionStart}
               onHoverEnd={handleInteractionEnd}
             >
-              {/* 3. Map over the filtered displayCategories */}
+              {/* Mapping 4 exact copies ensures there's always safe space to loop within */}
               {[...displayCategories, ...displayCategories, ...displayCategories, ...displayCategories].map((collection: any, idx: number) => (
                 <div 
                   key={idx} 
                   className={`relative w-[75vw] sm:w-[300px] md:w-[400px] shrink-0 h-[300px] sm:h-[400px] md:h-[500px]`}
                 >
                   <Link 
-                    // 4. Force the URL to pre-filter by Sneakers
                     href={`/shop?type=sneakers&category=${collection.slug}`} 
                     className="block w-full h-full overflow-hidden group/card rounded-md sm:rounded-lg bg-neutral-900 border border-white/5 relative"
                   >
