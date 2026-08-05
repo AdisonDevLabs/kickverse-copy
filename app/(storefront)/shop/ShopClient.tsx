@@ -556,7 +556,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                             ) : null}
                           </div>
 
-                          {/* Quick Actions - Always visible on touch devices via responsive classes */}
+                          {/* Quick Actions - Always visible on touch devices via responsive classes 
                           <div className="absolute top-3 right-3 z-30 flex flex-col gap-2 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <button className="h-8 w-8 bg-white text-black rounded-md flex items-center justify-center hover:bg-brand-primary transition-colors shadow-lg" aria-label="Save">
                               <Heart className="h-4 w-4" />
@@ -566,7 +566,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                               className="h-8 w-8 bg-white text-black rounded-md flex items-center justify-center hover:bg-brand-primary transition-colors shadow-lg" aria-label="Quick View">
                               <Eye className="h-4 w-4" />
                             </button>
-                          </div>
+                          </div>*/}
                           
                           <Image
                             src={product.image}
@@ -787,6 +787,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
           </>
         )}
       </AnimatePresence>
+      {/*
       <AnimatePresence>
         {quickViewProduct && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
@@ -810,7 +811,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                 <X className="h-5 w-5" />
               </button>
 
-              {/* Image Sec */}
+              {/* Image Sec */}{/*
               <div className="w-full md:w-1/2 relative bg-brand-dark aspect-square md:aspect-auto md:min-h-[500px]">
                  <Image
                     src={quickViewProduct.image}
@@ -821,7 +822,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                   />
               </div>
 
-              {/* Content Sec */}
+              {/* Content Sec */}{/*
               <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col">
                 <div className="mb-2 uppercase tracking-widest text-[10px] text-brand-primary font-bold">
                   {quickViewProduct.category}
@@ -877,7 +878,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
           </div>
         )}
       </AnimatePresence>
-
+      */}
     </div>
   );
 }
