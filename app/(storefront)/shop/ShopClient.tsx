@@ -69,7 +69,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    // 1. Handle Categories & Types
     if (rawCategory && rawType) {
       setFilterCategory(getInitialFilterCategory(rawCategory));
       setDiscoveryMode(getInitialDiscoveryMode(rawCategory));
@@ -83,7 +82,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
       setFilterCategory('All'); 
     }
 
-    // 2. Handle Search, Brands, and Models overriding state via Navigation
     if (rawQuery) {
       setSearchQuery(rawQuery);
       if (!rawCategory && !rawType) {
@@ -95,7 +93,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
     } else if (rawModel) {
       setSearchQuery(rawModel.replace(/-/g, ' '));
     } else {
-      // If navigating to a URL strictly from a category/type navlink, clear previous search
       if (rawCategory || rawType) {
         setSearchQuery('');
       }
@@ -246,7 +243,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
   return (
     <div className="bg-brand-dark min-h-screen text-white">
       {/* Page Header */}
-      <div className="bg-brand-card pt-4 md:pt-6 pb-4 px-6 border-b border-white/5 relative overflow-hidden">
+      <div className="bg-brand-card pt-4 md:pt-6 pb-4 px-6 relative overflow-hidden">
         {/* Subtle background glow for visual hierarchy */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-full bg-brand-primary/5 blur-3xl rounded-full pointer-events-none"></div>
         
@@ -269,7 +266,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
       </div>
 
       {/* Refined Navigation & Controls Bar */}
-      <div className="sticky top-0 z-40 bg-brand-dark/95 backdrop-blur-md border-b border-white/10 shadow-sm transition-all py-2">
+      <div className="sticky top-0 z-40 bg-brand-dark/95 backdrop-blur-md shadow-sm transition-all py-2">
         <div className="max-w-7xl mx-auto px-6">
           
           {/* Row 1: Search, Sort, and Advanced Filters */}
@@ -355,35 +352,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                 );
               })}
             </div>
-
-            {/* 2. Collections Group
-            <div className="flex items-center gap-2 flex-nowrap">
-              {discoveryChips
-                .filter(chip => !['sneakers', 'soccer-cleats'].includes(chip.id))
-                .map((chip) => {
-                  const isActive = !searchQuery && (
-                    normalizeSlug(filterCategory) === normalizeSlug(chip.id) ||
-                    (discoveryMode === chip.id && filterCategory === 'All')
-                  );
-
-                  return (
-                    <button
-                      key={chip.id}
-                      onClick={() => { 
-                        clearAllFilters(); 
-                        setFilterCategory(chip.id.replace(/-/g, ' '));
-                      }}
-                      className={`whitespace-nowrap px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
-                        isActive
-                          ? 'bg-brand-primary text-black shadow-md shadow-brand-primary/20'
-                          : 'bg-transparent text-gray-400 hover:bg-white/5 hover:text-white border border-white/10'
-                      }`}
-                    >
-                      {chip.label}
-                    </button>
-                  );
-              })}
-            </div> */}
           </div>
         </div>
       </div>
@@ -395,10 +363,10 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
           <div>
             <motion.div 
               initial="hidden" animate="visible" variants={fadeIn}
-              className="flex items-center justify-between gap-3 border-b border-white/5 pb-2"
+              className="flex items-center justify-between gap-3 pb-2"
             >
               
-              {/* Left Side: Active Filter Tags (Scrollable on mobile to preserve side-by-side layout) */}
+              {/* Left Side: Active Filter Tags */}
               <div className="flex-1 overflow-x-auto hide-scrollbar">
                 <AnimatePresence>
                   {hasActiveFilters && (
@@ -446,8 +414,8 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                 </AnimatePresence>
               </div>
 
-              {/* Right Side: Product Count (Pinned, never shrinks) */}
-              <div className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-500 bg-white/5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full inline-flex items-center border border-white/5 flex-shrink-0 whitespace-nowrap">
+              {/* Right Side: Product Count */}
+              <div className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-500 bg-white/5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full inline-flex items-center border border-white/5 flex-shrink-0 whitespace-nowrap">
                  {sortedAndFilteredProducts.length} {sortedAndFilteredProducts.length === 1 ? 'Product' : 'Products'} Found
               </div>
             </motion.div>
@@ -455,7 +423,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
 
           {/* Product Grid */}
           {isLoading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-12 border-t border-white/10 pt-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-12 pt-2">
               {[...Array(10)].map((_, i) => (
                 <div key={i} className="animate-pulse">
                   <div className="aspect-[3/4] bg-brand-card w-full mb-4 border border-white/5 rounded-md"></div>
@@ -490,7 +458,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                 </button>
               </motion.div>
 
-              {/* WhatsApp Recovery */}
               <motion.div variants={staggerItem} className="p-6 md:p-8 bg-brand-card border border-white/10 rounded-md max-w-xl w-full text-center">
                 <h4 className="font-bold text-white uppercase tracking-widest text-sm mb-2">Can&apos;t find what you&apos;re looking for?</h4>
                 <p className="text-gray-400 text-sm mb-6">Chat with our stylists and we&apos;ll help you personally.</p>
@@ -522,7 +489,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
             <>
               <div 
                 key={`${filterCategory}-${sortOption}-${searchQuery}-${discoveryMode}`}
-                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-12 border-t border-white/10 pt-8"
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-12 pt-2"
               >
                 {sortedAndFilteredProducts.slice(0, visibleCount).map((product, index) => {
                   const isSeparator = index > 0 && index % 12 === 0;
@@ -555,18 +522,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                               <span className="bg-brand-primary text-black rounded-md text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest leading-none block">Best Seller</span>
                             ) : null}
                           </div>
-
-                          {/* Quick Actions - Always visible on touch devices via responsive classes 
-                          <div className="absolute top-3 right-3 z-30 flex flex-col gap-2 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <button className="h-8 w-8 bg-white text-black rounded-md flex items-center justify-center hover:bg-brand-primary transition-colors shadow-lg" aria-label="Save">
-                              <Heart className="h-4 w-4" />
-                            </button>
-                            <button 
-                              onClick={(e) => { e.preventDefault(); setQuickViewProduct(product); }}
-                              className="h-8 w-8 bg-white text-black rounded-md flex items-center justify-center hover:bg-brand-primary transition-colors shadow-lg" aria-label="Quick View">
-                              <Eye className="h-4 w-4" />
-                            </button>
-                          </div>*/}
                           
                           <Image
                             src={product.image}
@@ -649,21 +604,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
           )}
         </div>
       </div>
-
-      {/* Persistent WhatsApp Floating CTA 
-      <div className="fixed bottom-10 right-4 z-40 flex flex-col items-end">
-        <a 
-          href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(`Hello ${brand.name}, I'm interested in ordering from your website. Could you assist me with availability, options, and delivery? Thank you.`)}`}
-          target="_blank" rel="noreferrer"
-          className="relative flex items-center justify-center p-4 bg-brand-primary text-black rounded-full hover:bg-brand-hover transition-colors shadow-2xl shadow-brand-primary/30 group overflow-hidden"
-        >
-          <MessageCircle className="h-6 w-6 relative z-10 group-hover:scale-110 transition-transform" />
-          <span className="hidden sm:block max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-[150px] group-hover:ml-3 transition-all duration-300 font-bold uppercase tracking-widest text-sm relative z-10">
-            Need Help?
-          </span>
-          <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:animate-[ping_1.5s_ease-out_infinite] pointer-events-none"></div>
-        </a>
-      </div>*/}
 
       {/* Advanced Filter Drawer */}
       <AnimatePresence>
@@ -787,98 +727,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
           </>
         )}
       </AnimatePresence>
-      {/*
-      <AnimatePresence>
-        {quickViewProduct && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setQuickViewProduct(null)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-4xl rounded-md max-h-[90vh] bg-brand-card border border-white/10 shadow-2xl overflow-y-auto hide-scrollbar flex flex-col md:flex-row z-10"
-            >
-              <button
-                onClick={() => setQuickViewProduct(null)}
-                className="absolute top-4 right-4 z-20 p-2 bg-black/50 hover:bg-black rounded-md text-white transition-colors border border-white/10"
-              >
-                <X className="h-5 w-5" />
-              </button>
-
-              {/* Image Sec */}{/*
-              <div className="w-full md:w-1/2 relative bg-brand-dark aspect-square md:aspect-auto md:min-h-[500px]">
-                 <Image
-                    src={quickViewProduct.image}
-                    alt={quickViewProduct.name}
-                    fill
-                    referrerPolicy="no-referrer"
-                    className="object-cover rounded-t-md md:rounded-l-md md:rounded-tr-none"
-                  />
-              </div>
-
-              {/* Content Sec */}{/*
-              <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col">
-                <div className="mb-2 uppercase tracking-widest text-[10px] text-brand-primary font-bold">
-                  {quickViewProduct.category}
-                </div>
-                <h2 className="font-display uppercase tracking-wide text-2xl sm:text-3xl lg:text-4xl text-white leading-tight mb-2">
-                  {quickViewProduct.name}
-                </h2>
-                
-                <div className="flex items-end gap-3 mb-6">
-                  <span className="font-sans font-medium text-brand-primary text-xl">{formatPrice(quickViewProduct.price)}</span>
-                  {quickViewProduct.originalPrice && (
-                    <span className="text-sm text-gray-500 line-through mb-0.5">{formatPrice(quickViewProduct.originalPrice)}</span>
-                  )}
-                </div>
-
-                <p className="text-gray-400 text-sm leading-relaxed mb-8">
-                  {quickViewProduct.description}
-                </p>
-
-                {quickViewProduct.sizes && quickViewProduct.sizes.length > 0 && (
-                  <div className="mb-8">
-                    <span className="font-bold text-white uppercase tracking-widest text-xs block mb-3">Available Sizes / Options</span>
-                    <div className="flex flex-wrap gap-2">
-                      {quickViewProduct.sizes.map((size: string) => (
-                        <div
-                          key={size}
-                          className="h-10 px-4 rounded-md border border-white/20 text-white flex items-center justify-center font-bold text-sm bg-white/5"
-                        >
-                          {size}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="mt-auto pt-6 border-t border-white/10">
-                   <a 
-                    href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(`I'm interested in: ${quickViewProduct.name}`)}`}
-                    target="_blank" rel="noreferrer"
-                    className="w-full h-14 bg-brand-primary text-black font-bold hover:bg-brand-hover transition-colors flex justify-center items-center uppercase tracking-widest text-sm mb-3 rounded-md"
-                   >
-                     <MessageCircle className="h-5 w-5 mr-3" /> Order on WhatsApp
-                   </a>
-                   <Link
-                     href={`/product/${quickViewProduct.id}`}
-                     className="w-full h-12 border border-white/20 text-white font-bold rounded-md hover:bg-white hover:text-black transition-colors flex justify-center items-center uppercase tracking-widest text-xs"
-                   >
-                     View Full Details
-                   </Link>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-      */}
     </div>
   );
 }
