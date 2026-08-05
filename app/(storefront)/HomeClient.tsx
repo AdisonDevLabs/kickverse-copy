@@ -20,6 +20,75 @@ export default function HomeClient({ initialProducts, initialCategories, initial
   const [timeLeft, setTimeLeft] = useState(0);
   const [mounted, setMounted] = useState(false);
 
+  // --- New Carousel State & Refs ---
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // For desktop mouse drag support
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartX = useRef(0);
+  const dragScrollLeft = useRef(0);
+  const hasDragged = useRef(false);
+
+  const handleInteraction = () => {
+    setIsAutoPlaying(false);
+    if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
+    // Hold for 2 minutes (120,000 ms) before resuming auto move
+    pauseTimeoutRef.current = setTimeout(() => {
+      setIsAutoPlaying(true);
+    }, 120000); 
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    hasDragged.current = false;
+    if (carouselRef.current) {
+      dragStartX.current = e.pageX - carouselRef.current.offsetLeft;
+      dragScrollLeft.current = carouselRef.current.scrollLeft;
+    }
+    handleInteraction();
+  };
+
+  const handleMouseLeave = () => setIsDragging(false);
+  const handleMouseUp = () => setIsDragging(false);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !carouselRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - carouselRef.current.offsetLeft;
+    const walk = (x - dragStartX.current) * 1.5; // Drag sensitivity
+    
+    // Prevent accidental clicks if the user was actively dragging
+    if (Math.abs(walk) > 5) {
+      hasDragged.current = true;
+    }
+
+    carouselRef.current.scrollLeft = dragScrollLeft.current - walk;
+  };
+
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+    let animationFrameId: number;
+
+    const scroll = () => {
+      if (carouselRef.current) {
+        // Slower auto-scroll speed for better UX
+        carouselRef.current.scrollLeft += 0.5;
+
+        // Seamless infinite loop: jump back to start when reaching 50% scrollWidth
+        if (carouselRef.current.scrollLeft >= carouselRef.current.scrollWidth / 2) {
+          carouselRef.current.scrollLeft = 0;
+        }
+      }
+      animationFrameId = requestAnimationFrame(scroll);
+    };
+
+    animationFrameId = requestAnimationFrame(scroll);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [isAutoPlaying]);
+  // ---------------------------------
+
   useEffect(() => {
     setMounted(true);
     // Set duration to 6 Days, 14 Hours, 45 Minutes
@@ -344,59 +413,68 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-r from-brand-card to-transparent z-10 pointer-events-none hidden md:block" />
             <div className="absolute right-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-l from-brand-card to-transparent z-10 pointer-events-none hidden md:block" />
             
-            {/* Outer draggable wrapper allows user to swipe horizontally without breaking the inner animation loop */}
-            <motion.div
-              drag="x"
-              dragConstraints={{ left: -1200, right: 1200 }}
-              dragElastic={0.1}
-              className="cursor-grab active:cursor-grabbing"
+            <div 
+              ref={carouselRef}
+              className="flex w-full gap-3 sm:gap-4 md:gap-6 overflow-x-auto touch-pan-x"
+              style={{
+                scrollbarWidth: 'none', // Hide scrollbar for Firefox
+                msOverflowStyle: 'none', // Hide scrollbar for IE
+                cursor: isDragging ? 'grabbing' : 'grab'
+              }}
+              // Interaction Handlers
+              onMouseDown={handleMouseDown}
+              onMouseLeave={handleMouseLeave}
+              onMouseUp={handleMouseUp}
+              onMouseMove={handleMouseMove}
+              onTouchStart={handleInteraction}
+              onScroll={handleInteraction}
             >
-              <motion.div 
-                className="flex w-max gap-3 sm:gap-4 md:gap-6"
-                animate={{ x: ["-25%", "-50%"] }} // Shifted bounds to provide swipe buffer on both sides
-                transition={{ repeat: Infinity, ease: "linear", duration: 55 }} // Increased duration from 35 to 55 to slow it down
-              >
-                {/* 3. Map over the filtered displayCategories (Increased to 8 copies for endless swipe buffer padding) */}
-                {[...displayCategories, ...displayCategories, ...displayCategories, ...displayCategories, ...displayCategories, ...displayCategories, ...displayCategories, ...displayCategories].map((collection: any, idx: number) => (
-                  <div 
-                    key={idx} 
-                    className={`relative w-[75vw] sm:w-[300px] md:w-[400px] shrink-0 h-[300px] sm:h-[400px] md:h-[500px]`}
+              {/* Webkit scrollbar hiding is implicitly added assuming you have .no-scrollbar in global css. If not, the style property above covers most modern browsers */}
+              
+              {/* 3. Map over the filtered displayCategories */}
+              {[...displayCategories, ...displayCategories, ...displayCategories, ...displayCategories].map((collection: any, idx: number) => (
+                <div 
+                  key={idx} 
+                  className={`relative w-[75vw] sm:w-[300px] md:w-[400px] shrink-0 h-[300px] sm:h-[400px] md:h-[500px]`}
+                >
+                  <Link 
+                    // 4. Force the URL to pre-filter by Sneakers
+                    href={`/shop?type=sneakers&category=${collection.slug}`} 
+                    draggable={false} // Prevent HTML ghost drag
+                    className="block w-full h-full overflow-hidden group/card rounded-md sm:rounded-lg bg-neutral-900 border border-white/5 relative select-none"
+                    onClick={(e) => {
+                      // Prevent link trigger if the user was actively dragging
+                      if (hasDragged.current) e.preventDefault();
+                    }}
                   >
-                    <Link 
-                      // 4. Force the URL to pre-filter by Sneakers
-                      href={`/shop?type=sneakers&category=${collection.slug}`} 
-                      className="block w-full h-full overflow-hidden group/card rounded-md sm:rounded-lg bg-neutral-900 border border-white/5 relative"
-                      draggable={false} // Prevents native ghost-dragging of the element
-                    >
-                      <div className="absolute inset-0 bg-black/40 group-hover/card:bg-black/60 transition-colors duration-500 z-10" />
-                      <Image
-                        src={collection.image}
-                        alt={collection.name}
-                        fill
-                        referrerPolicy="no-referrer"
-                        draggable={false}
-                        className="object-cover transition-transform duration-1000 group-hover/card:scale-110 opacity-80 group-hover/card:opacity-100"
-                      />
-                      
-                      <div className="absolute inset-x-0 top-0 p-4 sm:p-6 z-20 flex justify-between items-start opacity-100 transition-opacity">
-                         <div className="bg-brand-primary text-black rounded-sm sm:rounded-md text-[8px] sm:text-[10px] md:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 uppercase tracking-widest">
-                           {collection.label}
-                         </div>
+                    <div className="absolute inset-0 bg-black/40 group-hover/card:bg-black/60 transition-colors duration-500 z-10 pointer-events-none" />
+                    <Image
+                      src={collection.image}
+                      alt={collection.name}
+                      fill
+                      draggable={false} // Prevent HTML ghost drag
+                      referrerPolicy="no-referrer"
+                      className="object-cover transition-transform duration-1000 group-hover/card:scale-110 opacity-80 group-hover/card:opacity-100 pointer-events-none"
+                    />
+                    
+                    <div className="absolute inset-x-0 top-0 p-4 sm:p-6 z-20 flex justify-between items-start opacity-100 transition-opacity">
+                       <div className="bg-brand-primary text-black rounded-sm sm:rounded-md text-[8px] sm:text-[10px] md:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 uppercase tracking-widest pointer-events-none">
+                         {collection.label}
+                       </div>
+                    </div>
+
+                    <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 md:p-8 flex flex-col justify-end z-20 transition-transform duration-500 pointer-events-none">
+                      <h3 className="text-white font-display uppercase tracking-wider text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-1 sm:mb-2 shadow-black drop-shadow-xl group-hover/card:text-brand-primary transition-colors">{collection.name}</h3>
+                      <div className="flex mt-2 sm:mt-4 opacity-100 md:opacity-0 md:-translate-y-4 group-hover/card:opacity-100 group-hover/card:translate-y-0 transition-all duration-500">
+                        <span className="flex items-center rounded-sm sm:rounded-md text-white text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-widest bg-white/20 md:bg-white/10 backdrop-blur-md px-3 py-2 sm:px-4 sm:py-2.5 md:px-6 md:py-3 border border-white/20 group-hover/card:bg-brand-primary group-hover/card:text-black group-hover/card:border-brand-primary">
+                          Shop Now <ArrowRight className="ml-1.5 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+                        </span>
                       </div>
-  
-                      <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 md:p-8 flex flex-col justify-end z-20 transition-transform duration-500">
-                        <h3 className="text-white font-display uppercase tracking-wider text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-1 sm:mb-2 shadow-black drop-shadow-xl group-hover/card:text-brand-primary transition-colors">{collection.name}</h3>
-                        <div className="flex mt-2 sm:mt-4 opacity-100 md:opacity-0 md:-translate-y-4 group-hover/card:opacity-100 group-hover/card:translate-y-0 transition-all duration-500">
-                          <span className="flex items-center rounded-sm sm:rounded-md text-white text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-widest bg-white/20 md:bg-white/10 backdrop-blur-md px-3 py-2 sm:px-4 sm:py-2.5 md:px-6 md:py-3 border border-white/20 group-hover/card:bg-brand-primary group-hover/card:text-black group-hover/card:border-brand-primary">
-                            Shop Now <ArrowRight className="ml-1.5 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-                ))}
-              </motion.div>
-            </motion.div>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
