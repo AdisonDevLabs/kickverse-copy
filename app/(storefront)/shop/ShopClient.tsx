@@ -392,7 +392,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
         <div className="flex-1 w-full">
           
           {/* Active Discovery State & Filter Summary */}
-          <div className="mb-4">
+          <div>
             <motion.div 
               initial="hidden" animate="visible" variants={fadeIn}
               className="flex items-center justify-between gap-3 border-b border-white/5 pb-2"
@@ -650,7 +650,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
         </div>
       </div>
 
-      {/* Persistent WhatsApp Floating CTA */}
+      {/* Persistent WhatsApp Floating CTA 
       <div className="fixed bottom-10 right-4 z-40 flex flex-col items-end">
         <a 
           href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(`Hello ${brand.name}, I'm interested in ordering from your website. Could you assist me with availability, options, and delivery? Thank you.`)}`}
@@ -663,7 +663,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
           </span>
           <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:animate-[ping_1.5s_ease-out_infinite] pointer-events-none"></div>
         </a>
-      </div>
+      </div>*/}
 
       {/* Advanced Filter Drawer */}
       <AnimatePresence>
