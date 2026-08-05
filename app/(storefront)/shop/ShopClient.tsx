@@ -69,6 +69,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
+    // 1. Handle Categories & Types
     if (rawCategory && rawType) {
       setFilterCategory(getInitialFilterCategory(rawCategory));
       setDiscoveryMode(getInitialDiscoveryMode(rawCategory));
@@ -82,6 +83,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
       setFilterCategory('All'); 
     }
 
+    // 2. Handle Search, Brands, and Models overriding state via Navigation
     if (rawQuery) {
       setSearchQuery(rawQuery);
       if (!rawCategory && !rawType) {
@@ -93,6 +95,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
     } else if (rawModel) {
       setSearchQuery(rawModel.replace(/-/g, ' '));
     } else {
+      // If navigating to a URL strictly from a category/type navlink, clear previous search
       if (rawCategory || rawType) {
         setSearchQuery('');
       }
@@ -266,7 +269,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
       </div>
 
       {/* Refined Navigation & Controls Bar */}
-      <div className="sticky top-0 z-40 bg-brand-dark/95 backdrop-blur-md shadow-sm transition-all py-2">
+      <div className="sticky top-0 z-40 bg-brand-dark/95 backdrop-blur-md transition-all py-2">
         <div className="max-w-7xl mx-auto px-6">
           
           {/* Row 1: Search, Sort, and Advanced Filters */}
@@ -363,10 +366,10 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
           <div>
             <motion.div 
               initial="hidden" animate="visible" variants={fadeIn}
-              className="flex items-center justify-between gap-3 pb-2"
+              className="flex items-center justify-between gap-3 border-b border-white/5 pb-2"
             >
               
-              {/* Left Side: Active Filter Tags */}
+              {/* Left Side: Active Filter Tags (Scrollable on mobile to preserve side-by-side layout) */}
               <div className="flex-1 overflow-x-auto hide-scrollbar">
                 <AnimatePresence>
                   {hasActiveFilters && (
@@ -414,7 +417,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                 </AnimatePresence>
               </div>
 
-              {/* Right Side: Product Count */}
+              {/* Right Side: Product Count (Pinned, never shrinks) */}
               <div className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-500 bg-white/5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full inline-flex items-center border border-white/5 flex-shrink-0 whitespace-nowrap">
                  {sortedAndFilteredProducts.length} {sortedAndFilteredProducts.length === 1 ? 'Product' : 'Products'} Found
               </div>
@@ -423,7 +426,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
 
           {/* Product Grid */}
           {isLoading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-12 pt-2">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-12 border-t border-white/10 pt-4">
               {[...Array(10)].map((_, i) => (
                 <div key={i} className="animate-pulse">
                   <div className="aspect-[3/4] bg-brand-card w-full mb-4 border border-white/5 rounded-md"></div>
@@ -458,6 +461,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                 </button>
               </motion.div>
 
+              {/* WhatsApp Recovery */}
               <motion.div variants={staggerItem} className="p-6 md:p-8 bg-brand-card border border-white/10 rounded-md max-w-xl w-full text-center">
                 <h4 className="font-bold text-white uppercase tracking-widest text-sm mb-2">Can&apos;t find what you&apos;re looking for?</h4>
                 <p className="text-gray-400 text-sm mb-6">Chat with our stylists and we&apos;ll help you personally.</p>
@@ -489,7 +493,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
             <>
               <div 
                 key={`${filterCategory}-${sortOption}-${searchQuery}-${discoveryMode}`}
-                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-12 pt-2"
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-12 border-t border-white/10 pt-8"
               >
                 {sortedAndFilteredProducts.slice(0, visibleCount).map((product, index) => {
                   const isSeparator = index > 0 && index % 12 === 0;
