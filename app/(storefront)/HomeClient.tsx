@@ -344,48 +344,58 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-r from-brand-card to-transparent z-10 pointer-events-none hidden md:block" />
             <div className="absolute right-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-l from-brand-card to-transparent z-10 pointer-events-none hidden md:block" />
             
-            <motion.div 
-              className="flex w-max gap-3 sm:gap-4 md:gap-6"
-              animate={{ x: ["0%", "-50%"] }}
-              transition={{ repeat: Infinity, ease: "linear", duration: 35 }}
+            {/* Outer draggable wrapper allows user to swipe horizontally without breaking the inner animation loop */}
+            <motion.div
+              drag="x"
+              dragConstraints={{ left: -1200, right: 1200 }}
+              dragElastic={0.1}
+              className="cursor-grab active:cursor-grabbing"
             >
-              {/* 3. Map over the filtered displayCategories */}
-              {[...displayCategories, ...displayCategories, ...displayCategories, ...displayCategories].map((collection: any, idx: number) => (
-                <div 
-                  key={idx} 
-                  className={`relative w-[75vw] sm:w-[300px] md:w-[400px] shrink-0 h-[300px] sm:h-[400px] md:h-[500px]`}
-                >
-                  <Link 
-                    // 4. Force the URL to pre-filter by Sneakers
-                    href={`/shop?type=sneakers&category=${collection.slug}`} 
-                    className="block w-full h-full overflow-hidden group/card rounded-md sm:rounded-lg bg-neutral-900 border border-white/5 relative"
+              <motion.div 
+                className="flex w-max gap-3 sm:gap-4 md:gap-6"
+                animate={{ x: ["-25%", "-50%"] }} // Shifted bounds to provide swipe buffer on both sides
+                transition={{ repeat: Infinity, ease: "linear", duration: 55 }} // Increased duration from 35 to 55 to slow it down
+              >
+                {/* 3. Map over the filtered displayCategories (Increased to 8 copies for endless swipe buffer padding) */}
+                {[...displayCategories, ...displayCategories, ...displayCategories, ...displayCategories, ...displayCategories, ...displayCategories, ...displayCategories, ...displayCategories].map((collection: any, idx: number) => (
+                  <div 
+                    key={idx} 
+                    className={`relative w-[75vw] sm:w-[300px] md:w-[400px] shrink-0 h-[300px] sm:h-[400px] md:h-[500px]`}
                   >
-                    <div className="absolute inset-0 bg-black/40 group-hover/card:bg-black/60 transition-colors duration-500 z-10" />
-                    <Image
-                      src={collection.image}
-                      alt={collection.name}
-                      fill
-                      referrerPolicy="no-referrer"
-                      className="object-cover transition-transform duration-1000 group-hover/card:scale-110 opacity-80 group-hover/card:opacity-100"
-                    />
-                    
-                    <div className="absolute inset-x-0 top-0 p-4 sm:p-6 z-20 flex justify-between items-start opacity-100 transition-opacity">
-                       <div className="bg-brand-primary text-black rounded-sm sm:rounded-md text-[8px] sm:text-[10px] md:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 uppercase tracking-widest">
-                         {collection.label}
-                       </div>
-                    </div>
-
-                    <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 md:p-8 flex flex-col justify-end z-20 transition-transform duration-500">
-                      <h3 className="text-white font-display uppercase tracking-wider text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-1 sm:mb-2 shadow-black drop-shadow-xl group-hover/card:text-brand-primary transition-colors">{collection.name}</h3>
-                      <div className="flex mt-2 sm:mt-4 opacity-100 md:opacity-0 md:-translate-y-4 group-hover/card:opacity-100 group-hover/card:translate-y-0 transition-all duration-500">
-                        <span className="flex items-center rounded-sm sm:rounded-md text-white text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-widest bg-white/20 md:bg-white/10 backdrop-blur-md px-3 py-2 sm:px-4 sm:py-2.5 md:px-6 md:py-3 border border-white/20 group-hover/card:bg-brand-primary group-hover/card:text-black group-hover/card:border-brand-primary">
-                          Shop Now <ArrowRight className="ml-1.5 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
-                        </span>
+                    <Link 
+                      // 4. Force the URL to pre-filter by Sneakers
+                      href={`/shop?type=sneakers&category=${collection.slug}`} 
+                      className="block w-full h-full overflow-hidden group/card rounded-md sm:rounded-lg bg-neutral-900 border border-white/5 relative"
+                      draggable={false} // Prevents native ghost-dragging of the element
+                    >
+                      <div className="absolute inset-0 bg-black/40 group-hover/card:bg-black/60 transition-colors duration-500 z-10" />
+                      <Image
+                        src={collection.image}
+                        alt={collection.name}
+                        fill
+                        referrerPolicy="no-referrer"
+                        draggable={false}
+                        className="object-cover transition-transform duration-1000 group-hover/card:scale-110 opacity-80 group-hover/card:opacity-100"
+                      />
+                      
+                      <div className="absolute inset-x-0 top-0 p-4 sm:p-6 z-20 flex justify-between items-start opacity-100 transition-opacity">
+                         <div className="bg-brand-primary text-black rounded-sm sm:rounded-md text-[8px] sm:text-[10px] md:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 uppercase tracking-widest">
+                           {collection.label}
+                         </div>
                       </div>
-                    </div>
-                  </Link>
-                </div>
-              ))}
+  
+                      <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 md:p-8 flex flex-col justify-end z-20 transition-transform duration-500">
+                        <h3 className="text-white font-display uppercase tracking-wider text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-1 sm:mb-2 shadow-black drop-shadow-xl group-hover/card:text-brand-primary transition-colors">{collection.name}</h3>
+                        <div className="flex mt-2 sm:mt-4 opacity-100 md:opacity-0 md:-translate-y-4 group-hover/card:opacity-100 group-hover/card:translate-y-0 transition-all duration-500">
+                          <span className="flex items-center rounded-sm sm:rounded-md text-white text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-widest bg-white/20 md:bg-white/10 backdrop-blur-md px-3 py-2 sm:px-4 sm:py-2.5 md:px-6 md:py-3 border border-white/20 group-hover/card:bg-brand-primary group-hover/card:text-black group-hover/card:border-brand-primary">
+                            Shop Now <ArrowRight className="ml-1.5 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+                ))}
+              </motion.div>
             </motion.div>
           </div>
         </div>
