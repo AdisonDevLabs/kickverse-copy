@@ -19,7 +19,10 @@ export const metadata: Metadata = {
 
 export default async function ShopPage() {
   const db = await getDb();
-  const allProducts = await db.select().from(products).orderBy(desc(products.createdAt));
+  const allProducts = await db.select().from(products).orderBy(
+    desc(products.isPinned),
+    desc(products.createdAt)
+  );
 
   const jsonLd = {
     '@context': 'https://schema.org',

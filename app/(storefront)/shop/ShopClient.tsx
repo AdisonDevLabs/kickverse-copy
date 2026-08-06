@@ -1,3 +1,4 @@
+// app/(storefront)/shop/ShopClient.tsx
 'use client';
 
 import React, { useState, useEffect, Suspense, useMemo, useRef, useCallback } from 'react';
@@ -95,7 +96,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
     } else if (rawModel) {
       setSearchQuery(rawModel.replace(/-/g, ' '));
     } else {
-      // If navigating to a URL strictly from a category/type navlink, clear previous search
       if (rawCategory || rawType) {
         setSearchQuery('');
       }
@@ -301,7 +301,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                 <select
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value)}
-                  className="w-full appearance-none bg-white/5 border border-white/10 px-5 py-2 pr-10 rounded-full text-xs font-bold uppercase tracking-widest text-white focus:outline-none focus:border-brand-primary cursor-pointer transition-all hover:bg-white/10"
+                  className="w-full appearance-none bg-white/5 border border-white/10 pl-4 pr-8 py-2 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-white focus:outline-none focus:border-brand-primary cursor-pointer transition-all hover:bg-white/10"
                 >
                   <option className="bg-brand-dark text-white" value="default">Sort: Default</option>
                   <option className="bg-brand-dark text-white" value="trending-now">Sort: Trending Now</option>
@@ -315,12 +315,12 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
               
               <button 
                 onClick={() => setIsAdvancedFiltersOpen(true)}
-                className="flex items-center justify-center space-x-2 bg-brand-primary text-black px-6 py-2 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-brand-hover transition-colors shadow-lg shadow-brand-primary/20 flex-shrink-0"
+                className="relative flex items-center justify-center bg-brand-primary text-black w-10 h-10 sm:w-auto sm:h-auto p-0 sm:px-6 sm:py-2 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-brand-hover transition-colors shadow-lg shadow-brand-primary/20 flex-shrink-0"
               >
                 <Filter className="h-4 w-4" />
-                <span className="hidden sm:inline">Filters</span>
+                <span className="hidden sm:inline sm:ml-2">Filters</span>
                 {hasActiveFilters && (
-                  <span className="ml-1 h-2 w-2 rounded-full bg-black block"></span>
+                  <span className="absolute sm:relative top-0 right-0 sm:top-auto sm:right-auto sm:ml-1 h-2.5 w-2.5 sm:h-2 sm:w-2 rounded-full bg-black block border-2 border-brand-primary sm:border-none"></span>
                 )}
               </button>
             </div>
@@ -333,9 +333,18 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
             </span>
 
             {/* 1. Product Types Group */}
-            <div className="flex items-center gap-2 flex-nowrap border-r border-white/10 pr-3 mr-1">
+            <div className="flex items-center gap-2 flex-nowrap pr-3">
               {['Sneakers', 'Soccer Cleats', 'Official Shoes', 'Opens & Sandals'].map((type) => {
                 const isActive = filterProductType === type;
+                
+                // Hide redundant pills on mobile if they correspond to the opposite bottom nav item
+                let visibilityClass = "";
+                if (filterProductType === 'Sneakers' && type === 'Soccer Cleats') {
+                  visibilityClass = "hidden lg:block";
+                } else if (filterProductType === 'Soccer Cleats' && type === 'Sneakers') {
+                  visibilityClass = "hidden lg:block";
+                }
+
                 return (
                   <button
                     key={type}
@@ -344,7 +353,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                       setFilterCategory('All');
                       setDiscoveryMode('all');
                     }}
-                    className={`whitespace-nowrap px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
+                    className={`${visibilityClass} whitespace-nowrap px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
                       isActive
                         ? 'bg-white text-black shadow-md shadow-white/10'
                         : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border border-white/5'
@@ -366,7 +375,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
           <div>
             <motion.div 
               initial="hidden" animate="visible" variants={fadeIn}
-              className="flex items-center justify-between gap-3 border-b border-white/5 pb-2"
+              className={`flex items-center gap-3 border-b border-white/5 pb-2 ${hasActiveFilters ? 'justify-between' : 'justify-end'}`}
             >
               
               {/* Left Side: Active Filter Tags (Scrollable on mobile to preserve side-by-side layout) */}
@@ -426,7 +435,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
 
           {/* Product Grid */}
           {isLoading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-12 border-t border-white/10 pt-2">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-3 gap-y-6 sm:gap-x-4 sm:gap-y-8 md:gap-x-6 md:gap-y-12 border-t border-white/10 pt-2">
               {[...Array(10)].map((_, i) => (
                 <div key={i} className="animate-pulse">
                   <div className="aspect-[3/4] bg-brand-card w-full mb-4 border border-white/5 rounded-md"></div>
@@ -493,7 +502,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
             <>
               <div 
                 key={`${filterCategory}-${sortOption}-${searchQuery}-${discoveryMode}`}
-                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-12 border-t border-white/10 pt-8"
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-3 gap-y-6 sm:gap-x-4 sm:gap-y-8 md:gap-x-6 md:gap-y-12 border-t border-white/10 pt-8"
               >
                 {sortedAndFilteredProducts.slice(0, visibleCount).map((product, index) => {
                   const isSeparator = index > 0 && index % 12 === 0;
@@ -504,7 +513,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                       {isSeparator && (
                         <motion.div 
                           initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
-                          className="col-span-2 md:col-span-3 lg:col-span-4 xl:col-span-5 py-12 md:py-16 flex items-center justify-center border-y border-white/5 my-4"
+                          className="col-span-2 md:col-span-3 lg:col-span-3 xl:col-span-4 2xl:col-span-5 py-12 md:py-16 flex items-center justify-center border-y border-white/5 my-4"
                         >
                           <span className="text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-brand-primary">{separatorText}</span>
                         </motion.div>
@@ -538,19 +547,19 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                         
                         <div className="w-full text-left flex flex-col flex-1 px-1">
                           <Link href={`/product/${product.id}`} className="w-full block">
-                            <h3 className="font-sans font-medium text-white line-clamp-2 mb-1 group-hover:text-brand-primary transition-colors text-sm sm:text-base leading-tight">
+                            <h3 className="font-sans font-medium text-white line-clamp-2 mb-1 group-hover:text-brand-primary transition-colors text-xs sm:text-sm md:text-base leading-tight">
                               {product.name}
                             </h3>
                             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                              <span className="font-sans font-medium text-brand-primary text-sm">{formatPrice(product.price)}</span>
+                              <span className="font-sans font-medium text-brand-primary text-xs sm:text-sm md:text-base">{formatPrice(product.price)}</span>
                               {product.originalPrice && (
-                                <span className="text-xs text-gray-500 line-through">{formatPrice(product.originalPrice)}</span>
+                                <span className="text-[10px] sm:text-xs text-gray-500 line-through">{formatPrice(product.originalPrice)}</span>
                               )}
                             </div>
-                            <div className="flex items-center text-xs text-gray-400 mb-4 h-4">
+                            <div className="flex items-center text-[10px] sm:text-xs text-gray-400 mb-4 h-4">
                               {product.rating ? (
                                 <span className="flex items-center text-gray-400">
-                                  <Star className="w-3 h-3 fill-brand-primary text-brand-primary mr-1" /> {product.rating} Rating
+                                  <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-brand-primary text-brand-primary mr-1" /> {product.rating} Rating
                                 </span>
                               ) : product.reviews ? (
                                 <span>{product.reviews}+ Reviews</span>

@@ -418,3 +418,19 @@ export async function deleteSizeGuide(id: string) {
     return { success: false, error: e.message };
   }
 }
+
+export async function togglePinProduct(id: string, currentStatus: boolean) {
+  try {
+    const db = await getDb();
+    await db.update(products).set({ isPinned: !currentStatus }).where(eq(products.id, id));
+    
+    // Refresh the storefront so Godfrey sees the change instantly
+    revalidatePath('/shop');
+    revalidatePath('/');
+    revalidatePath('/admin');
+    
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}

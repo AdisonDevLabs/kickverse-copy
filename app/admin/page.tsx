@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Suspense } from 'react';
 import { Plus, Edit, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import DeleteButton from './DeleteButton';
+import PinButton from './PinButton';
 import CategoryManager from './CategoryManager';
 import ProductToolbar from './components/ProductToolbar';
 
@@ -104,6 +105,7 @@ export default async function AdminDashboard(props: { searchParams: SearchParams
               <th className="px-4 sm:px-6 py-4 font-bold uppercase tracking-widest text-gray-500 text-[10px]">Price</th>
               <th className="px-4 sm:px-6 py-4 font-bold uppercase tracking-widest text-gray-500 text-[10px] hidden md:table-cell">Type</th>
               <th className="px-4 sm:px-6 py-4 font-bold uppercase tracking-widest text-gray-500 text-[10px] hidden sm:table-cell">Category</th>
+              <th className="px-4 sm:px-6 py-4 font-bold uppercase tracking-widest text-gray-500 text-[10px] w-12 text-center">Pin</th>
               <th className="px-4 sm:px-6 py-4 font-bold uppercase tracking-widest text-gray-500 text-[10px] text-right sticky right-0 bg-brand-card/95 backdrop-blur-md">Actions</th>
             </tr>
           </thead>
@@ -149,6 +151,9 @@ export default async function AdminDashboard(props: { searchParams: SearchParams
                   </td>
                   <td className="px-4 sm:px-6 py-3 text-gray-400 hidden sm:table-cell">
                     <span className="bg-white/5 px-2 py-1 rounded text-xs">{p.category}</span>
+                  </td>
+                  <td className="px-4 sm:px-6 py-3 text-center">
+                    <PinButton id={p.id} isPinned={Boolean(p.isPinned)} />
                   </td>
                   <td className="px-4 sm:px-6 py-3 text-right sticky right-0 bg-brand-card group-hover:bg-[#1a1a1a] transition-colors shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.5)]">
                     <div className="flex justify-end gap-2 sm:gap-3 opacity-90 group-hover:opacity-100 transition-opacity">
