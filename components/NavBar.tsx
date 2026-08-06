@@ -134,7 +134,7 @@ export function NavBar() {
                   </span>
                 </span>
                 {brand.name.split(' ').length > 2 && (
-                  <span className="hidden sm:block text-[8px] tracking-[0.3em] uppercase text-gray-400 mt-1 font-sans truncate text-center w-full">
+                  <span className="hidden sm:block text-[8px] tracking-[0.3em] uppercase text-white mt-1 font-sans truncate text-center w-full">
                     {brand.name.split(' ').slice(2).join(' ')}
                   </span>
                 )}
@@ -144,7 +144,7 @@ export function NavBar() {
             {/* Desktop Navigation (Visible strictly on lg & up) */}
             <nav className="hidden lg:flex flex-1 justify-center items-center space-x-6 xl:space-x-8 z-20">
               {/* Home */}
-              <Link href="/" className={`text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/') ? 'text-white' : 'text-gray-400 hover:text-white'}`}>
+              <Link href="/" className={`text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/') ? 'text-white' : 'text-white hover:text-white'}`}>
                 Home
                 <span className={`absolute -bottom-1 left-0 w-full h-[2px] rounded-full transition-transform duration-300 origin-left ${isTabActive('/') ? 'bg-brand-primary scale-x-100' : 'bg-brand-primary scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
@@ -155,7 +155,7 @@ export function NavBar() {
                 onMouseEnter={() => setActiveDropdown('sneakers')}
                 onMouseLeave={() => setActiveDropdown(null)}
               >
-                <Link href="/shop?type=sneakers" className={`text-xs uppercase tracking-widest font-bold transition-colors relative flex items-center ${isTabActive('/shop', 'sneakers') ? 'text-white' : 'text-gray-400 group-hover:text-white'}`}>
+                <Link href="/shop?type=sneakers" className={`text-xs uppercase tracking-widest font-bold transition-colors relative flex items-center ${isTabActive('/shop', 'sneakers') ? 'text-white' : 'text-white group-hover:text-white'}`}>
                   Sneakers <span className="ml-1.5 text-[8px] opacity-70 transition-transform group-hover:rotate-180">▼</span>
                   <span className={`absolute -bottom-3 left-0 w-full h-[2px] rounded-full transition-transform duration-300 origin-left ${isTabActive('/shop', 'sneakers') ? 'bg-brand-primary scale-x-100' : 'bg-brand-primary scale-x-0 group-hover:scale-x-100'}`}></span>
                 </Link>
@@ -198,7 +198,7 @@ export function NavBar() {
                 onMouseEnter={() => setActiveDropdown('cleats')}
                 onMouseLeave={() => setActiveDropdown(null)}
               >
-                <Link href="/shop?type=soccer-cleats" className={`text-xs uppercase tracking-widest font-bold transition-colors relative flex items-center ${isTabActive('/shop', 'soccer-cleats') ? 'text-white' : 'text-gray-400 group-hover:text-white'}`}>
+                <Link href="/shop?type=soccer-cleats" className={`text-xs uppercase tracking-widest font-bold transition-colors relative flex items-center ${isTabActive('/shop', 'soccer-cleats') ? 'text-white' : 'text-white group-hover:text-white'}`}>
                   Soccer Cleats <span className="ml-1.5 text-[8px] opacity-70 transition-transform group-hover:rotate-180">▼</span>
                   <span className={`absolute -bottom-3 left-0 w-full h-[2px] rounded-full transition-transform duration-300 origin-left ${isTabActive('/shop', 'soccer-cleats') ? 'bg-brand-primary scale-x-100' : 'bg-brand-primary scale-x-0 group-hover:scale-x-100'}`}></span>
                 </Link>
@@ -236,19 +236,19 @@ export function NavBar() {
               </div>
 
               {/* Flash Deals */}
-              <Link href="/shop?category=deals" className={`text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/shop', 'deals') ? 'text-white' : 'text-gray-400 hover:text-[#FF0000]'}`}>
+              <Link href="/shop?category=deals" className={`text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/shop', 'deals') ? 'text-white' : 'text-white hover:text-[#FF0000]'}`}>
                 Flash Deals
                 <span className={`absolute -bottom-1 left-0 w-full h-[2px] rounded-full transition-transform duration-300 origin-left ${isTabActive('/shop', 'deals') ? 'bg-[#FF0000] scale-x-100' : 'bg-[#FF0000] scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
 
               {/* Trending */}
-              <Link href="/shop?category=trending" className={`text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/shop', 'trending') ? 'text-white' : 'text-gray-400 hover:text-white'}`}>
+              <Link href="/shop?category=trending" className={`text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/shop', 'trending') ? 'text-white' : 'text-white hover:text-white'}`}>
                 Trending
                 <span className={`absolute -bottom-1 left-0 w-full h-[2px] rounded-full transition-transform duration-300 origin-left ${isTabActive('/shop', 'trending') ? 'bg-brand-primary scale-x-100' : 'bg-brand-primary scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
 
               {/* New Arrivals */}
-              <Link href="/shop?category=new-arrivals" className={`text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/shop', 'new-arrivals') ? 'text-white' : 'text-gray-400 hover:text-white'}`}>
+              <Link href="/shop?category=new-arrivals" className={`text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/shop', 'new-arrivals') ? 'text-white' : 'text-white hover:text-white'}`}>
                 New Arrivals
                 <span className={`absolute -bottom-1 left-0 w-full h-[2px] rounded-full transition-transform duration-300 origin-left ${isTabActive('/shop', 'new-arrivals') ? 'bg-brand-primary scale-x-100' : 'bg-brand-primary scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
@@ -276,7 +276,7 @@ export function NavBar() {
                       className="fixed inset-x-0 top-[96px] bottom-0 bg-brand-dark/95 backdrop-blur-xl border-t border-white/10 shadow-2xl p-4 z-50 overflow-y-auto"
                     >
                       <div className="relative max-w-3xl mx-auto">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white" />
                         <input 
                           type="text" 
                           placeholder="Search products..." 
@@ -331,7 +331,7 @@ export function NavBar() {
                       className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center z-50"
                     >
                       <div className="w-full relative shadow-2xl">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white" />
                         <input 
                           type="text" 
                           placeholder="Search products..." 
@@ -344,7 +344,7 @@ export function NavBar() {
                           autoFocus
                         />
                         <button 
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-white hover:text-white"
                           onClick={() => {
                             setIsDesktopSearchOpen(false);
                             setSearchQuery('');
@@ -426,14 +426,14 @@ export function NavBar() {
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-brand-card/95 backdrop-blur-lg border-t border-white/5 px-6 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] z-[55]">
         <div className="flex justify-between items-center mb-1 max-w-sm mx-auto">
           {/* 1. Home */}
-          <Link href="/" className={`relative flex flex-col items-center space-y-1 w-16 p-1 rounded-md transition-all ${isTabActive('/') ? 'text-brand-primary' : 'text-gray-400 hover:text-white'}`}>
+          <Link href="/" className={`relative flex flex-col items-center space-y-1 w-16 p-1 rounded-md transition-all ${isTabActive('/') ? 'text-brand-primary' : 'text-white hover:text-white'}`}>
             {isTabActive('/') && <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-brand-primary rounded-full"></div>}
             <Home className="h-5 w-5" />
             <span className="text-[9px] font-medium tracking-wide uppercase">Home</span>
           </Link>
           
           {/* 2. Sneakers */}
-          <Link href="/shop?type=sneakers" className={`relative flex flex-col items-center space-y-1 w-16 p-1 rounded-md transition-all ${isTabActive('/shop', 'sneakers') ? 'text-brand-primary' : 'text-gray-400 hover:text-white'}`}>
+          <Link href="/shop?type=sneakers" className={`relative flex flex-col items-center space-y-1 w-16 p-1 rounded-md transition-all ${isTabActive('/shop', 'sneakers') ? 'text-brand-primary' : 'text-white hover:text-white'}`}>
             {isTabActive('/shop', 'sneakers') && <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-brand-primary rounded-full"></div>}
             <SneakerIcon className="h-5 w-5" />
             <span className="text-[9px] font-medium tracking-wide uppercase">Sneakers</span>
@@ -457,7 +457,7 @@ export function NavBar() {
           </div>
           
           {/* 4. Soccer Cleats */}
-          <Link href="/shop?type=soccer-cleats" className={`relative flex flex-col items-center space-y-1 w-16 p-1 rounded-md transition-all ${isTabActive('/shop', 'soccer-cleats') ? 'text-brand-primary' : 'text-gray-400 hover:text-white'}`}>
+          <Link href="/shop?type=soccer-cleats" className={`relative flex flex-col items-center space-y-1 w-16 p-1 rounded-md transition-all ${isTabActive('/shop', 'soccer-cleats') ? 'text-brand-primary' : 'text-white hover:text-white'}`}>
             {isTabActive('/shop', 'soccer-cleats') && <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-brand-primary rounded-full"></div>}
             <CleatIcon className="h-5 w-5" />
             <span className="text-[8px] sm:text-[9px] font-medium tracking-wide uppercase text-center w-full whitespace-nowrap">
