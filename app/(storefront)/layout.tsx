@@ -13,7 +13,12 @@ export default function StorefrontLayout({children}: {children: React.ReactNode}
         <NavBar />
       </Suspense>
       <CartDrawer />
-      <main className="flex flex-col min-h-screen pt-[89px] md:pt-[100px] pb-[88px] md:pb-0">
+      {/* 
+        Adjusted top padding to perfectly match header height:
+        Mobile: 32px (Announcement) + 48px (NavBar) = 80px
+        Desktop: 32px (Announcement) + 55px (NavBar) = 87px
+      */}
+      <main className="flex flex-col min-h-screen pt-[80px] md:pt-[87px] pb-[88px] md:pb-0">
         {children}
       </main>
       <Footer />

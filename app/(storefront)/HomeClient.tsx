@@ -169,13 +169,13 @@ export default function HomeClient({ initialProducts, initialCategories, initial
   };
 
   return (
-    <div ref={containerRef} className="flex flex-col min-h-screen bg-brand-dark text-white">
+    <div ref={containerRef} className="flex flex-col min-h-screen bg-brand-dark text-white -mt-[80px] md:-mt-[87px]">
       {/* 
         Redesigned Hero Section
-        Unified section with full background image.
-        Grid cards placed directly beneath the CTAs.
+        2. Set to min-h-[100svh] to span from the absolute top to the absolute bottom edge
+        3. Add internal padding to safely center the content between the overlapping fixed navbars
       */}
-      <section ref={heroRef} className="relative h-[calc(100svh-180px)] md:h-[calc(100svh-96px)] min-h-[500px] md:min-h-[650px] w-full flex flex-col justify-center overflow-hidden bg-black">
+      <section ref={heroRef} className="relative min-h-[100svh] w-full flex flex-col justify-center overflow-hidden bg-black pt-[80px] md:pt-[87px] pb-[88px] md:pb-0">
         
         {/* Full Section Background Image */}
         <div className="absolute inset-0 z-0">
@@ -189,12 +189,9 @@ export default function HomeClient({ initialProducts, initialCategories, initial
           />
           {/* Mobile dark overlay for guaranteed readability */}
           <div className="absolute inset-0 bg-black/40 z-0" />
-          
-          {/* Desktop heavy black gradient on left side fading seamlessly to the image
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-black/80 via-black/40 to-transparent z-0" />*/}
         </div>
 
-        {/* Content Wrapper - Changed items-start to items-center */}
+        {/* Content Wrapper */}
         <motion.div 
           initial="hidden" animate="visible" variants={staggerContainer}
           className="relative z-10 max-w-7xl mx-auto w-full flex flex-col items-center text-center px-4 sm:px-6 lg:px-16 xl:px-24"
