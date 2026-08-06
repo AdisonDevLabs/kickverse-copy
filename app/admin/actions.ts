@@ -100,6 +100,7 @@ export async function createProduct(formData: FormData) {
       isNewArrival: formData.get('isNewArrival') === 'on',
       isBestSeller: formData.get('isBestSeller') === 'on',
       isFlashDeal: formData.get('isFlashDeal') === 'on',
+      isAccessory: formData.get('isAccessory') === 'on',
       rating: 5.0,
       reviews: 0,
       created_at: new Date().toISOString(),
@@ -214,6 +215,7 @@ export async function updateProduct(id: string, formData: FormData) {
       isNewArrival: formData.get('isNewArrival') === 'on',
       isBestSeller: formData.get('isBestSeller') === 'on',
       isFlashDeal: formData.get('isFlashDeal') === 'on',
+      isAccessory: formData.get('isAccessory') === 'on',
     };
 
     await db.update(products).set(updatedData).where(eq(products.id, id));

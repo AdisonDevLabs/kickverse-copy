@@ -4,7 +4,7 @@ import { brand } from '@/lib/data/brand';
 import ProductDetailsClient from './ProductDetailsClient';
 import { getDb } from '@/lib/db';
 import { products, sizeGuides, colorMap } from '@/lib/db/schema';
-import { eq, and, not, sql } from 'drizzle-orm';
+import { eq, and, not, sql, desc } from 'drizzle-orm';
 
 export const revalidate = 60;
 
@@ -75,17 +75,41 @@ export default async function ProductPage({ params }: Props) {
   const allColorMaps = await db.select().from(colorMap);
 
   // 2. Fetch related products (same category, excluding the current product, limit 4)
-  const relatedProducts = await db.select()
+  const relatedPool = await db.select()
     .from(products)
-    .where(and(eq(products.productType, product.productType), not(eq(products.id, product.id))))
-    .limit(4);
+    .where(and(
+      eq(products.productType, product.productType), 
+      eq(products.isAccessory, false), 
+      not(eq(products.id, product.id))
+    ))
+    .orderBy(desc(products.createdAt))
+    .limit(12);
 
-  // 3. Fetch recently viewed/others (prioritize current product type, then randomize, limit 8)
-  const recentlyViewed = await db.select()
+  const relatedProducts = relatedPool.sort(() => 0.5 - Math.random()).slice(0, 4);
+
+  const accessoriesPool = await db.select()
+    .from(products)
+    .where(and(
+      eq(products.isAccessory, true),
+      eq(products.productType, product.productType),
+      not(eq(products.id, product.id))
+    ))
+    .orderBy(desc(products.createdAt))
+    .limit(10);
+
+  const accessories = accessoriesPool.sort(() => 0.5 - Math.random()).slice(0, 4);
+
+  const recentlyViewedPool = await db.select()
     .from(products)
     .where(not(eq(products.id, product.id)))
-    .orderBy(sql`CASE WHEN ${products.productType} = ${product.productType} THEN 0 ELSE 1 END, RANDOM()`)
-    .limit(8);
+    .orderBy(
+      sql`CASE WHEN ${products.productType} = ${product.productType} THEN 0 ELSE 1 END`, 
+      desc(products.createdAt)
+    )
+    .limit(20);
+
+  const recentlyViewed = recentlyViewedPool.sort(() => 0.5 - Math.random()).slice(0, 8);
+
 
   // 4. Construct JSON-LD Schema.org Data for Google Rich Snippets
   const previewImage = product.images && product.images.length > 0 
@@ -126,6 +150,7 @@ export default async function ProductPage({ params }: Props) {
         product={product} 
         relatedProducts={relatedProducts} 
         recentlyViewed={recentlyViewed}
+        accessories={accessories}
         sizeGuides={allSizeGuides}
         colorMap={allColorMaps}
       />

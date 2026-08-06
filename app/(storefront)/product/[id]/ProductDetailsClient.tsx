@@ -14,7 +14,7 @@ import { useCart } from '@/lib/CartContext';
 import { motion, AnimatePresence } from 'motion/react';
 import { fadeUp, staggerContainer, staggerItem } from '@/lib/animations';
 
-export default function ProductDetailsClient({ product, relatedProducts, recentlyViewed, sizeGuides, colorMap }: any) {
+export default function ProductDetailsClient({ product, relatedProducts, recentlyViewed, accessories, sizeGuides, colorMap }: any) {
   const router = useRouter();
   const { addToCart, setIsCartOpen } = useCart();
   
@@ -451,6 +451,29 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
                 </button>
               </motion.div>
 
+              {/* NEW: Zone 2 - Accessories / Complete Your Look */}
+              {accessories && accessories.length > 0 && (
+                <motion.div variants={staggerItem} className="mb-8 p-4 bg-brand-card border border-white/5 rounded-md">
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-brand-primary mb-4 border-b border-white/10 pb-2">Complete Your Look</h3>
+                  <div className="flex flex-col gap-3">
+                    {accessories.map((acc: any) => (
+                      <div key={acc.id} className="flex items-center gap-3 bg-brand-dark p-2 rounded-md border border-white/5">
+                        <div className="relative w-12 h-12 bg-black rounded-sm overflow-hidden shrink-0 border border-white/10">
+                          <Image src={acc.image} alt={acc.name} fill className="object-cover" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-[11px] font-bold text-white truncate">{acc.name}</h4>
+                          <p className="text-[10px] text-gray-400">{formatPrice(acc.price)}</p>
+                        </div>
+                        <Link href={`/product/${acc.id}`} className="px-3 py-1.5 bg-white/5 hover:bg-brand-primary hover:text-black text-[9px] font-bold uppercase tracking-widest rounded transition-colors shrink-0">
+                          View Option
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
               <motion.div variants={staggerItem} className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-brand-card p-6 border border-white/5 mb-12 rounded-md">
                 <div className="flex items-start">
                   <Truck className="h-5 w-5 mr-3 text-gray-400 shrink-0" />
@@ -585,7 +608,7 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
           </div>
         </section>
 
-        {/* Related Products */}
+        {/* ZONE 1: Substitute Products (Changed title from "Complete the look" to "You Might Also Like") */}
         {relatedProducts.length > 0 && (
           <section className="py-20 bg-brand-card border-t border-white/10 px-6">
             <div className="max-w-7xl mx-auto">
@@ -593,7 +616,7 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
                 initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
                 className="font-display uppercase tracking-wide text-3xl md:text-5xl text-center mb-12 text-white"
               >
-                Complete The Look
+                You Might Also Like
               </motion.h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 {relatedProducts.map((prod: any) => (
