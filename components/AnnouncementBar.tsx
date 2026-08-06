@@ -22,14 +22,15 @@ export function AnnouncementBar() {
     
     return () => clearInterval(timer);
   }, [isPaused]);
+
   return (
     <div
       className="fixed top-0 left-0 right-0 bg-brand-primary text-black h-8 flex items-center justify-center px-4 z-[60] overflow-hidden font-sans w-full"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Mobile/Tablet Rotating View */}
-      <div className="md:hidden w-full h-full flex items-center justify-center">
+      {/* Mobile/Tablet Rotating View (Up to 1023px) */}
+      <div className="lg:hidden w-full h-full flex items-center justify-center">
         <AnimatePresence mode="wait">
           <motion.div
             key={index}
@@ -44,8 +45,9 @@ export function AnnouncementBar() {
           </motion.div>
         </AnimatePresence>
       </div>
-      {/* Desktop Split View */}
-      <div className="hidden md:flex w-full items-center justify-between max-w-7xl mx-auto px-4 font-semibold text-sm">
+
+      {/* Desktop Split View (1024px and above) */}
+      <div className="hidden lg:flex w-full items-center justify-between max-w-7xl mx-auto px-4 font-semibold text-xs xl:text-sm">
         <div className="flex items-center space-x-2">
           <Sparkles className="h-4 w-4" />
           <span>{messages[0].text}</span>
@@ -65,4 +67,4 @@ export function AnnouncementBar() {
       </div>
     </div>
   );
-} 
+}
