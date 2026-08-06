@@ -4,7 +4,7 @@ import { brand } from '@/lib/data/brand';
 import ProductDetailsClient from './ProductDetailsClient';
 import { getDb } from '@/lib/db';
 import { products, sizeGuides, colorMap } from '@/lib/db/schema';
-import { eq, and, not, sql, desc } from 'drizzle-orm'; // Added desc
+import { eq, and, not, sql } from 'drizzle-orm';
 
 export const revalidate = 60;
 
@@ -16,6 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const db = await getDb();
   
+  // Find the product to generate specific metadata
   const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
   const product = result[0];
   
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     : `${brand.url.replace(/\/$/, '')}${previewImage.startsWith('/') ? '' : '/'}${previewImage}`;
 
   return {
-    title: product.name, 
+    title: product.name, // layout.tsx template will automatically append "| KICKVERSE"
     description: product.description,
     openGraph: {
       title: product.name,
@@ -67,51 +68,26 @@ export default async function ProductPage({ params }: Props) {
   const product = result[0];
 
   if (!product) {
-    return <ProductDetailsClient product={null} relatedProducts={[]} recentlyViewed={[]} accessories={[]} />;
+    return <ProductDetailsClient product={null} relatedProducts={[]} recentlyViewed={[]} />;
   }
 
   const allSizeGuides = await db.select().from(sizeGuides);
   const allColorMaps = await db.select().from(colorMap);
 
-  // 2. ZONE 1: Substitute Products (Same type, NOT an accessory)
-  // Fix: Fetch 12 newest items predictably, then shuffle in memory to save DB reads
-  const relatedPool = await db.select()
+  // 2. Fetch related products (same category, excluding the current product, limit 4)
+  const relatedProducts = await db.select()
     .from(products)
-    .where(and(
-      eq(products.productType, product.productType), 
-      eq(products.isAccessory, false), 
-      not(eq(products.id, product.id))
-    ))
-    .orderBy(desc(products.createdAt))
-    .limit(12);
-  
-  const relatedProducts = relatedPool.sort(() => 0.5 - Math.random()).slice(0, 4);
+    .where(and(eq(products.productType, product.productType), not(eq(products.id, product.id))))
+    .limit(4);
 
-  // 3. ZONE 2: Accessories (isAccessory = true, matches current product type)
-  const accessoriesPool = await db.select()
-    .from(products)
-    .where(and(
-      eq(products.isAccessory, true),
-      eq(products.productType, product.productType),
-      not(eq(products.id, product.id))
-    ))
-    .orderBy(desc(products.createdAt))
-    .limit(10);
-
-  const accessories = accessoriesPool.sort(() => 0.5 - Math.random()).slice(0, 4);
-
-  // 4. Fix: Remove RANDOM() from Recently Viewed. Sort by matching type first, then newest.
-  const recentlyViewedPool = await db.select()
+  // 3. Fetch recently viewed/others (prioritize current product type, then randomize, limit 8)
+  const recentlyViewed = await db.select()
     .from(products)
     .where(not(eq(products.id, product.id)))
-    .orderBy(
-      sql`CASE WHEN ${products.productType} = ${product.productType} THEN 0 ELSE 1 END`, 
-      desc(products.createdAt)
-    )
-    .limit(20);
+    .orderBy(sql`CASE WHEN ${products.productType} = ${product.productType} THEN 0 ELSE 1 END, RANDOM()`)
+    .limit(8);
 
-  const recentlyViewed = recentlyViewedPool.sort(() => 0.5 - Math.random()).slice(0, 8);
-
+  // 4. Construct JSON-LD Schema.org Data for Google Rich Snippets
   const previewImage = product.images && product.images.length > 0 
     ? product.images[0] 
     : product.image;
@@ -150,7 +126,6 @@ export default async function ProductPage({ params }: Props) {
         product={product} 
         relatedProducts={relatedProducts} 
         recentlyViewed={recentlyViewed}
-        accessories={accessories} // Passed down to client
         sizeGuides={allSizeGuides}
         colorMap={allColorMaps}
       />

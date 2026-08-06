@@ -361,10 +361,6 @@ export default function NewFormClient({ initialCategories, initialMedia, product
               <input type="checkbox" name="isFlashDeal" className="w-5 h-5 accent-brand-primary bg-brand-dark border-white/10 transition-colors" />
               <span className="text-sm font-bold uppercase tracking-widest text-white">Flash Deal</span>
             </label>
-            <label className="flex items-center space-x-3 cursor-pointer">
-              <input type="checkbox" name="isAccessory" className="w-5 h-5 accent-brand-primary bg-brand-dark border-white/10 transition-colors" />
-              <span className="text-sm font-bold uppercase tracking-widest text-brand-primary">➕ Is Accessory (Cross-sell)</span>
-            </label>
           </div>
 
           <div>
