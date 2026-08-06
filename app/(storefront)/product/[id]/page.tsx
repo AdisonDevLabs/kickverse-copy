@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { brand } from '@/lib/data/brand';
 import ProductDetailsClient from './ProductDetailsClient';
 import { getDb } from '@/lib/db';
-import { products, sizeGuides, colorMap } from '@/lib/db/schema';
+import { products, sizeGuides } from '@/lib/db/schema';
 import { eq, and, not, sql } from 'drizzle-orm';
 
 export const revalidate = 60;
@@ -16,7 +16,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const db = await getDb();
   
-  // Find the product to generate specific metadata
   const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
   const product = result[0];
   
@@ -33,21 +32,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     : `${brand.url.replace(/\/$/, '')}${previewImage.startsWith('/') ? '' : '/'}${previewImage}`;
 
   return {
-    title: product.name, // layout.tsx template will automatically append "| KICKVERSE"
+    title: product.name, 
     description: product.description,
     openGraph: {
       title: product.name,
       description: `Order the ${product.name} directly on WhatsApp.`,
       url: `${brand.url}product/${id}`,
       siteName: brand.name,
-      images: [
-        {
-          url: absoluteImageUrl,
-          width: 800,
-          height: 800,
-          alt: `${product.name} preview image`,
-        },
-      ],
+      images: [{ url: absoluteImageUrl, width: 800, height: 800, alt: `${product.name} preview image` }],
       type: 'website',
     },
     twitter: {
@@ -63,7 +55,7 @@ export default async function ProductPage({ params }: Props) {
   const { id } = await params;
   const db = await getDb();
   
-  // 1. Fetch the main product
+  // 1. Fetch the main product[cite: 1]
   const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
   const product = result[0];
 
@@ -71,23 +63,22 @@ export default async function ProductPage({ params }: Props) {
     return <ProductDetailsClient product={null} relatedProducts={[]} recentlyViewed={[]} />;
   }
 
+  // Fetch size guides[cite: 1]
   const allSizeGuides = await db.select().from(sizeGuides);
-  const allColorMaps = await db.select().from(colorMap);
 
-  // 2. Fetch related products (same category, excluding the current product, limit 4)
+  // 2. Fetch related products (Similar Boots)[cite: 1]
   const relatedProducts = await db.select()
     .from(products)
     .where(and(eq(products.productType, product.productType), not(eq(products.id, product.id))))
     .limit(4);
 
-  // 3. Fetch recently viewed/others (prioritize current product type, then randomize, limit 8)
+  // 3. Fetch recently viewed[cite: 1]
   const recentlyViewed = await db.select()
     .from(products)
     .where(not(eq(products.id, product.id)))
     .orderBy(sql`CASE WHEN ${products.productType} = ${product.productType} THEN 0 ELSE 1 END, RANDOM()`)
     .limit(8);
 
-  // 4. Construct JSON-LD Schema.org Data for Google Rich Snippets
   const previewImage = product.images && product.images.length > 0 
     ? product.images[0] 
     : product.image;
@@ -109,10 +100,7 @@ export default async function ProductPage({ params }: Props) {
       price: product.price,
       url: `${brand.url}product/${product.id}`,
       availability: 'https://schema.org/InStock',
-      seller: {
-        '@type': 'Organization',
-        name: brand.name,
-      },
+      seller: { '@type': 'Organization', name: brand.name },
     },
   };
 
@@ -127,7 +115,6 @@ export default async function ProductPage({ params }: Props) {
         relatedProducts={relatedProducts} 
         recentlyViewed={recentlyViewed}
         sizeGuides={allSizeGuides}
-        colorMap={allColorMaps}
       />
     </>
   );
