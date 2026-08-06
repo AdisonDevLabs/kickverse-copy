@@ -110,21 +110,20 @@ export function NavBar() {
         <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-12 md:h-[55px] w-full">
             
-            {/* Left: Logo */}
-            <div className="flex-shrink-0 flex items-center z-20">
+            {/* Left: Logo - Fixed width ensures center element stays perfectly centered */}
+            <div className="flex-shrink-0 flex items-center z-20 w-[115px] sm:w-[130px] lg:w-auto">
               <Link href="/" className="z-10 focus:outline-none">
                 <Image 
                   src={brand.logo} 
                   alt={`${brand.name} Logo`} 
                   width={44} 
                   height={44} 
-                  // Added bg-white, object-contain, and padding so transparent logos are fully visible and readable
                   className="bg-white rounded-full object-contain p-0.5 border border-white/20 w-8 h-8 sm:w-9 sm:h-9 md:w-11 md:h-11 shadow-sm"
                 />
               </Link>
             </div>
 
-            {/* Center: Brand Name (Mobile & Tablet Only - Flex-1 prevents overlap) */}
+            {/* Center: Brand Name (Mobile & Tablet Only) */}
             <div className="flex-1 flex lg:hidden items-center justify-center min-w-0 z-10 px-2">
               <Link href="/" className="font-display tracking-[0.05em] sm:tracking-[0.15em] text-white flex flex-col items-center rounded-md focus:outline-none min-w-0 max-w-full">
                 <span className="text-[17px] sm:text-xl font-black uppercase leading-none truncate w-full text-center">
@@ -141,10 +140,10 @@ export function NavBar() {
               </Link>
             </div>
 
-            {/* Desktop Navigation (Visible strictly on lg & up) */}
-            <nav className="hidden lg:flex flex-1 justify-center items-center space-x-6 xl:space-x-8 z-20">
+            {/* Desktop Navigation (Visible strictly on lg & up) - Scaled space for 1024px */}
+            <nav className="hidden lg:flex flex-1 justify-center items-center space-x-3 xl:space-x-8 z-20">
               {/* Home */}
-              <Link href="/" className={`text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/') ? 'text-white' : 'text-white hover:text-white'}`}>
+              <Link href="/" className={`text-[10px] xl:text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/') ? 'text-white' : 'text-white hover:text-white'}`}>
                 Home
                 <span className={`absolute -bottom-1 left-0 w-full h-[2px] rounded-full transition-transform duration-300 origin-left ${isTabActive('/') ? 'bg-brand-primary scale-x-100' : 'bg-brand-primary scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
@@ -155,7 +154,7 @@ export function NavBar() {
                 onMouseEnter={() => setActiveDropdown('sneakers')}
                 onMouseLeave={() => setActiveDropdown(null)}
               >
-                <Link href="/shop?type=sneakers" className={`text-xs uppercase tracking-widest font-bold transition-colors relative flex items-center ${isTabActive('/shop', 'sneakers') ? 'text-white' : 'text-white group-hover:text-white'}`}>
+                <Link href="/shop?type=sneakers" className={`text-[10px] xl:text-xs uppercase tracking-widest font-bold transition-colors relative flex items-center ${isTabActive('/shop', 'sneakers') ? 'text-white' : 'text-white group-hover:text-white'}`}>
                   Sneakers <span className="ml-1.5 text-[8px] opacity-70 transition-transform group-hover:rotate-180">▼</span>
                   <span className={`absolute -bottom-3 left-0 w-full h-[2px] rounded-full transition-transform duration-300 origin-left ${isTabActive('/shop', 'sneakers') ? 'bg-brand-primary scale-x-100' : 'bg-brand-primary scale-x-0 group-hover:scale-x-100'}`}></span>
                 </Link>
@@ -198,7 +197,7 @@ export function NavBar() {
                 onMouseEnter={() => setActiveDropdown('cleats')}
                 onMouseLeave={() => setActiveDropdown(null)}
               >
-                <Link href="/shop?type=soccer-cleats" className={`text-xs uppercase tracking-widest font-bold transition-colors relative flex items-center ${isTabActive('/shop', 'soccer-cleats') ? 'text-white' : 'text-white group-hover:text-white'}`}>
+                <Link href="/shop?type=soccer-cleats" className={`text-[10px] xl:text-xs uppercase tracking-widest font-bold transition-colors relative flex items-center ${isTabActive('/shop', 'soccer-cleats') ? 'text-white' : 'text-white group-hover:text-white'}`}>
                   Soccer Cleats <span className="ml-1.5 text-[8px] opacity-70 transition-transform group-hover:rotate-180">▼</span>
                   <span className={`absolute -bottom-3 left-0 w-full h-[2px] rounded-full transition-transform duration-300 origin-left ${isTabActive('/shop', 'soccer-cleats') ? 'bg-brand-primary scale-x-100' : 'bg-brand-primary scale-x-0 group-hover:scale-x-100'}`}></span>
                 </Link>
@@ -236,26 +235,26 @@ export function NavBar() {
               </div>
 
               {/* Flash Deals */}
-              <Link href="/shop?category=deals" className={`text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/shop', 'deals') ? 'text-white' : 'text-white hover:text-[#FF0000]'}`}>
+              <Link href="/shop?category=deals" className={`text-[10px] xl:text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/shop', 'deals') ? 'text-white' : 'text-white hover:text-[#FF0000]'}`}>
                 Flash Deals
                 <span className={`absolute -bottom-1 left-0 w-full h-[2px] rounded-full transition-transform duration-300 origin-left ${isTabActive('/shop', 'deals') ? 'bg-[#FF0000] scale-x-100' : 'bg-[#FF0000] scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
 
               {/* Trending */}
-              <Link href="/shop?category=trending" className={`text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/shop', 'trending') ? 'text-white' : 'text-white hover:text-white'}`}>
+              <Link href="/shop?category=trending" className={`text-[10px] xl:text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/shop', 'trending') ? 'text-white' : 'text-white hover:text-white'}`}>
                 Trending
                 <span className={`absolute -bottom-1 left-0 w-full h-[2px] rounded-full transition-transform duration-300 origin-left ${isTabActive('/shop', 'trending') ? 'bg-brand-primary scale-x-100' : 'bg-brand-primary scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
 
               {/* New Arrivals */}
-              <Link href="/shop?category=new-arrivals" className={`text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/shop', 'new-arrivals') ? 'text-white' : 'text-white hover:text-white'}`}>
+              <Link href="/shop?category=new-arrivals" className={`text-[10px] xl:text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/shop', 'new-arrivals') ? 'text-white' : 'text-white hover:text-white'}`}>
                 New Arrivals
                 <span className={`absolute -bottom-1 left-0 w-full h-[2px] rounded-full transition-transform duration-300 origin-left ${isTabActive('/shop', 'new-arrivals') ? 'bg-brand-primary scale-x-100' : 'bg-brand-primary scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
             </nav>
 
-            {/* Right: Quick Actions */}
-            <div className="flex-shrink-0 flex items-center justify-end space-x-2 lg:space-x-5 z-20">
+            {/* Right: Quick Actions - Fixed width ensures center element stays perfectly centered */}
+            <div className="flex-shrink-0 flex items-center justify-end space-x-2 lg:space-x-3 xl:space-x-5 z-20 w-[115px] sm:w-[130px] lg:w-auto">
               
               {/* MOBILE Search Toggle */}
               <div className="relative lg:hidden">
@@ -393,7 +392,7 @@ export function NavBar() {
                 </motion.div>
                 {/* Desktop Notification Badge */}
                 <div className="hidden lg:flex items-center bg-brand-primary/10 px-2 py-0.5 rounded-full border border-brand-primary/20">
-                  <span className="font-bold text-xs text-brand-primary">{cartCount}</span>
+                  <span className="font-bold text-[10px] xl:text-xs text-brand-primary">{cartCount}</span>
                 </div>
               </button>
 
@@ -412,7 +411,7 @@ export function NavBar() {
                 href={`https://wa.me/${brand.whatsappNumber}`} 
                 target="_blank" 
                 rel="noreferrer"
-                className="hidden lg:flex items-center bg-brand-primary text-black px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wide hover:bg-[#b3e600] transition-all hover:scale-105 shadow-[0_0_15px_-3px_rgba(198,255,0,0.4)]"
+                className="hidden lg:flex items-center bg-brand-primary text-black px-3 py-2 xl:px-5 xl:py-2.5 rounded-full text-[10px] xl:text-xs font-bold uppercase tracking-wide hover:bg-[#b3e600] transition-all hover:scale-105 shadow-[0_0_15px_-3px_rgba(198,255,0,0.4)]"
               >
                 Order Now
               </a>
