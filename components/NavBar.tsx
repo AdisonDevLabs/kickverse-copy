@@ -421,25 +421,25 @@ export function NavBar() {
         </div>
       </header>
 
-      {/* Mobile Bottom Navigation Hub (100% UNTOUCHED) */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-brand-card/95 backdrop-blur-lg border-t border-white/5 px-6 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] z-[55]">
+      {/* Mobile Bottom Navigation Hub */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-brand-card/95 backdrop-blur-lg border-t border-white/5 px-2 sm:px-6 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] z-[55]">
         <div className="flex justify-between items-center mb-1 max-w-sm mx-auto">
           {/* 1. Home */}
-          <Link href="/" className={`relative flex flex-col items-center space-y-1 w-16 p-1 rounded-md transition-all ${isTabActive('/') ? 'text-brand-primary' : 'text-white hover:text-white'}`}>
-            {isTabActive('/') && <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-brand-primary rounded-full"></div>}
+          <Link href="/" className={`relative flex flex-col items-center space-y-1 flex-1 p-1 rounded-md transition-all ${isTabActive('/') ? 'text-brand-primary' : 'text-white hover:text-white'}`}>
             <Home className="h-5 w-5" />
             <span className="text-[9px] font-medium tracking-wide uppercase">Home</span>
+            {isTabActive('/') && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-[2px] bg-brand-primary rounded-full"></div>}
           </Link>
           
           {/* 2. Sneakers */}
-          <Link href="/shop?type=sneakers" className={`relative flex flex-col items-center space-y-1 w-16 p-1 rounded-md transition-all ${isTabActive('/shop', 'sneakers') ? 'text-brand-primary' : 'text-white hover:text-white'}`}>
-            {isTabActive('/shop', 'sneakers') && <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-brand-primary rounded-full"></div>}
+          <Link href="/shop?type=sneakers" className={`relative flex flex-col items-center space-y-1 flex-1 p-1 rounded-md transition-all ${isTabActive('/shop', 'sneakers') ? 'text-brand-primary' : 'text-white hover:text-white'}`}>
             <SneakerIcon className="h-5 w-5" />
             <span className="text-[9px] font-medium tracking-wide uppercase">Sneakers</span>
+            {isTabActive('/shop', 'sneakers') && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-[2px] bg-brand-primary rounded-full"></div>}
           </Link>
           
           {/* 3. Cart Icon */}
-          <div className="relative">
+          <div className="relative flex-shrink-0 px-1 sm:px-2">
             <button 
               onClick={() => setIsCartOpen(true)}
               className="bg-brand-primary text-black p-3 rounded-full flex flex-col items-center justify-center h-14 w-14 border-[3px] border-brand-card shadow-lg focus:outline-none"
@@ -456,12 +456,12 @@ export function NavBar() {
           </div>
           
           {/* 4. Soccer Cleats */}
-          <Link href="/shop?type=soccer-cleats" className={`relative flex flex-col items-center space-y-1 w-16 p-1 rounded-md transition-all ${isTabActive('/shop', 'soccer-cleats') ? 'text-brand-primary' : 'text-white hover:text-white'}`}>
-            {isTabActive('/shop', 'soccer-cleats') && <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-brand-primary rounded-full"></div>}
+          <Link href="/shop?type=soccer-cleats" className={`relative flex flex-col items-center space-y-1 flex-1 p-1 rounded-md transition-all ${isTabActive('/shop', 'soccer-cleats') ? 'text-brand-primary' : 'text-white hover:text-white'}`}>
             <CleatIcon className="h-5 w-5" />
             <span className="text-[8px] sm:text-[9px] font-medium tracking-wide uppercase text-center w-full whitespace-nowrap">
               Soccer Cleats
             </span>
+            {isTabActive('/shop', 'soccer-cleats') && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-[2px] bg-brand-primary rounded-full"></div>}
           </Link>
         </div>
       </div>
