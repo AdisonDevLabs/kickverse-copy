@@ -2,7 +2,8 @@ import { Metadata } from 'next';
 import { getDb } from '@/lib/db';
 import { products } from '@/lib/db/schema';
 import { brand } from '@/lib/data/brand';
-import ShopWrapper from './ShopWrapper'; // Import the new wrapper
+import ShopWrapper from './ShopWrapper';
+import { desc } from 'drizzle-orm';
 
 export const revalidate = 60;
 
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
 
 export default async function ShopPage() {
   const db = await getDb();
-  const allProducts = await db.select().from(products);
+  const allProducts = await db.select().from(products).orderBy(desc(products.createdAt));
 
   const jsonLd = {
     '@context': 'https://schema.org',

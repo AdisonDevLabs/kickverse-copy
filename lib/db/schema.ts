@@ -36,7 +36,7 @@ export const products = sqliteTable('products', {
   isBestSeller: integer('isBestSeller', { mode: 'boolean' }).default(false),
   isFlashDeal: integer('isFlashDeal', { mode: 'boolean' }).default(false),
   description: text('description').notNull(),
-  created_at: text('created_at')
+  createdAt: text('created_at')
 });
 
 // ==========================================
