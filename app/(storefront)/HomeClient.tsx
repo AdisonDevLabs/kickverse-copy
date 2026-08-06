@@ -137,7 +137,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
     
     // 1. Move automatically ONLY if not paused
     if (!isPausedRef.current) {
-      const speedPxPerMs = 0.04; // Slower, better UX
+      const speedPxPerMs = 0.08; // Slower, better UX
       currentX -= speedPxPerMs * delta;
     }
 
