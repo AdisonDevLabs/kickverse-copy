@@ -1,6 +1,6 @@
 // app/admin/reviews/page.tsx
 import { getDb } from '@/lib/db';
-import { testimonials, products } from '@/lib/db/schema';
+import { testimonials, products, storeSettings } from '@/lib/db/schema';
 import { desc, eq } from 'drizzle-orm';
 import ReviewsClient from './ReviewsClient';
 
@@ -28,5 +28,13 @@ export default async function AdminReviewsPage() {
   .from(products)
   .orderBy(desc(products.createdAt));
 
-  return <ReviewsClient initialReviews={allReviewsData} products={allProducts} />;
+  // --- NEW: Fetch Settings ---
+  const settingsResult = await db.select().from(storeSettings).where(eq(storeSettings.id, 1)).limit(1);
+  const config = settingsResult[0] || { 
+    happyCustomersText: '500+ Happy Customers', 
+    defaultAvatar: '/pexels-wedding-maps-130174465-10114295.jpg',
+    fallbackRating: '4.8'
+  };
+
+  return <ReviewsClient initialReviews={allReviewsData} products={allProducts} initialConfig={config} />;
 }

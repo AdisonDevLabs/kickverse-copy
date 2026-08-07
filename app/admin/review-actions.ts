@@ -2,7 +2,7 @@
 'use server';
 
 import { getDb } from '@/lib/db';
-import { testimonials, products } from '@/lib/db/schema';
+import { testimonials, products, storeSettings } from '@/lib/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
@@ -78,7 +78,7 @@ export async function toggleGlobalReview(reviewId: number, currentStatus: boolea
   }
 }
 
-export async function addWhatsappReview(data: { name: string; location: string; rating: number; text: string; productId: string }) {
+export async function addWhatsappReview(data: { name: string; location: string; rating: number; text: string; productId: string; profile: string }) {
   try {
     const db = await getDb();
     
@@ -88,17 +88,65 @@ export async function addWhatsappReview(data: { name: string; location: string; 
       rating: data.rating,
       text: data.text,
       product: data.productId,
-      profile: '/pexels-wedding-maps-130174465-10114295.jpg', // Default avatar
+      profile: data.profile, // Now dynamic!
       date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
-      purchased: true, // Always true for WhatsApp manual entries
+      purchased: true, 
       isGlobal: false, 
-      isApproved: true // Bypasses moderation queue
+      isApproved: true 
     });
 
     await syncProductRating(db, data.productId);
     
     revalidatePath('/admin/reviews');
     revalidatePath(`/product/${data.productId}`);
+    revalidatePath('/');
+    
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+// NEW: Edit an existing review
+export async function updateReview(id: number, data: { name: string; location: string; rating: number; text: string; productId: string; profile: string }) {
+  try {
+    const db = await getDb();
+    
+    await db.update(testimonials).set({
+      name: data.name,
+      location: data.location,
+      rating: data.rating,
+      text: data.text,
+      product: data.productId,
+      profile: data.profile,
+    }).where(eq(testimonials.id, id));
+
+    await syncProductRating(db, data.productId);
+    
+    revalidatePath('/admin/reviews');
+    revalidatePath(`/product/${data.productId}`);
+    revalidatePath('/');
+    
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+
+export async function updateStoreSettings(data: { happyCustomersText: string; defaultAvatar: string; fallbackRating: string }) {
+  try {
+    const db = await getDb();
+    
+    await db.update(storeSettings).set({
+      happyCustomersText: data.happyCustomersText,
+      defaultAvatar: data.defaultAvatar,
+      fallbackRating: data.fallbackRating
+    }).where(eq(storeSettings.id, 1));
+    
+    // Refresh both the admin panel and the storefront homepage
+    revalidatePath('/admin/reviews');
+    revalidatePath('/'); 
     
     return { success: true };
   } catch (error: any) {
