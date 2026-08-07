@@ -75,7 +75,12 @@ export default async function ProductPage({ params }: Props) {
 
   // 2. ZONE 1: Substitute Products (Same type, NOT an accessory)
   // Fix: Fetch 12 newest items predictably, then shuffle in memory to save DB reads
-  const relatedPool = await db.select()
+  const relatedPool = await db.select({
+    id: products.id,
+    name: products.name,
+    price: products.price,
+    image: products.image,
+  })
     .from(products)
     .where(and(
       eq(products.productType, product.productType), 
@@ -88,7 +93,11 @@ export default async function ProductPage({ params }: Props) {
   const relatedProducts = relatedPool.sort(() => 0.5 - Math.random()).slice(0, 4);
 
   // 3. Fetch recently viewed/others (prioritize current product type, then randomize, limit 8)
-  const recentlyViewedPool = await db.select()
+  const recentlyViewedPool = await db.select({
+    id: products.id,
+    name: products.name,
+    image: products.image,
+  })
     .from(products)
     .where(not(eq(products.id, product.id)))
     .orderBy(
