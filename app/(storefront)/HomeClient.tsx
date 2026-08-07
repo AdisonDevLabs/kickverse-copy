@@ -9,11 +9,10 @@ import { motion, useAnimationFrame, useMotionValue } from 'motion/react';
 import { fadeUp, fadeLeft, heroReveal, staggerContainer, staggerItem } from '@/lib/animations';
 import { ArrowRight, Star, ShoppingBag, Truck, ShieldCheck, Clock, MessageCircle, Flame, Eye, Zap, Sparkles, Wallet, CheckCircle, Heart, Tag, Grid } from 'lucide-react';
 import { formatPrice } from '@/lib/data';
-import { reviewAvatars, reviewStats } from '@/lib/data/testimonials';
 import { brand } from '@/lib/data/brand';
 
 // Define the props we expect from the server
-export default function HomeClient({ initialProducts, initialCategories, initialTestimonials }: any) {
+export default function HomeClient({ initialProducts, initialCategories, initialTestimonials, storeSettings }: any) {
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   
@@ -905,17 +904,31 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 {brand.sections?.reviews?.titleTop || "WHAT OUR"} <br className="hidden md:block"/>
                 {brand.sections?.reviews?.titleBottom || "CUSTOMERS SAY"}
               </h2>
+              
               <div className="flex items-center gap-3 sm:gap-4 mt-4 sm:mt-6">
                 <div className="flex -space-x-2 sm:-space-x-3">
+                  {/* DYNAMIC: Maps the first 3 overlapping avatars directly from the testimonials table's profile column */}
                   {initialTestimonials.slice(0, 3).map((item: any, idx: number) => (
-                    <Image key={idx} src={item.profile} width={40} height={40} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white object-cover" alt={`User ${idx + 1}`} />
+                    <Image 
+                      key={idx} 
+                      src={item.profile || '/pexels-wedding-maps-130174465-10114295.jpg'} 
+                      width={40} 
+                      height={40} 
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white object-cover bg-brand-dark" 
+                      alt={`User ${idx + 1}`} 
+                    />
                   ))}
                 </div>
                 <div>
                   <div className="flex text-brand-accent mb-1">
                     {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 sm:w-4 sm:h-4 fill-current" />)}
                   </div>
-                  <p className="text-white text-[8px] sm:text-[10px] md:text-xs font-bold tracking-widest uppercase">{reviewStats.averageRating} • {reviewStats.totalCustomers}</p>
+                  {/* DYNAMIC: Calculates real average rating + uses storeSettings for the marketing text */}
+                  <p className="text-white text-[8px] sm:text-[10px] md:text-xs font-bold tracking-widest uppercase">
+                    {initialTestimonials.length > 0 
+                      ? (initialTestimonials.reduce((acc: number, curr: any) => acc + curr.rating, 0) / initialTestimonials.length).toFixed(1) 
+                      : storeSettings?.fallbackRating || "4.8"}/5 Average Rating • {storeSettings?.happyCustomersText || "500+ Happy Customers"}
+                  </p>
                 </div>
               </div>
             </motion.div>
@@ -931,7 +944,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               animate={{ x: ["0%", "-50%"] }}
               transition={{ repeat: Infinity, ease: "linear", duration: 40 }}
             >
-              {/* 3. Map over the initialTestimonials passed from the server */}
+              {/* Map over the initialTestimonials passed from the server */}
               {[...initialTestimonials, ...initialTestimonials, ...initialTestimonials, ...initialTestimonials].map((review: any, idx: number) => (
                 <div 
                   key={`${review.id}-${idx}`} 
@@ -939,13 +952,17 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 >
                   <div className="flex justify-between items-start mb-4 sm:mb-6">
                     <div className="flex text-brand-accent">
-                      {[...Array(8)].map((_, i) => (
+                      {/* FIXED: Changed from Array(8) back to Array(5) */}
+                      {[...Array(5)].map((_, i) => (
                          <Star key={i} className={`w-3 h-3 sm:w-4 sm:h-4 ${i < Math.floor(review.rating) ? 'fill-current' : 'text-gray-600'}`} />
                       ))}
                     </div>
-                    <div className="bg-brand-primary/10 text-brand-primary text-[8px] sm:text-[10px] right-3 font-bold px-1.5 py-0.5 sm:px-2 sm:py-1 uppercase rounded-sm sm:rounded-md tracking-widest flex items-center border border-brand-primary/20">
-                      <CheckCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" /> Verified Order
-                    </div>
+                    {/* DYNAMIC: Only show the 'Verified Order' badge if 'purchased' is true in the DB */}
+                    {review.purchased && (
+                      <div className="bg-brand-primary/10 text-brand-primary text-[8px] sm:text-[10px] right-3 font-bold px-1.5 py-0.5 sm:px-2 sm:py-1 uppercase rounded-sm sm:rounded-md tracking-widest flex items-center border border-brand-primary/20">
+                        <CheckCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" /> Verified Order
+                      </div>
+                    )}
                   </div>
                   
                   <p className="text-gray-300 text-sm sm:text-base md:text-lg italic mb-6 sm:mb-8 flex-1 leading-relaxed">
@@ -953,17 +970,22 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   </p>
                   
                   <div className="flex items-center gap-3 sm:gap-4 mt-auto">
+                    {/* DYNAMIC: Fetches the individual user's profile image */}
                     <Image
-                      src={review.profile}
+                      src={review.profile || '/pexels-wedding-maps-130174465-10114295.jpg'}
                       alt={review.name}
                       width={48}
                       height={48}
-                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-white/10 group-hover/review:border-brand-primary/50 transition-colors"
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-white/10 group-hover/review:border-brand-primary/50 transition-colors bg-brand-dark"
                     />
                     <div>
                       <p className="text-white font-bold text-xs sm:text-sm tracking-wide">{review.name}</p>
-                      <p className="text-gray-400 text-[10px] sm:text-xs mt-0.5 sm:mt-1 flex items-center font-medium truncate max-w-[220px]">
-                        Purchased: <span className="text-brand-primary ml-1 truncate">{review.productName || 'Verified Style'}</span>
+                      {/* BULLETPROOF TRUNCATION LAYOUT */}
+                      <p className="text-gray-400 text-[10px] sm:text-xs mt-0.5 sm:mt-1 flex items-center font-medium w-full max-w-[220px] sm:max-w-[260px]">
+                        <span className="whitespace-nowrap shrink-0 mr-1">Purchased:</span> 
+                        <span className="text-brand-primary truncate block">
+                          {review.productName || 'Verified Style'}
+                        </span>
                       </p>
                     </div>
                   </div>

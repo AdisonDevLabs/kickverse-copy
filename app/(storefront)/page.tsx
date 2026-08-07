@@ -1,6 +1,6 @@
 // app/(storefront)/page.tsx
 import { getDb } from '@/lib/db';
-import { products, categories, testimonials } from '@/lib/db/schema';
+import { products, categories, testimonials, storeSettings } from '@/lib/db/schema';
 import { eq, desc, and } from 'drizzle-orm';
 import { brand } from '@/lib/data/brand';
 import HomeClient from './HomeClient';
@@ -52,6 +52,14 @@ export default async function HomePage() {
       eq(testimonials.isApproved, true)
     ));
 
+  // --- NEW: Fetch Global Store Settings ---
+  const settingsResult = await db.select().from(storeSettings).where(eq(storeSettings.id, 1)).limit(1);
+  const storeConfig = settingsResult[0] || { 
+    happyCustomersText: '500+ Happy Customers', 
+    defaultAvatar: '/pexels-wedding-maps-130174465-10114295.jpg',
+    fallbackRating: '4.8'
+  };
+
   // 3. Construct JSON-LD Schema.org Data for the Storefront Homepage
   const storeJsonLd = {
     '@context': 'https://schema.org',
@@ -79,7 +87,8 @@ export default async function HomePage() {
       <HomeClient 
         initialProducts={allProducts} 
         initialCategories={heroCategories} 
-        initialTestimonials={globalTestimonials} 
+        initialTestimonials={globalTestimonials}
+        storeConfig={storeConfig} 
       />
     </>
   );

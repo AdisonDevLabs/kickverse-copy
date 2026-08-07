@@ -90,3 +90,13 @@ export const mediaAssets = sqliteTable('media_assets', {
   fileName: text('file_name').notNull(),
   isAssigned: integer('is_assigned', { mode: 'boolean' }).default(false)
 });
+
+// ==========================================
+// 7. STORE SETTINGS (Global CMS)
+// ==========================================
+export const storeSettings = sqliteTable('store_settings', {
+  id: integer('id').primaryKey(), // We will only ever use ID 1
+  happyCustomersText: text('happy_customers_text').notNull().default('500+ Happy Customers'),
+  defaultAvatar: text('default_avatar').notNull().default('/pexels-wedding-maps-130174465-10114295.jpg'),
+  fallbackRating: text('fallback_rating').notNull().default('4.8')
+});
