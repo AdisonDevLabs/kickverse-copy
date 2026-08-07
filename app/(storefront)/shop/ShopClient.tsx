@@ -141,6 +141,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
   }, [filterCategory, filterProductType, filterPrice, filterSize, sortOption, discoveryMode]);
 
   // 1. Dynamically extract categories based ONLY on the active Product Type
+  // 1. Dynamically extract categories based ONLY on the active Product Type
   const dynamicCategories = useMemo(() => {
     const filteredByType = initialProducts.filter(p => {
       const pType = (p.productType || 'Sneakers').toLowerCase();
@@ -153,7 +154,8 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
     if (filterProductType === 'Sneakers') {
       rawCategories = rawCategories.filter(cat =>
         cat.toLowerCase() !== 'official shoes' &&
-        cat.toLowerCase() !== 'opens & sandals'
+        cat.toLowerCase() !== 'opens & sandals' &&
+        cat.toLowerCase() !== 'sneakers' // Added rule to prevent duplicate "Sneakers" pill
       );
     }
 
@@ -199,6 +201,13 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                targetCategory.includes(prodCategory) ||
                prodType.includes(targetCategory) || 
                targetCategory.includes(prodType);   
+      });
+    } else if (!searchQuery && filterProductType === 'Sneakers' && (!filterCategory || filterCategory.toLowerCase() === 'all')) {
+      // EXCLUSION RULE: When viewing "All" Sneakers, hide Official Shoes and Opens & Sandals
+      // (Unless the user is actively using the search bar)
+      result = result.filter(p => {
+        const cat = (p.category || '').toLowerCase();
+        return cat !== 'official shoes' && cat !== 'opens & sandals';
       });
     }
 
