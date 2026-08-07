@@ -140,17 +140,33 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
     return () => clearTimeout(timer);
   }, [filterCategory, filterProductType, filterPrice, filterSize, sortOption, discoveryMode]);
 
-  // 1. NEW: Dynamically extract categories based ONLY on the active Product Type
+  // 1. Dynamically extract categories based ONLY on the active Product Type
   const dynamicCategories = useMemo(() => {
     const filteredByType = initialProducts.filter(p => {
       const pType = (p.productType || 'Sneakers').toLowerCase();
       return pType === filterProductType.toLowerCase();
     });
 
-    // Extract unique categories directly from the database results
-    const rawCategories = Array.from(new Set(filteredByType.map(p => p.category))).filter(Boolean) as string[];
+    let rawCategories = Array.from(new Set(filteredByType.map(p => p.category))).filter(Boolean) as string[];
+
+    // Exclude the priority categories from the alphabetical sort so they don't duplicate
+    if (filterProductType === 'Sneakers') {
+      rawCategories = rawCategories.filter(cat =>
+        cat.toLowerCase() !== 'official shoes' &&
+        cat.toLowerCase() !== 'opens & sandals'
+      );
+    }
+
     return rawCategories.sort();
   }, [initialProducts, filterProductType]);
+
+  // 2. Create the final ordered array for the UI
+  const displayCategories = useMemo(() => {
+    if (filterProductType === 'Sneakers') {
+      return ['Official Shoes', 'Opens & Sandals', ...dynamicCategories];
+    }
+    return dynamicCategories;
+  }, [filterProductType, dynamicCategories]);
 
   // 2. UPDATED: Clean product filtering without the old hardcoded hacks
   const sortedAndFilteredProducts = useMemo(() => {
@@ -330,60 +346,44 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
 
           {/* Row 2: Scrollable Pill Navigation for Types & Collections */}
           <div className="flex items-center overflow-x-auto hide-scrollbar gap-3 pb-2 -mx-6 px-6 lg:mx-0 lg:px-0">
-            <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold hidden md:block mr-2 flex-shrink-0">
-              Explore:
-            </span>
 
-            {/* 1. STRICT Product Types Group (Database Aligned) */}
-            <div className="flex items-center gap-2 flex-nowrap pr-3 border-r border-white/10">
-              {['Sneakers', 'Soccer Cleats'].map((type) => {
-                const isActive = filterProductType === type;
+            <div className="flex items-center gap-2 flex-nowrap pl-1 pr-3">
+              {/* 1. Main Product Type Pill (Acts as the "All" reset button) */}
+              <button
+                onClick={() => {
+                  setFilterCategory('All');
+                  setDiscoveryMode('all');
+                }}
+                className={`whitespace-nowrap px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
+                  filterCategory === 'All' && discoveryMode === 'all'
+                    ? 'bg-white text-black shadow-md shadow-white/10'
+                    : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border border-white/5'
+                }`}
+              >
+                {filterProductType}
+              </button>
+
+              {/* 2. Ordered Categories (Priority first, then alphabetical) */}
+              {displayCategories.map((cat) => {
+                const isActive = filterCategory === cat;
                 return (
                   <button
-                    key={type}
+                    key={cat}
                     onClick={() => {
-                      if (!isActive) {
-                        setFilterProductType(type);
-                        setFilterCategory('All');
-                        setDiscoveryMode('all');
-                      }
+                      setFilterCategory(isActive ? 'All' : cat);
+                      setDiscoveryMode('all');
                     }}
-                    className={`whitespace-nowrap px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
+                    className={`whitespace-nowrap px-4 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
                       isActive
-                        ? 'bg-white text-black shadow-md shadow-white/10'
-                        : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border border-white/5'
+                        ? 'bg-brand-primary text-black shadow-md shadow-brand-primary/20'
+                        : 'bg-transparent text-gray-400 hover:bg-white/5 hover:text-white border border-white/10'
                     }`}
                   >
-                    {type}
+                    {cat}
                   </button>
                 );
               })}
             </div>
-
-            {/* 2. DYNAMIC Categories Group (Auto-updates based on Product Type) */}
-            {dynamicCategories.length > 0 && (
-              <div className="flex items-center gap-2 flex-nowrap pl-1">
-                {dynamicCategories.map((cat) => {
-                  const isActive = filterCategory === cat;
-                  return (
-                    <button
-                      key={cat}
-                      onClick={() => {
-                        setFilterCategory(isActive ? 'All' : cat);
-                        setDiscoveryMode('all');
-                      }}
-                      className={`whitespace-nowrap px-4 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
-                        isActive
-                          ? 'bg-brand-primary text-black shadow-md shadow-brand-primary/20'
-                          : 'bg-transparent text-gray-400 hover:bg-white/5 hover:text-white border border-white/10'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -579,7 +579,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                           <div className="mt-auto pt-2 w-full">
                              <Link 
                               href={`/product/${product.id}`}
-                              className="w-full bg-white/5 border border-white/10 text-white font-bold h-10 rounded-md group-hover:bg-brand-primary group-hover:text-black group-hover:border-brand-primary transition-all flex justify-center items-center uppercase tracking-widest text-[10px] sm:text-xs z-20 relative"
+                              className="w-full bg-brand-primary border border-white/10 text-white font-bold h-10 rounded-md group-hover:bg-brand-primary group-hover:text-black group-hover:border-brand-primary transition-all flex justify-center items-center uppercase tracking-widest text-[10px] sm:text-xs z-20 relative"
                              >
                                View Details
                              </Link>
@@ -661,7 +661,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                     )}
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {dynamicCategories.map((cat) => (
+                    {displayCategories.map((cat) => (
                       <button
                         key={cat}
                         onClick={() => setFilterCategory(cat)}
