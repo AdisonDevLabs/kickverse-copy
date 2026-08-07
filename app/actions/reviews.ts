@@ -15,7 +15,7 @@ export async function submitProductReview(data: { name: string; location: string
       rating: data.rating,
       text: data.text,
       product: data.productId,
-      profile: '/pexels-wedding-maps-130174465-10114295.jpg', // Default avatar fallback
+      profile: '', // Default avatar fallback
       date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
       purchased: false,
       isGlobal: false,
