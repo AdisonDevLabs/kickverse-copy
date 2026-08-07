@@ -261,6 +261,31 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
 
   const hasActiveFilters = (filterCategory && filterCategory !== 'All') || filterPrice || filterSize || searchQuery || sortOption !== 'default' || discoveryMode !== 'all';
 
+  // NEW: Dynamic context-aware label for the results counter
+  const getDynamicProductLabel = () => {
+    const count = sortedAndFilteredProducts.length;
+    
+    // 1. Search takes highest priority
+    if (searchQuery) return count === 1 ? 'Match' : 'Matches';
+    
+    // 2. Specific Category
+    if (filterCategory && filterCategory !== 'All') return filterCategory;
+
+    // 3. Discovery Modes (from Top Nav)
+    if (filterCategory === 'All') {
+      if (discoveryMode === 'deals') return count === 1 ? 'Flash Deal' : 'Flash Deals';
+      if (discoveryMode === 'just-dropped') return count === 1 ? 'New Arrival' : 'New Arrivals';
+      if (discoveryMode === 'best-sellers') return count === 1 ? 'Best Seller' : 'Best Sellers';
+    }
+    
+    // 4. Base Product Types
+    if (filterProductType === 'Sneakers') return count === 1 ? 'Sneaker' : 'Sneakers';
+    if (filterProductType === 'Soccer Cleats') return count === 1 ? 'Soccer Cleat' : 'Soccer Cleats';
+    
+    // 5. Ultimate Fallback
+    return count === 1 ? 'Item' : 'Items';
+  };
+
   const clearAllFilters = () => {
     setSearchQuery('');
     setFilterCategory('All');
@@ -457,7 +482,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
 
               {/* Right Side: Product Count (Pinned, never shrinks) */}
               <div className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-500 bg-white/5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full inline-flex items-center border border-white/5 flex-shrink-0 whitespace-nowrap">
-                 {sortedAndFilteredProducts.length} {sortedAndFilteredProducts.length === 1 ? 'Product' : 'Products'} Found
+                 {sortedAndFilteredProducts.length} {getDynamicProductLabel()} Found
               </div>
             </motion.div>
           </div>
@@ -588,7 +613,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                           <div className="mt-auto pt-2 w-full">
                              <Link 
                               href={`/product/${product.id}`}
-                              className="w-full bg-brand-primary border border-white/10 text-black font-bold h-10 rounded-md group-hover:bg-white group-hover:text-black group-hover:border-brand-primary transition-all flex justify-center items-center uppercase tracking-widest text-[10px] sm:text-xs z-20 relative"
+                              className="w-full bg-brand-primary border border-white/10 text-black font-bold h-10 rounded-md group-hover:bg-white group-hover:text-black group-hover:border-white transition-all flex justify-center items-center uppercase tracking-widest text-[10px] sm:text-xs z-20 relative"
                              >
                                View Details
                              </Link>
