@@ -38,12 +38,12 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
   };
 
   const getInitialProductType = (typeVal: string | null) => {
-    if (!typeVal) return 'All';
+    if (!typeVal) return 'Sneakers';
     if (typeVal.toLowerCase() === 'sneakers') return 'Sneakers';
     if (typeVal.toLowerCase() === 'soccer-cleats') return 'Soccer Cleats';
     if (typeVal.toLowerCase() === 'official-shoes') return 'Official Shoes';
     if (typeVal.toLowerCase() === 'opens-sandals') return 'Opens & Sandals';
-    return 'All';
+    return 'Sneakers';
   };
 
   const [filterCategory, setFilterCategory] = useState<string>(() => getInitialFilterCategory(rawCategory));
@@ -78,7 +78,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
     } else if (rawCategory) {
       setFilterCategory(getInitialFilterCategory(rawCategory));
       setDiscoveryMode(getInitialDiscoveryMode(rawCategory));
-      setFilterProductType('All'); 
+      setFilterProductType('Sneakers'); 
     } else if (rawType) {
       setFilterProductType(getInitialProductType(rawType));
       setFilterCategory('All'); 
@@ -142,6 +142,38 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
     const timer = setTimeout(() => setIsLoading(false), 300);
     return () => clearTimeout(timer);
   }, [filterCategory, filterProductType, filterPrice, filterSize, sortOption, discoveryMode]);
+
+  const dynamicCategories = useMemo(() => {
+    let filteredForCategories = initialProducts;
+    
+    // Filter down to the active Product Type
+    if (filterProductType !== 'All') {
+      const targetType = filterProductType.toLowerCase();
+      filteredForCategories = initialProducts.filter(p => {
+        const pType = (p.productType || '').toLowerCase();
+        const pCat = (p.category || '').toLowerCase();
+        
+        if (targetType === 'sneakers') {
+          return pType === 'sneakers' && pCat !== 'official shoes' && pCat !== 'opens & sandals';
+        } else if (targetType === 'official shoes' || targetType === 'opens & sandals') {
+          return pCat === targetType;
+        } else {
+          return pType === targetType;
+        }
+      });
+    }
+
+    // Extract unique categories from those products
+    const rawCategories = Array.from(new Set(filteredForCategories.map(p => p.category))).filter(Boolean) as string[];
+    
+    // Filter out 'Official Shoes' and 'Opens & Sandals' since they act as Product Types in your UI
+    const displayCategories = rawCategories.filter(cat => {
+      const lowerCat = cat.toLowerCase();
+      return lowerCat !== 'official shoes' && lowerCat !== 'opens & sandals';
+    });
+
+    return displayCategories.sort(); // Sorts them alphabetically
+  }, [initialProducts, filterProductType]);
 
   const sortedAndFilteredProducts = useMemo(() => {
     let result = [...initialProducts];
@@ -328,16 +360,12 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
 
           {/* Row 2: Scrollable Pill Navigation for Types & Collections */}
           <div className="flex items-center overflow-x-auto hide-scrollbar gap-3 pb-2 -mx-6 px-6 lg:mx-0 lg:px-0">
-            <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold hidden md:block mr-2 flex-shrink-0">
-              Explore:
-            </span>
 
             {/* 1. Product Types Group */}
-            <div className="flex items-center gap-2 flex-nowrap pr-3">
+            <div className="flex items-center gap-2 flex-nowrap pr-3 border-r border-white/10">
               {['Sneakers', 'Soccer Cleats', 'Official Shoes', 'Opens & Sandals'].map((type) => {
                 const isActive = filterProductType === type;
                 
-                // Hide redundant pills on mobile if they correspond to the opposite bottom nav item
                 let visibilityClass = "";
                 if (filterProductType === 'Sneakers' && type === 'Soccer Cleats') {
                   visibilityClass = "hidden lg:block";
@@ -349,21 +377,49 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                   <button
                     key={type}
                     onClick={() => {
-                      setFilterProductType(isActive ? 'All' : type);
+                    // Prevent toggling off. Only update if clicking a DIFFERENT type.
+                    if (!isActive) {
+                      setFilterProductType(type);
                       setFilterCategory('All');
                       setDiscoveryMode('all');
-                    }}
-                    className={`${visibilityClass} whitespace-nowrap px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
-                      isActive
-                        ? 'bg-white text-black shadow-md shadow-white/10'
-                        : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border border-white/5'
-                    }`}
-                  >
-                    {type}
-                  </button>
+                    }
+                  }}
+                  className={`${visibilityClass} whitespace-nowrap px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
+                    isActive
+                      ? 'bg-white text-black shadow-md shadow-white/10'
+                      : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border border-white/5'
+                  }`}
+                >
+                  {type}
+                </button>
                 );
               })}
             </div>
+
+            {/* 2. NEW: Dynamic Categories Group */}
+            {dynamicCategories.length > 0 && (
+              <div className="flex items-center gap-2 flex-nowrap pl-1">
+                {dynamicCategories.map((cat) => {
+                  const isActive = filterCategory === cat;
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => {
+                        setFilterCategory(isActive ? 'All' : cat);
+                        setDiscoveryMode('all');
+                      }}
+                      className={`whitespace-nowrap px-4 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
+                        isActive
+                          ? 'bg-brand-primary text-black shadow-md shadow-brand-primary/20'
+                          : 'bg-transparent text-gray-400 hover:bg-white/5 hover:text-white border border-white/10'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -657,7 +713,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                     )}
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {filterCategories.map((cat) => (
+                    {dynamicCategories.map((cat) => (
                       <button
                         key={cat}
                         onClick={() => setFilterCategory(cat)}
