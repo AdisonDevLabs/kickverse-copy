@@ -31,7 +31,26 @@ export default async function ShopPage({ searchParams }: Props) {
     redirect('/shop?type=sneakers');
   }
   const db = await getDb();
-  const allProducts = await db.select().from(products).orderBy(
+  const allProducts = await db.select({
+    id: products.id,
+    name: products.name,
+    price: products.price,
+    originalPrice: products.originalPrice,
+    image: products.image,          // Only the single thumbnail image
+    productType: products.productType,
+    category: products.category,
+    rating: products.rating,
+    reviews: products.reviews,
+    sizes: products.sizes,          // Kept because ShopClient uses this to filter
+    isNewArrival: products.isNewArrival,
+    isBestSeller: products.isBestSeller,
+    isFlashDeal: products.isFlashDeal,
+    isPinned: products.isPinned,
+    isAccessory: products.isAccessory,
+    createdAt: products.createdAt,
+  })
+  .from(products)
+  .orderBy(
     desc(products.isPinned),
     desc(products.createdAt)
   );

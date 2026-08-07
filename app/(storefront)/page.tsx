@@ -1,7 +1,7 @@
 // app/(storefront)/page.tsx
 import { getDb } from '@/lib/db';
 import { products, categories, testimonials } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { brand } from '@/lib/data/brand';
 import HomeClient from './HomeClient';
 
@@ -12,7 +12,23 @@ export default async function HomePage() {
   // 2. Await the database initialization
   const db = await getDb();
 
-  const allProducts = await db.select().from(products);
+  const allProducts = await db.select({
+    id: products.id,
+    name: products.name,
+    price: products.price,
+    originalPrice: products.originalPrice,
+    image: products.image,
+    productType: products.productType,
+    category: products.category,
+    rating: products.rating,
+    reviews: products.reviews,
+    isNewArrival: products.isNewArrival,
+    isBestSeller: products.isBestSeller,
+    isFlashDeal: products.isFlashDeal,
+    createdAt: products.createdAt,
+  })
+  .from(products)
+  .orderBy(desc(products.createdAt));
   
   const heroCategories = await db.select().from(categories);
   
