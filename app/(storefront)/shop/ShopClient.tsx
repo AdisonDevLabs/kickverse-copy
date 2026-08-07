@@ -298,9 +298,9 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
   return (
     <div className="bg-brand-dark min-h-screen text-white">
       {/* Page Header */}
-      <div className="bg-brand-card pt-4 md:pt-6 pb-4 px-6 relative overflow-hidden">
-        {/* Subtle background glow for visual hierarchy */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-full bg-brand-primary/5 blur-3xl rounded-full pointer-events-none"></div>
+      <div className="bg-brand-card pt-3 md:pt-5 pb-3 px-5 relative overflow-hidden">
+        {/* Subtle background glow for visual hierarchy 
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-full bg-brand-primary/5 blur-3xl rounded-full pointer-events-none"></div>*/}
         
         <motion.div 
           initial="hidden" animate="visible" variants={staggerContainer}
@@ -308,7 +308,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
         >
           <motion.h1 
             variants={staggerItem}
-            className="font-display font-black uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl text-white leading-none"
+            className="font-display font-black uppercase tracking-wide text-2.5xl sm:text-3.5xl md:text-4.5xl text-white leading-none"
           >
             {discoveryMode === 'deals' && filterCategory === 'All' ? 'Flash Deals' : 
              discoveryMode === 'just-dropped' && filterCategory === 'All' ? 'New Arrivals' :

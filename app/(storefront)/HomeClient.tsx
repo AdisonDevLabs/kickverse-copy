@@ -256,7 +256,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                  <MessageCircle className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" /> Order on WhatsApp
                </a>
                <Link 
-                href="/shop" 
+                href="/shop?type=sneakers" 
                 className="h-9 sm:h-12 px-3 sm:px-6 rounded-md bg-transparent border border-white text-white font-bold uppercase tracking-widest text-[9px] sm:text-xs flex items-center justify-center hover:bg-white hover:text-black transition-colors flex-1 sm:flex-none"
                >
                  {brand.hero?.ctaSecondary || "SHOP COLLECTION"}
@@ -331,7 +331,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
 
                 {/* 3. Official Shoes Card */}
                 <Link 
-                  href="/shop?type=official-shoes" 
+                   href="/shop?type=sneakers&category=official-shoes"
                   className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
@@ -360,7 +360,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
 
                 {/* 4. Opens & Sandals Card */}
                 <Link 
-                  href="/shop?type=opens-sandals" 
+                  href="/shop?type=sneakers&category=opens-sandals"
                   className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
@@ -502,7 +502,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
                 className="mt-4 md:mt-0"
               >
-                <Link href="/shop?category=deals" className="h-7 sm:h-8 px-4 sm:px-8 bg-transparent border sm:border-2 border-white text-white font-bold hover:bg-white hover:text-brand-accent rounded-md transition-colors flex items-center justify-center uppercase tracking-widest text-[9px] sm:text-sm w-max">
+                <Link href="/shop?type=sneakers&category=deals" className="h-7 sm:h-8 px-4 sm:px-8 bg-transparent border sm:border-2 border-white text-white font-bold hover:bg-white hover:text-brand-accent rounded-md transition-colors flex items-center justify-center uppercase tracking-widest text-[9px] sm:text-sm w-max">
                   {brand.sections?.flashDeals?.cta || "View All Deals"} <ArrowRight className="ml-1.5 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
                 </Link>
               </motion.div>
@@ -668,7 +668,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               </p>
             </motion.div>
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} className="mt-4 md:mt-0">
-              <Link href="/shop?category=new-arrivals" className="h-8 sm:h-12 px-4 sm:px-8 border border-white/20 text-white font-bold hover:bg-white hover:text-black transition-colors flex items-center justify-center uppercase tracking-widest text-[9px] sm:text-sm group rounded-md w-max">
+              <Link href="/shop?type=sneakers&category=new-arrivals" className="h-8 sm:h-12 px-4 sm:px-8 border border-white/20 text-white font-bold hover:bg-white hover:text-black transition-colors flex items-center justify-center uppercase tracking-widest text-[9px] sm:text-sm group rounded-md w-max">
                 {brand.sections?.newArrivals?.cta || "View All Arrivals"} <ArrowRight className="ml-1.5 sm:ml-3 h-3 w-3 sm:h-4 sm:w-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>
@@ -748,7 +748,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               </p>
             </motion.div>
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} className="mt-4 md:mt-0">
-              <Link href="/shop?category=best-sellers" className="h-8 sm:h-12 px-4 sm:px-8 border border-white/20 text-white font-bold hover:bg-white hover:text-black transition-colors flex items-center justify-center uppercase tracking-widest text-[9px] sm:text-sm group rounded-md w-max">
+              <Link href="/shop?type=sneakers&category=best-sellers" className="h-8 sm:h-12 px-4 sm:px-8 border border-white/20 text-white font-bold hover:bg-white hover:text-black transition-colors flex items-center justify-center uppercase tracking-widest text-[9px] sm:text-sm group rounded-md w-max">
                 {brand.sections?.bestSellers?.cta || "View All Favorites"} <ArrowRight className="ml-1.5 sm:ml-3 h-3 w-3 sm:h-4 sm:w-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>
