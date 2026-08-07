@@ -579,7 +579,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                           <div className="mt-auto pt-2 w-full">
                              <Link 
                               href={`/product/${product.id}`}
-                              className="w-full bg-brand-primary border border-white/10 text-white font-bold h-10 rounded-md group-hover:bg-brand-primary group-hover:text-black group-hover:border-brand-primary transition-all flex justify-center items-center uppercase tracking-widest text-[10px] sm:text-xs z-20 relative"
+                              className="w-full bg-brand-primary border border-white/10 text-black font-bold h-10 rounded-md group-hover:bg-white group-hover:text-black group-hover:border-brand-primary transition-all flex justify-center items-center uppercase tracking-widest text-[10px] sm:text-xs z-20 relative"
                              >
                                View Details
                              </Link>
