@@ -23,6 +23,7 @@ export default async function AdminReviewsPage() {
   const allProducts = await db.select({
     id: products.id,
     name: products.name,
+    image: products.image,
   })
   .from(products)
   .orderBy(desc(products.createdAt));

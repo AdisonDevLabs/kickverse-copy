@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Star, CheckCircle, XCircle, Trash2, Globe, MessageCircle, Plus, X } from 'lucide-react';
+import { Star, CheckCircle, Trash2, Globe, MessageCircle, X, Search } from 'lucide-react';
 import { approveReview, deleteReview, toggleGlobalReview, addWhatsappReview } from '../review-actions';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -16,8 +16,17 @@ export default function ReviewsClient({ initialReviews, products }: { initialRev
   const [formData, setFormData] = useState({ name: '', location: '', rating: 5, text: '', productId: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Searchable Product Dropdown State
+  const [productSearch, setProductSearch] = useState('');
+  const [isProductListOpen, setIsProductListOpen] = useState(false);
+
   const pendingReviews = initialReviews.filter((r) => !r.review.isApproved);
   const publishedReviews = initialReviews.filter((r) => r.review.isApproved);
+
+  const selectedProduct = products.find(p => p.id === formData.productId);
+  const filteredProducts = products.filter(p => 
+    p.name.toLowerCase().includes(productSearch.toLowerCase())
+  );
 
   const handleApprove = async (id: number, productId: string | null) => {
     setLoadingId(id);
@@ -40,7 +49,7 @@ export default function ReviewsClient({ initialReviews, products }: { initialRev
 
   const handleSubmitWhatsapp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.productId) return alert("Please select a product");
+    if (!formData.productId) return alert("Please search and select a product.");
     
     setIsSubmitting(true);
     const res = await addWhatsappReview(formData);
@@ -49,6 +58,7 @@ export default function ReviewsClient({ initialReviews, products }: { initialRev
     if (res.success) {
       setIsModalOpen(false);
       setFormData({ name: '', location: '', rating: 5, text: '', productId: '' });
+      setProductSearch('');
       setActiveTab('published');
     } else {
       alert("Error saving review");
@@ -168,14 +178,57 @@ export default function ReviewsClient({ initialReviews, products }: { initialRev
               </div>
               
               <form onSubmit={handleSubmitWhatsapp} className="p-6 space-y-4">
-                <div>
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 block">Select Product</label>
-                  <select required value={formData.productId} onChange={(e) => setFormData({...formData, productId: e.target.value})} className="w-full bg-brand-dark border border-white/10 rounded-md p-3 text-sm text-white focus:outline-none focus:border-brand-primary">
-                    <option value="" disabled>-- Select a Product --</option>
-                    {products.map(p => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
-                  </select>
+                {/* Searchable Product Input */}
+                <div className="relative">
+                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 block">Search Product</label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    <input 
+                      type="text"
+                      placeholder="Type shoe name to search..."
+                      value={isProductListOpen ? productSearch : (selectedProduct ? selectedProduct.name : productSearch)}
+                      onChange={(e) => {
+                        setProductSearch(e.target.value);
+                        setIsProductListOpen(true);
+                        if (formData.productId) {
+                          setFormData({...formData, productId: ''}); // Reset selection if searching anew
+                        }
+                      }}
+                      onFocus={() => setIsProductListOpen(true)}
+                      className="w-full bg-brand-dark border border-white/10 rounded-md pl-10 pr-3 py-3 text-sm text-white focus:outline-none focus:border-brand-primary"
+                    />
+                  </div>
+
+                  {/* Filtered Dropdown Results */}
+                  {isProductListOpen && (
+                    <div className="absolute left-0 right-0 mt-1 max-h-52 overflow-y-auto bg-brand-dark border border-white/20 rounded-md shadow-2xl z-50 divide-y divide-white/5">
+                      {filteredProducts.length === 0 ? (
+                        <div className="p-4 text-xs text-gray-400 text-center uppercase tracking-widest">No matching products found</div>
+                      ) : (
+                        filteredProducts.map(p => (
+                          <div 
+                            key={p.id}
+                            onClick={() => {
+                              setFormData({...formData, productId: p.id});
+                              setProductSearch(p.name);
+                              setIsProductListOpen(false);
+                            }}
+                            className="flex items-center gap-3 p-3 hover:bg-brand-primary/20 cursor-pointer transition-colors"
+                          >
+                            {p.image && (
+                              <div className="w-9 h-9 relative rounded overflow-hidden bg-black shrink-0 border border-white/10">
+                                <Image src={p.image} alt={p.name} fill className="object-cover" />
+                              </div>
+                            )}
+                            <div className="truncate">
+                              <p className="text-xs font-bold text-white truncate">{p.name}</p>
+                              <p className="text-[9px] text-gray-500 uppercase tracking-widest">{p.id}</p>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
