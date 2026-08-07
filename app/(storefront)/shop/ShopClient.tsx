@@ -39,10 +39,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
 
   const getInitialProductType = (typeVal: string | null) => {
     if (!typeVal) return 'Sneakers';
-    if (typeVal.toLowerCase() === 'sneakers') return 'Sneakers';
-    if (typeVal.toLowerCase() === 'soccer-cleats') return 'Soccer Cleats';
-    if (typeVal.toLowerCase() === 'official-shoes') return 'Official Shoes';
-    if (typeVal.toLowerCase() === 'opens-sandals') return 'Opens & Sandals';
+    if (typeVal.toLowerCase().replace(/-/g, ' ') === 'soccer cleats') return 'Soccer Cleats';
     return 'Sneakers';
   };
 
@@ -65,7 +62,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
   const [quickViewProduct, setQuickViewProduct] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   
-  const [visibleCount, setVisibleCount] = useState(8);
+  const [visibleCount, setVisibleCount] = useState(20);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -103,7 +100,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
   }, [rawCategory, rawType, rawQuery, rawBrand, rawModel]);
 
   useEffect(() => {
-    setVisibleCount(8);
+    setVisibleCount(20);
   }, [filterCategory, filterProductType, filterPrice, filterSize, searchQuery, sortOption, discoveryMode]);
 
   useEffect(() => {
@@ -119,7 +116,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
     if (isLoadingMore) return;
     setIsLoadingMore(true);
     setTimeout(() => {
-      setVisibleCount(prev => prev + 8);
+      setVisibleCount(prev => prev + 20);
       setIsLoadingMore(false);
     }, 600);
   }, [isLoadingMore]);
@@ -143,38 +140,19 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
     return () => clearTimeout(timer);
   }, [filterCategory, filterProductType, filterPrice, filterSize, sortOption, discoveryMode]);
 
+  // 1. NEW: Dynamically extract categories based ONLY on the active Product Type
   const dynamicCategories = useMemo(() => {
-    let filteredForCategories = initialProducts;
-    
-    // Filter down to the active Product Type
-    if (filterProductType !== 'All') {
-      const targetType = filterProductType.toLowerCase();
-      filteredForCategories = initialProducts.filter(p => {
-        const pType = (p.productType || '').toLowerCase();
-        const pCat = (p.category || '').toLowerCase();
-        
-        if (targetType === 'sneakers') {
-          return pType === 'sneakers' && pCat !== 'official shoes' && pCat !== 'opens & sandals';
-        } else if (targetType === 'official shoes' || targetType === 'opens & sandals') {
-          return pCat === targetType;
-        } else {
-          return pType === targetType;
-        }
-      });
-    }
-
-    // Extract unique categories from those products
-    const rawCategories = Array.from(new Set(filteredForCategories.map(p => p.category))).filter(Boolean) as string[];
-    
-    // Filter out 'Official Shoes' and 'Opens & Sandals' since they act as Product Types in your UI
-    const displayCategories = rawCategories.filter(cat => {
-      const lowerCat = cat.toLowerCase();
-      return lowerCat !== 'official shoes' && lowerCat !== 'opens & sandals';
+    const filteredByType = initialProducts.filter(p => {
+      const pType = (p.productType || 'Sneakers').toLowerCase();
+      return pType === filterProductType.toLowerCase();
     });
 
-    return displayCategories.sort(); // Sorts them alphabetically
+    // Extract unique categories directly from the database results
+    const rawCategories = Array.from(new Set(filteredByType.map(p => p.category))).filter(Boolean) as string[];
+    return rawCategories.sort();
   }, [initialProducts, filterProductType]);
 
+  // 2. UPDATED: Clean product filtering without the old hardcoded hacks
   const sortedAndFilteredProducts = useMemo(() => {
     let result = [...initialProducts];
     
@@ -187,19 +165,11 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
       );
     }
 
+    // STRICT Product Type Filtering
     if (filterProductType && filterProductType !== 'All') {
       result = result.filter(p => {
-        const pType = (p.productType || '').toLowerCase();
-        const pCat = (p.category || '').toLowerCase();
-        const targetType = filterProductType.toLowerCase();
-
-        if (targetType === 'sneakers') {
-          return pType === 'sneakers' && pCat !== 'official shoes' && pCat !== 'opens & sandals';
-        } else if (targetType === 'official shoes' || targetType === 'opens & sandals') {
-          return pCat === targetType;
-        } else {
-          return pType === targetType;
-        }
+        const pType = (p.productType || 'Sneakers').toLowerCase();
+        return pType === filterProductType.toLowerCase();
       });
     }
 
@@ -360,43 +330,37 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
 
           {/* Row 2: Scrollable Pill Navigation for Types & Collections */}
           <div className="flex items-center overflow-x-auto hide-scrollbar gap-3 pb-2 -mx-6 px-6 lg:mx-0 lg:px-0">
+            <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold hidden md:block mr-2 flex-shrink-0">
+              Explore:
+            </span>
 
-            {/* 1. Product Types Group */}
+            {/* 1. STRICT Product Types Group (Database Aligned) */}
             <div className="flex items-center gap-2 flex-nowrap pr-3 border-r border-white/10">
-              {['Sneakers', 'Soccer Cleats', 'Official Shoes', 'Opens & Sandals'].map((type) => {
+              {['Sneakers', 'Soccer Cleats'].map((type) => {
                 const isActive = filterProductType === type;
-                
-                let visibilityClass = "";
-                if (filterProductType === 'Sneakers' && type === 'Soccer Cleats') {
-                  visibilityClass = "hidden lg:block";
-                } else if (filterProductType === 'Soccer Cleats' && type === 'Sneakers') {
-                  visibilityClass = "hidden lg:block";
-                }
-
                 return (
                   <button
                     key={type}
                     onClick={() => {
-                    // Prevent toggling off. Only update if clicking a DIFFERENT type.
-                    if (!isActive) {
-                      setFilterProductType(type);
-                      setFilterCategory('All');
-                      setDiscoveryMode('all');
-                    }
-                  }}
-                  className={`${visibilityClass} whitespace-nowrap px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
-                    isActive
-                      ? 'bg-white text-black shadow-md shadow-white/10'
-                      : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border border-white/5'
-                  }`}
-                >
-                  {type}
-                </button>
+                      if (!isActive) {
+                        setFilterProductType(type);
+                        setFilterCategory('All');
+                        setDiscoveryMode('all');
+                      }
+                    }}
+                    className={`whitespace-nowrap px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
+                      isActive
+                        ? 'bg-white text-black shadow-md shadow-white/10'
+                        : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border border-white/5'
+                    }`}
+                  >
+                    {type}
+                  </button>
                 );
               })}
             </div>
 
-            {/* 2. NEW: Dynamic Categories Group */}
+            {/* 2. DYNAMIC Categories Group (Auto-updates based on Product Type) */}
             {dynamicCategories.length > 0 && (
               <div className="flex items-center gap-2 flex-nowrap pl-1">
                 {dynamicCategories.map((cat) => {
@@ -560,24 +524,12 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                 key={`${filterCategory}-${sortOption}-${searchQuery}-${discoveryMode}`}
                 className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-3 gap-y-6 sm:gap-x-4 sm:gap-y-8 md:gap-x-6 md:gap-y-12 border-t border-white/10 pt-8"
               >
-                {sortedAndFilteredProducts.slice(0, visibleCount).map((product, index) => {
-                  const isSeparator = index > 0 && index % 12 === 0;
-                  const separatorText = index === 12 ? 'Trending Right Now' : (index === 24 ? 'Customer Favorites' : 'Recently Added');
-                  
-                  return (
-                    <React.Fragment key={product.id}>
-                      {isSeparator && (
-                        <motion.div 
-                          initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
-                          className="col-span-2 md:col-span-3 lg:col-span-3 xl:col-span-4 2xl:col-span-5 py-12 md:py-16 flex items-center justify-center border-y border-white/5 my-4"
-                        >
-                          <span className="text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-brand-primary">{separatorText}</span>
-                        </motion.div>
-                      )}
-                      <motion.div 
-                        initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
-                        className="group flex flex-col hover:-translate-y-1 transition-transform duration-300"
-                      >
+                {sortedAndFilteredProducts.slice(0, visibleCount).map((product) => (
+                  <motion.div 
+                    key={product.id}
+                    initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
+                    className="group flex flex-col hover:-translate-y-1 transition-transform duration-300"
+                  >
                         <div className="relative aspect-[3/4] w-full bg-brand-card overflow-hidden mb-4 group-hover:shadow-lg group-hover:shadow-brand-primary/20 transition-shadow duration-300 border border-transparent rounded-md group-hover:border-white/10">
                           <Link href={`/product/${product.id}`} className="absolute inset-0 z-10" aria-label={`View ${product.name}`}></Link>
                           
@@ -625,21 +577,17 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
 
                           {/* CTAs */}
                           <div className="mt-auto pt-2 w-full">
-                             <a 
-                              href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(
-                                `👋 Hello ${brand.name},\n\nI was browsing your store and I'm interested in ordering this item:\n\n🛍️ *Item:* ${product.name}\n💰 *Price:* Ksh ${product.price}\n\n${brand.url}/product/${product.id}`
-                              )}`}
-                              target="_blank" rel="noreferrer"
-                              className="w-full bg-brand-primary text-black font-bold h-10 rounded-md hover:bg-brand-hover transition-colors flex justify-center items-center uppercase tracking-widest text-[10px] sm:text-xs z-20 relative"
+                             <Link 
+                              href={`/product/${product.id}`}
+                              className="w-full bg-white/5 border border-white/10 text-white font-bold h-10 rounded-md group-hover:bg-brand-primary group-hover:text-black group-hover:border-brand-primary transition-all flex justify-center items-center uppercase tracking-widest text-[10px] sm:text-xs z-20 relative"
                              >
-                               <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-2" /> WhatsApp
-                             </a>
+                               View Details
+                             </Link>
                           </div>
                         </div>
                       </motion.div>
-                    </React.Fragment>
-                  );
-                })}
+                  )
+                )}
               </div>
 
               {/* Load More System */}

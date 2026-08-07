@@ -71,12 +71,16 @@ export function NavBar() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const isTabActive = (path: string, queryType?: string) => {
+  // NEW: Extract the current type to preserve context across navigations
+  const currentType = searchParams?.get('type') || 'sneakers';
+
+  // UPDATED: Strictly check 'type' for type links, and 'category' for category links
+  const isTabActive = (path: string, queryValue?: string, paramKey: 'type' | 'category' = 'type') => {
     if (!pathname) return false;
-    if (queryType) {
-      return pathname === path && (searchParams?.get('type') === queryType || searchParams?.get('category') === queryType);
+    if (queryValue) {
+      return pathname === path && searchParams?.get(paramKey) === queryValue;
     }
-    return pathname === path && !searchParams?.get('type') && !searchParams?.get('category');
+    return pathname === path;
   };
 
   const handleSearchSubmit = (query: string) => {
@@ -84,7 +88,9 @@ export function NavBar() {
     setIsSearchOpen(false);
     setIsDesktopSearchOpen(false);
     setSearchQuery('');
-    router.push(`/shop?q=${encodeURIComponent(query.trim())}`);
+    
+    // Maintain the active product type when searching
+    router.push(`/shop?type=${currentType}&q=${encodeURIComponent(query.trim())}`);
   };
 
   useEffect(() => {
@@ -235,21 +241,21 @@ export function NavBar() {
               </div>
 
               {/* Flash Deals */}
-              <Link href="/shop?category=deals" className={`text-[10px] xl:text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/shop', 'deals') ? 'text-white' : 'text-white hover:text-[#FF0000]'}`}>
+              <Link href={`/shop?type=${currentType}&category=deals`} className={`text-[10px] xl:text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/shop', 'deals', 'category') ? 'text-white' : 'text-white hover:text-[#FF0000]'}`}>
                 Flash Deals
-                <span className={`absolute -bottom-1 left-0 w-full h-[2px] rounded-full transition-transform duration-300 origin-left ${isTabActive('/shop', 'deals') ? 'bg-[#FF0000] scale-x-100' : 'bg-[#FF0000] scale-x-0 group-hover:scale-x-100'}`}></span>
+                <span className={`absolute -bottom-1 left-0 w-full h-[2px] rounded-full transition-transform duration-300 origin-left ${isTabActive('/shop', 'deals', 'category') ? 'bg-[#FF0000] scale-x-100' : 'bg-[#FF0000] scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
 
               {/* Trending */}
-              <Link href="/shop?category=trending" className={`text-[10px] xl:text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/shop', 'trending') ? 'text-white' : 'text-white hover:text-white'}`}>
+              <Link href={`/shop?type=${currentType}&category=trending`} className={`text-[10px] xl:text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/shop', 'trending', 'category') ? 'text-white' : 'text-white hover:text-white'}`}>
                 Trending
-                <span className={`absolute -bottom-1 left-0 w-full h-[2px] rounded-full transition-transform duration-300 origin-left ${isTabActive('/shop', 'trending') ? 'bg-brand-primary scale-x-100' : 'bg-brand-primary scale-x-0 group-hover:scale-x-100'}`}></span>
+                <span className={`absolute -bottom-1 left-0 w-full h-[2px] rounded-full transition-transform duration-300 origin-left ${isTabActive('/shop', 'trending', 'category') ? 'bg-brand-primary scale-x-100' : 'bg-brand-primary scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
 
               {/* New Arrivals */}
-              <Link href="/shop?category=new-arrivals" className={`text-[10px] xl:text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/shop', 'new-arrivals') ? 'text-white' : 'text-white hover:text-white'}`}>
+              <Link href={`/shop?type=${currentType}&category=new-arrivals`} className={`text-[10px] xl:text-xs uppercase tracking-widest font-bold transition-colors relative group py-2 ${isTabActive('/shop', 'new-arrivals', 'category') ? 'text-white' : 'text-white hover:text-white'}`}>
                 New Arrivals
-                <span className={`absolute -bottom-1 left-0 w-full h-[2px] rounded-full transition-transform duration-300 origin-left ${isTabActive('/shop', 'new-arrivals') ? 'bg-brand-primary scale-x-100' : 'bg-brand-primary scale-x-0 group-hover:scale-x-100'}`}></span>
+                <span className={`absolute -bottom-1 left-0 w-full h-[2px] rounded-full transition-transform duration-300 origin-left ${isTabActive('/shop', 'new-arrivals', 'category') ? 'bg-brand-primary scale-x-100' : 'bg-brand-primary scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
             </nav>
 
