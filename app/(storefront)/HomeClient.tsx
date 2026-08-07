@@ -907,8 +907,8 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               </h2>
               <div className="flex items-center gap-3 sm:gap-4 mt-4 sm:mt-6">
                 <div className="flex -space-x-2 sm:-space-x-3">
-                  {reviewAvatars.map((src, idx) => (
-                    <Image key={idx} src={src} width={40} height={40} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white object-cover" alt={`User ${idx + 1}`} />
+                  {initialTestimonials.slice(0, 3).map((item: any, idx: number) => (
+                    <Image key={idx} src={item.profile} width={40} height={40} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white object-cover" alt={`User ${idx + 1}`} />
                   ))}
                 </div>
                 <div>
@@ -939,7 +939,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 >
                   <div className="flex justify-between items-start mb-4 sm:mb-6">
                     <div className="flex text-brand-accent">
-                      {[...Array(5)].map((_, i) => (
+                      {[...Array(8)].map((_, i) => (
                          <Star key={i} className={`w-3 h-3 sm:w-4 sm:h-4 ${i < Math.floor(review.rating) ? 'fill-current' : 'text-gray-600'}`} />
                       ))}
                     </div>
@@ -962,8 +962,8 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     />
                     <div>
                       <p className="text-white font-bold text-xs sm:text-sm tracking-wide">{review.name}</p>
-                      <p className="text-gray-400 text-[10px] sm:text-xs mt-0.5 sm:mt-1 flex items-center font-medium">
-                        Purchased: <span className="text-brand-primary ml-1">{review.product}</span>
+                      <p className="text-gray-400 text-[10px] sm:text-xs mt-0.5 sm:mt-1 flex items-center font-medium truncate max-w-[220px]">
+                        Purchased: <span className="text-brand-primary ml-1 truncate">{review.productName || 'Verified Style'}</span>
                       </p>
                     </div>
                   </div>

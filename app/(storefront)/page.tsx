@@ -1,7 +1,7 @@
 // app/(storefront)/page.tsx
 import { getDb } from '@/lib/db';
 import { products, categories, testimonials } from '@/lib/db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, and } from 'drizzle-orm';
 import { brand } from '@/lib/data/brand';
 import HomeClient from './HomeClient';
 
@@ -33,9 +33,24 @@ export default async function HomePage() {
   const heroCategories = await db.select().from(categories);
   
   const globalTestimonials = await db
-    .select()
+    .select({
+      id: testimonials.id,
+      name: testimonials.name,
+      location: testimonials.location,
+      rating: testimonials.rating,
+      text: testimonials.text,
+      profile: testimonials.profile,
+      date: testimonials.date,
+      purchased: testimonials.purchased,
+      isGlobal: testimonials.isGlobal,
+      productName: products.name, // Grabs the clean product name from products table
+    })
     .from(testimonials)
-    .where(eq(testimonials.isGlobal, true));
+    .leftJoin(products, eq(testimonials.product, products.id))
+    .where(and(
+      eq(testimonials.isGlobal, true),
+      eq(testimonials.isApproved, true)
+    ));
 
   // 3. Construct JSON-LD Schema.org Data for the Storefront Homepage
   const storeJsonLd = {
