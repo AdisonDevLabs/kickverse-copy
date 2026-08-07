@@ -8,13 +8,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronRight, Star, Minus, Plus, ShoppingBag, MessageCircle, Heart, ArrowLeft, ShieldCheck, Truck, X, HelpCircle, CheckCircle, ChevronLeft, SearchX, Quote } from 'lucide-react';
 import { formatPrice } from '@/lib/data';
-import { productReviews } from '@/lib/data/testimonials';
 import { brand } from '@/lib/data/brand';
 import { useCart } from '@/lib/CartContext';
 import { motion, AnimatePresence } from 'motion/react';
 import { fadeUp, staggerContainer, staggerItem } from '@/lib/animations';
+import { submitProductReview } from '@/app/actions/reviews';
 
-export default function ProductDetailsClient({ product, relatedProducts, recentlyViewed, sizeGuides, colorMap }: any) {
+export default function ProductDetailsClient({ product, reviews, relatedProducts, recentlyViewed, sizeGuides, colorMap }: any) {
   const router = useRouter();
   const { addToCart, setIsCartOpen } = useCart();
   
@@ -22,6 +22,10 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
   const [selectedColor, setSelectedColor] = useState<string>(product?.colors?.[0] || '');
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewForm, setReviewForm] = useState({ name: '', location: '', rating: 5, text: '' });
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
   const [activeGuideTab, setActiveGuideTab] = useState(sizeGuides?.[0]?.id || '');
 
@@ -543,44 +547,55 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
                   <span className="ml-3 text-lg font-bold text-white tracking-widest">{product.rating || '5.0'} OUT OF 5</span>
                 </div>
               </div>
-              <button className="mt-6 md:mt-0 px-8 py-4 bg-transparent border border-white text-white rounded-md font-bold uppercase tracking-widest text-xs hover:bg-white hover:text-black transition-colors">
+              <button 
+                onClick={() => setIsReviewModalOpen(true)} 
+                className="mt-6 md:mt-0 px-8 py-4 bg-transparent border border-white text-white rounded-md font-bold uppercase tracking-widest text-xs hover:bg-white hover:text-black transition-colors"
+              >
                 Write a Review
               </button>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {productReviews.map((review) => (
-                <motion.div 
-                  initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
-                  key={review.id} 
-                  className="bg-brand-card p-6 border border-white/5 flex flex-col rounded-md"
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h4 className="text-white font-bold tracking-widest uppercase text-sm">{review.name}</h4>
-                      <span className="text-gray-500 text-[10px] uppercase font-bold tracking-widest">{review.location}</span>
+              {reviews && reviews.length > 0 ? (
+                reviews.map((review: any) => (
+                  <motion.div 
+                    initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
+                    key={review.id} 
+                    className="bg-brand-card p-6 border border-white/5 flex flex-col rounded-md"
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h4 className="text-white font-bold tracking-widest uppercase text-sm">{review.name}</h4>
+                        <span className="text-gray-500 text-[10px] uppercase font-bold tracking-widest">{review.location}</span>
+                      </div>
+                      <div className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">
+                        {review.date || new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </div>
                     </div>
-                    <div className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">{review.date}</div>
-                  </div>
-                  
-                  <div className="flex mb-4 text-brand-primary">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className={`h-3 w-3 ${i < review.rating ? 'fill-current' : 'text-gray-700'}`} />
-                    ))}
-                  </div>
-                  
-                  <p className="text-gray-300 font-light text-sm italic mb-6 flex-1 bg-white/5 p-4 rounded-md relative">
-                    <Quote className="absolute top-2 left-2 text-white/5 w-8 h-8" />
-                    <span className="relative z-10">&quot;{review.text}&quot;</span>
-                  </p>
-                  
-                  {review.purchased && (
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-brand-primary flex items-center">
-                      <CheckCircle className="w-3 h-3 mr-1" /> Verified Buyer
+
+                    <div className="flex mb-4 text-brand-primary">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className={`h-3 w-3 ${i < review.rating ? 'fill-current' : 'text-gray-700'}`} />
+                      ))}
                     </div>
-                  )}
-                </motion.div>
-              ))}
+
+                    <p className="text-gray-300 font-light text-sm italic mb-6 flex-1 bg-white/5 p-4 rounded-md relative">
+                      <Quote className="absolute top-2 left-2 text-white/5 w-8 h-8" />
+                      <span className="relative z-10">&quot;{review.text}&quot;</span>
+                    </p>
+
+                    {review.purchased && (
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-brand-primary flex items-center">
+                        <CheckCircle className="w-3 h-3 mr-1" /> Verified Buyer
+                      </div>
+                    )}
+                  </motion.div>
+                ))
+              ) : (
+                <div className="col-span-full py-12 text-center border border-white/5 rounded-md bg-white/5">
+                  <p className="text-gray-400 text-sm">No reviews yet. Be the first to review this item!</p>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -744,6 +759,86 @@ export default function ProductDetailsClient({ product, relatedProducts, recentl
         </AnimatePresence>
 
       </div>
+
+      {/* Write A Review Modal */}
+      <AnimatePresence>
+        {isReviewModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsReviewModalOpen(false)} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative w-full max-w-md bg-brand-card border border-white/10 shadow-2xl rounded-md z-10 p-6">
+              
+              <div className="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
+                <h3 className="font-display text-xl uppercase tracking-wide text-white">Write a Review</h3>
+                <button onClick={() => setIsReviewModalOpen(false)} className="text-gray-400 hover:text-white"><X className="h-5 w-5" /></button>
+              </div>
+
+              {reviewSuccess ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-brand-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle className="h-8 w-8 text-brand-primary" />
+                  </div>
+                  <h4 className="text-white font-bold uppercase tracking-widest mb-2">Review Submitted</h4>
+                  <p className="text-gray-400 text-sm">Thank you! Your review has been sent for moderation and will appear shortly.</p>
+                  <button onClick={() => { setIsReviewModalOpen(false); setReviewSuccess(false); }} className="mt-6 w-full h-12 bg-white text-black font-bold uppercase tracking-widest rounded-md text-xs hover:bg-gray-200">Close</button>
+                </div>
+              ) : (
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  setIsSubmittingReview(true);
+                  // TODO: Call your Server Action here to insert into D1
+                  const result = await submitProductReview({
+                    ...reviewForm,
+                    productId: product.id
+                  });
+                  if (result.success) {
+                    setIsSubmittingReview(false); 
+                    setReviewSuccess(true);
+                  } else {
+                    // Fallback if there's an error
+                    console.error(result.error);
+                    setIsSubmittingReview(false);
+                    alert("Failed to submit review. Please try again.");
+                  }
+                }} className="space-y-4">
+                  
+                  {/* Interactive Star Rating */}
+                  <div>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Rating</label>
+                    <div className="flex gap-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button key={star} type="button" onClick={() => setReviewForm({...reviewForm, rating: star})} className="focus:outline-none">
+                          <Star className={`h-8 w-8 transition-colors ${star <= reviewForm.rating ? 'fill-brand-primary text-brand-primary' : 'text-white/10 fill-white/5 hover:text-white/30'}`} />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Name</label>
+                      <input required type="text" value={reviewForm.name} onChange={e => setReviewForm({...reviewForm, name: e.target.value})} className="w-full bg-brand-dark border border-white/10 rounded-md px-3 py-2 text-white text-sm focus:border-brand-primary focus:outline-none" placeholder="John D." />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Location</label>
+                      <input required type="text" value={reviewForm.location} onChange={e => setReviewForm({...reviewForm, location: e.target.value})} className="w-full bg-brand-dark border border-white/10 rounded-md px-3 py-2 text-white text-sm focus:border-brand-primary focus:outline-none" placeholder="Nairobi" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Your Review</label>
+                    <textarea required rows={4} value={reviewForm.text} onChange={e => setReviewForm({...reviewForm, text: e.target.value})} className="w-full bg-brand-dark border border-white/10 rounded-md px-3 py-2 text-white text-sm focus:border-brand-primary focus:outline-none resize-none" placeholder="How was the fit, quality, and delivery?" />
+                  </div>
+
+                  <button type="submit" disabled={isSubmittingReview} className="w-full h-12 bg-brand-primary text-black font-bold uppercase tracking-widest rounded-md text-xs hover:bg-brand-hover mt-4 flex items-center justify-center">
+                    {isSubmittingReview ? <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" /> : "Submit Review"}
+                  </button>
+                </form>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }

@@ -23,10 +23,7 @@ export const products = sqliteTable('products', {
   originalPrice: integer('originalPrice'),
   image: text('image').notNull(),
   images: text('images', { mode: 'json' }).$type<string[]>().notNull(),
-  
-  // Enforce the types at the ORM level using the exported array
   productType: text('product_type', { enum: productTypeEnum }).notNull().default('Sneakers'), 
-  
   category: text('category').notNull(),
   rating: real('rating').default(5.0),
   reviews: integer('reviews').default(0),
@@ -65,7 +62,8 @@ export const testimonials = sqliteTable('testimonials', {
   profile: text('profile').notNull(),
   date: text('date'),
   purchased: integer('purchased', { mode: 'boolean' }).default(false),
-  isGlobal: integer('is_global', { mode: 'boolean' }).default(false) 
+  isGlobal: integer('is_global', { mode: 'boolean' }).default(false),
+  isApproved: integer('is_approved', { mode: 'boolean' }).default(false)
 });
 
 // ==========================================

@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { brand } from '@/lib/data/brand';
 import ProductDetailsClient from './ProductDetailsClient';
 import { getDb } from '@/lib/db';
-import { products, sizeGuides, colorMap } from '@/lib/db/schema';
+import { products, testimonials, sizeGuides, colorMap } from '@/lib/db/schema';
 import { eq, and, not, sql, desc } from 'drizzle-orm'; // Added desc
 
 export const revalidate = 60;
@@ -90,6 +90,15 @@ export default async function ProductPage({ params }: Props) {
     .orderBy(desc(products.createdAt))
     .limit(12);
   
+  const productReviews = await db.select()
+    .from(testimonials)
+    .where(and(
+      eq(testimonials.product, product.id),
+      eq(testimonials.isApproved, true)
+    ))
+    .orderBy(desc(testimonials.id));
+
+
   const relatedProducts = relatedPool.sort(() => 0.5 - Math.random()).slice(0, 4);
 
   // 3. Fetch recently viewed/others (prioritize current product type, then randomize, limit 8)
@@ -105,6 +114,7 @@ export default async function ProductPage({ params }: Props) {
       desc(products.createdAt)
     )
     .limit(20);
+
 
   const recentlyViewed = recentlyViewedPool.sort(() => 0.5 - Math.random()).slice(0, 8);
 
@@ -144,6 +154,7 @@ export default async function ProductPage({ params }: Props) {
       />
       <ProductDetailsClient 
         product={product} 
+        reviews={productReviews}
         relatedProducts={relatedProducts} 
         recentlyViewed={recentlyViewed}
         sizeGuides={allSizeGuides}
