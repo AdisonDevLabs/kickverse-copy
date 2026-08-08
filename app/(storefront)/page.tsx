@@ -12,48 +12,53 @@ export default async function HomePage() {
   // 2. Await the database initialization
   const db = await getDb();
 
-  const allProducts = await db.select({
-    id: products.id,
-    name: products.name,
-    price: products.price,
-    originalPrice: products.originalPrice,
-    image: products.image,
-    productType: products.productType,
-    category: products.category,
-    rating: products.rating,
-    reviews: products.reviews,
-    isNewArrival: products.isNewArrival,
-    isBestSeller: products.isBestSeller,
-    isFlashDeal: products.isFlashDeal,
-    createdAt: products.createdAt,
-  })
-  .from(products)
-  .orderBy(desc(products.createdAt));
-  
-  const heroCategories = await db.select().from(categories);
-  
-  const globalTestimonials = await db
-    .select({
+  // --- PERFORMANCE FIX: Fire all 4 database queries concurrently! ---
+  const [allProducts, heroCategories, globalTestimonials, settingsResult] = await Promise.all([
+    
+    // Query 1: Products
+    db.select({
+      id: products.id,
+      name: products.name,
+      price: products.price,
+      originalPrice: products.originalPrice,
+      image: products.image,
+      productType: products.productType,
+      category: products.category,
+      rating: products.rating,
+      reviews: products.reviews,
+      isNewArrival: products.isNewArrival,
+      isBestSeller: products.isBestSeller,
+      isFlashDeal: products.isFlashDeal,
+      createdAt: products.createdAt,
+    })
+    .from(products)
+    .orderBy(desc(products.createdAt)),
+
+    // Query 2: Categories
+    db.select().from(categories),
+
+    // Query 3: Testimonials
+    db.select({
       id: testimonials.id,
       name: testimonials.name,
       location: testimonials.location,
       rating: testimonials.rating,
       text: testimonials.text,
       profile: testimonials.profile,
+      reviewImage: testimonials.reviewImage, // <--- IMAGE FIX: Added the missing image column!
       date: testimonials.date,
       purchased: testimonials.purchased,
       isGlobal: testimonials.isGlobal,
-      productName: products.name, // Grabs the clean product name from products table
+      productName: products.name, 
     })
     .from(testimonials)
     .leftJoin(products, eq(testimonials.product, products.id))
-    .where(and(
-      eq(testimonials.isGlobal, true),
-      eq(testimonials.isApproved, true)
-    ));
+    .where(and(eq(testimonials.isGlobal, true), eq(testimonials.isApproved, true))),
 
-  // --- NEW: Fetch Global Store Settings ---
-  const settingsResult = await db.select().from(storeSettings).where(eq(storeSettings.id, 1)).limit(1);
+    // Query 4: Store Settings
+    db.select().from(storeSettings).where(eq(storeSettings.id, 1)).limit(1)
+  ]);
+
   const storeConfig = settingsResult[0] || { 
     happyCustomersText: '500+ Happy Customers', 
     defaultAvatar: '/pexels-wedding-maps-130174465-10114295.jpg',
@@ -70,11 +75,9 @@ export default async function HomePage() {
     description: brand.description,
     address: {
       '@type': 'PostalAddress',
-      // Dynamically grabs "Nairobi" from "Nairobi, Kenya" in your brand config
       addressLocality: brand.location.split(',')[0].trim(), 
       addressCountry: 'KE',
     },
-    // Optional but highly recommended for e-commerce search results
     priceRange: 'KSh 3,000 - KSh 25,000', 
   };
 
@@ -88,7 +91,7 @@ export default async function HomePage() {
         initialProducts={allProducts} 
         initialCategories={heroCategories} 
         initialTestimonials={globalTestimonials}
-        storeConfig={storeConfig} 
+        storeSettings={storeConfig} /* <--- PROP FIX: Changed to storeSettings to match HomeClient */
       />
     </>
   );

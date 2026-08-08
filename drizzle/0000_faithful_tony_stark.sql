@@ -1,60 +1,7 @@
-CREATE TABLE `categories` (
-	`slug` text PRIMARY KEY NOT NULL,
-	`name` text NOT NULL,
-	`label` text,
-	`image` text NOT NULL,
-	`span` text
-);
---> statement-breakpoint
-CREATE TABLE `color_map` (
-	`color_name` text PRIMARY KEY NOT NULL,
-	`hex_code` text NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE `media_assets` (
-	`id` text PRIMARY KEY NOT NULL,
-	`url` text NOT NULL,
-	`file_name` text NOT NULL,
-	`is_assigned` integer DEFAULT false
-);
---> statement-breakpoint
-CREATE TABLE `products` (
-	`id` text PRIMARY KEY NOT NULL,
-	`name` text NOT NULL,
-	`price` integer NOT NULL,
-	`originalPrice` integer,
-	`image` text NOT NULL,
-	`images` text NOT NULL,
-	`product_type` text DEFAULT 'Sneakers' NOT NULL,
-	`category` text NOT NULL,
-	`rating` real DEFAULT 5,
-	`reviews` integer DEFAULT 0,
-	`sizes` text NOT NULL,
-	`colors` text NOT NULL,
-	`isNewArrival` integer DEFAULT false,
-	`isBestSeller` integer DEFAULT false,
-	`isFlashDeal` integer DEFAULT false,
-	`is_pinned` integer DEFAULT false,
-	`is_accessory` integer DEFAULT false,
-	`description` text NOT NULL,
-	`created_at` text
-);
---> statement-breakpoint
-CREATE TABLE `size_guides` (
-	`id` text PRIMARY KEY NOT NULL,
-	`name` text NOT NULL,
-	`headers` text NOT NULL,
-	`rows` text NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE `store_settings` (
-	`id` integer PRIMARY KEY NOT NULL,
-	`happy_customers_text` text DEFAULT '500+ Happy Customers' NOT NULL,
-	`default_avatar` text DEFAULT '/pexels-wedding-maps-130174465-10114295.jpg' NOT NULL,
-	`fallback_rating` text DEFAULT '4.8' NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE `testimonials` (
+PRAGMA foreign_keys=OFF;
+
+-- 1. Create the new testimonials table with the exact new schema
+CREATE TABLE `testimonials_new` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`location` text,
@@ -69,13 +16,25 @@ CREATE TABLE `testimonials` (
 	`is_global` integer DEFAULT false,
 	`is_approved` integer DEFAULT false
 );
---> statement-breakpoint
-CREATE TABLE `users` (
-	`id` text PRIMARY KEY NOT NULL,
-	`email` text NOT NULL,
-	`password_hash` text NOT NULL,
-	`reset_token` text,
-	`reset_token_expiry` integer
+
+-- 2. Safely copy your existing live reviews over to the new table
+INSERT INTO `testimonials_new` (`id`, `name`, `location`, `rating`, `text`, `product`, `profile`, `date`, `purchased`, `is_global`, `is_approved`)
+SELECT `id`, `name`, `location`, `rating`, `text`, `product`, `profile`, `date`, `purchased`, `is_global`, `is_approved` FROM `testimonials`;
+
+-- 3. Drop the old table and rename the new one into place
+DROP TABLE `testimonials`;
+ALTER TABLE `testimonials_new` RENAME TO `testimonials`;
+
+-- 4. Create the store_settings table if it hasn't been created yet
+CREATE TABLE IF NOT EXISTS `store_settings` (
+	`id` integer PRIMARY KEY NOT NULL,
+	`happy_customers_text` text DEFAULT '500+ Happy Customers' NOT NULL,
+	`default_avatar` text DEFAULT '/pexels-wedding-maps-130174465-10114295.jpg' NOT NULL,
+	`fallback_rating` text DEFAULT '4.8' NOT NULL
 );
---> statement-breakpoint
-CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);
+
+-- 5. Seed the default settings
+INSERT OR IGNORE INTO `store_settings` (`id`, `happy_customers_text`, `default_avatar`, `fallback_rating`) 
+VALUES (1, '500+ Happy Customers', '/pexels-wedding-maps-130174465-10114295.jpg', '4.8');
+
+PRAGMA foreign_keys=ON;
