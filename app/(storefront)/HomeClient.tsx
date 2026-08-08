@@ -909,7 +909,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
 
           {/* Stats - Left Aligned */}
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeLeft} className="mb-6 sm:mb-8 flex items-center">
-             <div className="flex items-center text-brand-primary bg-brand-primary/10 px-4 py-2 rounded-md border border-brand-primary/20">
+             <div className="flex items-center text-brand-primary px-4 py-2">
                <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-current mr-2.5" />
                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-white">
                  <span className="text-brand-primary text-sm sm:text-base mr-1">
@@ -970,7 +970,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                            <Star key={i} className={`w-3 h-3 sm:w-4 sm:h-4 ${i < Math.floor(review.rating) ? 'fill-current' : 'text-gray-600'}`} />
                         ))}
                       </div>
-                      <p className="text-gray-300 text-sm sm:text-base italic leading-relaxed">
+                      <p className="text-gray-300 text-sm sm:text-base italic leading-relaxed break-words">
                         &ldquo;{review.text}&rdquo;
                       </p>
                       

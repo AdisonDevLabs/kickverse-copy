@@ -23,7 +23,7 @@ export async function generateReviewUploadUrl() {
     const key = `public-reviews/${fileId}.webp`; 
     
     const command = new PutObjectCommand({
-      Bucket: "kickverse-copy-images", // Change this to your exact bucket name if different
+      Bucket: "kickverse-copy-images",
       Key: key,
       ContentType: 'image/webp' 
     });
@@ -38,23 +38,26 @@ export async function generateReviewUploadUrl() {
 
 export async function submitPublicReview(data: { 
   name: string; 
+  location: string;
   text: string; 
   rating: number; 
   productId?: string; 
   productName?: string;
   reviewImage?: string; 
+  profile?: string;
 }) {
   try {
     const db = await getDb();
     
     await db.insert(testimonials).values({
       name: data.name,
+      location: data.location,
       rating: data.rating,
       text: data.text,
       product: data.productId || null,
       productName: data.productName || null,
       reviewImage: data.reviewImage || null,
-      profile: null, // Left null so the frontend falls back to the default avatar
+      profile: data.profile || null, // Left null so the frontend falls back to the default avatar
       date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
       purchased: false, // Must be verified by admin
       isGlobal: data.productId ? false : true, // If no product, it's a global store review

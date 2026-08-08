@@ -597,7 +597,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                              <Star key={i} className={`w-3 h-3 sm:w-4 sm:h-4 ${i < Math.floor(review.rating) ? 'fill-current' : 'text-gray-600'}`} />
                           ))}
                         </div>
-                        <p className="text-gray-300 text-sm sm:text-base italic leading-relaxed">
+                        <p className="text-gray-300 text-sm sm:text-base italic leading-relaxed break-words">
                           &ldquo;{review.text}&rdquo;
                         </p>
                       </div>
