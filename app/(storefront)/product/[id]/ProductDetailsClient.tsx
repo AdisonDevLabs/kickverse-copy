@@ -6,13 +6,13 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronRight, Star, Minus, Plus, ShoppingBag, MessageCircle, Heart, ArrowLeft, ShieldCheck, Truck, X, HelpCircle, CheckCircle, ChevronLeft, SearchX, Quote } from 'lucide-react';
+import { Star, Minus, Plus, ShoppingBag, MessageCircle, ArrowLeft, ShieldCheck, Truck, X, HelpCircle, CheckCircle, SearchX } from 'lucide-react';
 import { formatPrice } from '@/lib/data';
 import { brand } from '@/lib/data/brand';
 import { useCart } from '@/lib/CartContext';
 import { motion, AnimatePresence } from 'motion/react';
-import { fadeUp, staggerContainer, staggerItem } from '@/lib/animations';
-import { submitProductReview } from '@/app/actions/reviews';
+import { fadeUp, fadeLeft, staggerContainer, staggerItem } from '@/lib/animations';
+import { PublicReviewModal } from '@/components/PublicReviewModal';
 
 export default function ProductDetailsClient({ product, reviews, relatedProducts, recentlyViewed, sizeGuides, colorMap }: any) {
   const router = useRouter();
@@ -22,10 +22,10 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
   const [selectedColor, setSelectedColor] = useState<string>(product?.colors?.[0] || '');
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
+  
+  // Universal Modal Trigger State
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-  const [reviewForm, setReviewForm] = useState({ name: '', location: '', rating: 5, text: '' });
-  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
-  const [reviewSuccess, setReviewSuccess] = useState(false);
+  
   const [showSizeGuide, setShowSizeGuide] = useState(false);
   const [activeGuideTab, setActiveGuideTab] = useState(sizeGuides?.[0]?.id || '');
 
@@ -310,12 +310,12 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                     {[1,2,3,4,5].map((s) => (
                       <Star key={s} className={`h-4 w-4 ${s <= (product.rating || 5) ? 'fill-current' : 'text-gray-600'}`} />
                     ))}
-                    <span className="ml-2 text-sm font-bold text-white tracking-widest">{product.rating || '5.0'}</span>
+                    <span className="ml-2 text-sm font-bold text-white tracking-widest">{product.rating ? Number(product.rating).toFixed(1) : '5.0'}</span>
                   </div>
                   <div className="w-1 h-1 rounded-full bg-white/20"></div>
-                  <Link href="#reviews" className="text-xs font-bold text-gray-400 uppercase tracking-widest hover:text-white underline underline-offset-4">
-                    {product.reviews || '120'} Reviews
-                  </Link>
+                  <button onClick={() => document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs font-bold text-gray-400 uppercase tracking-widest hover:text-white underline underline-offset-4">
+                    {reviews?.length || product.reviews || 0} Reviews
+                  </button>
                   <div className="w-1 h-1 rounded-full bg-white/20"></div>
                   <span className="text-xs font-bold uppercase tracking-widest text-brand-primary flex items-center">
                     <CheckCircle className="w-3 h-3 mr-1" /> In Stock
@@ -531,105 +531,128 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
           </div>
         </div>
 
-        {/* Customer Reviews Section */}
-        <section id="reviews" className="border-t border-white/10 bg-brand-dark py-20 px-6">
-          <div className="max-w-7xl mx-auto">
-            <motion.div 
-              initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
-              className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12"
-            >
-              <div>
-                <h2 className="font-display uppercase tracking-wide text-3xl md:text-5xl text-white mb-4">Why Customers Love It</h2>
-                <div className="flex items-center text-brand-primary">
-                  {[1,2,3,4,5].map((s) => (
-                    <Star key={s} className="h-5 w-5 fill-current" />
-                  ))}
-                  <span className="ml-3 text-lg font-bold text-white tracking-widest">{product.rating || '5.0'} OUT OF 5</span>
-                </div>
-              </div>
-              <button 
-                onClick={() => setIsReviewModalOpen(true)} 
-                className="mt-6 md:mt-0 px-8 py-4 bg-transparent border border-white text-white rounded-md font-bold uppercase tracking-widest text-xs hover:bg-white hover:text-black transition-colors"
-              >
-                Write a Review
-              </button>
+        {/* Customer Reviews Section (3-Tier Card Redesign) */}
+        <section id="reviews" className="py-12 sm:py-16 md:py-24 bg-brand-dark relative overflow-hidden border-t border-white/10 px-4 sm:px-6">
+          <div className="max-w-7xl mx-auto relative z-10">
+            
+            {/* Header - Centered Title & Subtitle */}
+            <div className="flex flex-col items-center text-center mb-8 sm:mb-12">
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}>
+                <h2 className="font-display uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-2 sm:mb-4">
+                  WHAT OUR CUSTOMERS SAY
+                </h2>
+                <p className="text-gray-400 max-w-2xl mx-auto font-medium text-xs sm:text-sm md:text-lg mb-6">
+                  Real experiences from verified buyers of this style
+                </p>
+              </motion.div>
+            </div>
+
+            {/* Product Specific Rating Stats */}
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeLeft} className="mb-6 sm:mb-8 flex items-center">
+               <div className="flex items-center text-brand-primary bg-brand-primary/10 px-4 py-2 rounded-md border border-brand-primary/20">
+                 <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-current mr-2.5" />
+                 <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-white">
+                   <span className="text-brand-primary text-sm sm:text-base mr-1">
+                     {product.rating ? Number(product.rating).toFixed(1) : "5.0"}/5
+                   </span> 
+                   from {reviews?.length || 0} verified reviews
+                 </span>
+               </div>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Reviews Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {reviews && reviews.length > 0 ? (
-                reviews.map((review: any) => (
-                  <motion.div 
-                    initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
-                    key={review.id} 
-                    className="bg-brand-card p-6 border border-white/5 flex flex-col rounded-md"
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h4 className="text-white font-bold tracking-widest uppercase text-sm">{review.name}</h4>
-                        <span className="text-gray-500 text-[10px] uppercase font-bold tracking-widest">{review.location}</span>
+                reviews.map((review: any, idx: number) => {
+                  const reviewImages = review.reviewImage ? review.reviewImage.split(',').slice(0, 2) : [];
+                  return (
+                    <motion.div 
+                      initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
+                      key={`${review.id}-${idx}`} 
+                      className="bg-brand-card border border-white/5 hover:border-brand-primary/30 p-5 sm:p-6 flex flex-col group/review rounded-xl transition-all duration-500 shadow-xl"
+                    >
+                      {/* --- TOP SECTION: Identity --- */}
+                      <div className="flex justify-between items-center mb-5">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 relative rounded-full overflow-hidden border border-white/10 shrink-0 bg-black">
+                            <Image src={review.profile || '/pexels-wedding-maps-130174465-10114295.jpg'} alt={review.name} fill className="object-cover" />
+                          </div>
+                          <div className="flex flex-col">
+                            <h4 className="text-white font-bold text-sm sm:text-base tracking-wide leading-tight">{review.name}</h4>
+                            <p className="text-gray-500 text-[9px] sm:text-[10px] uppercase tracking-widest mt-0.5">{review.date || 'Recently'}</p>
+                          </div>
+                        </div>
+                        
+                        {review.purchased && (
+                          <div className="bg-brand-primary/10 text-brand-primary text-[8px] sm:text-[9px] font-bold px-2 py-1 uppercase rounded-md tracking-widest flex items-center border border-brand-primary/20 shrink-0">
+                            <CheckCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" /> Verified
+                          </div>
+                        )}
                       </div>
-                      <div className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">
-                        {review.date || new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+
+                      {/* --- MIDDLE SECTION: Content --- */}
+                      <div className="flex flex-col flex-1 mb-2">
+                        <div className="flex text-brand-accent mb-3">
+                          {[...Array(5)].map((_, i) => (
+                             <Star key={i} className={`w-3 h-3 sm:w-4 sm:h-4 ${i < Math.floor(review.rating) ? 'fill-current' : 'text-gray-600'}`} />
+                          ))}
+                        </div>
+                        <p className="text-gray-300 text-sm sm:text-base italic leading-relaxed">
+                          &ldquo;{review.text}&rdquo;
+                        </p>
                       </div>
-                    </div>
 
-                    <div className="flex mb-4 text-brand-primary">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className={`h-3 w-3 ${i < review.rating ? 'fill-current' : 'text-gray-700'}`} />
-                      ))}
-                    </div>
-
-                    <p className="text-gray-300 font-light text-sm italic mb-6 flex-1 bg-white/5 p-4 rounded-md relative">
-                      <Quote className="absolute top-2 left-2 text-white/5 w-8 h-8" />
-                      <span className="relative z-10">&quot;{review.text}&quot;</span>
-                    </p>
-
-                    {review.purchased && (
-                      <div className="text-[10px] font-bold uppercase tracking-widest text-brand-primary flex items-center">
-                        <CheckCircle className="w-3 h-3 mr-1" /> Verified Buyer
-                      </div>
-                    )}
-                  </motion.div>
-                ))
+                      {/* --- BOTTOM SECTION: Media --- */}
+                      {reviewImages.length > 0 && (
+                        <div className="mt-5 pt-4 border-t border-white/5">
+                          <p className="text-[9px] text-gray-500 uppercase tracking-widest mb-2 font-bold">
+                            Customer Photo{reviewImages.length > 1 ? 's' : ''}
+                          </p>
+                          <div className="flex gap-2">
+                            {reviewImages.map((imgUrl: string, imgIdx: number) => (
+                              <div key={imgIdx} className="relative h-24 sm:h-28 flex-1 rounded-md overflow-hidden border border-white/10 bg-black">
+                                <Image src={imgUrl.trim()} alt={`Review Image ${imgIdx + 1}`} fill className="object-cover" />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })
               ) : (
-                <div className="col-span-full py-12 text-center border border-white/5 rounded-md bg-white/5">
-                  <p className="text-gray-400 text-sm">No reviews yet. Be the first to review this item!</p>
+                <div className="col-span-full py-12 text-center border border-white/5 rounded-xl bg-white/5">
+                  <p className="text-gray-400 text-sm font-medium">No reviews yet for this style. Be the first to review this item!</p>
                 </div>
               )}
             </div>
+
+            {/* --- BOTTOM PAGE SECTION: Call to Action --- */}
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} className="mt-10 sm:mt-16 flex justify-center">
+               <button 
+                 onClick={() => setIsReviewModalOpen(true)}
+                 className="inline-flex h-10 sm:h-12 px-6 sm:px-8 bg-transparent border-2 border-brand-primary text-brand-primary font-bold text-xs sm:text-sm rounded-md items-center justify-center hover:bg-brand-primary hover:text-black transition-all uppercase tracking-widest cursor-pointer"
+               >
+                 <MessageCircle className="mr-2 w-4 h-4 sm:w-5 sm:h-5" /> Share Your Experience
+               </button>
+            </motion.div>
           </div>
         </section>
 
-        {/* ZONE 1: Substitute Products (Changed title from "Complete the look" to "You Might Also Like") */}
+        {/* You Might Also Like */}
         {relatedProducts.length > 0 && (
           <section className="py-20 bg-brand-card border-t border-white/10 px-6">
             <div className="max-w-7xl mx-auto">
-              <motion.h2 
-                initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
-                className="font-display uppercase tracking-wide text-3xl md:text-5xl text-center mb-12 text-white"
-              >
-                You Might Also Like
-              </motion.h2>
+              <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} className="font-display uppercase tracking-wide text-3xl md:text-5xl text-center mb-12 text-white">You Might Also Like</motion.h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 {relatedProducts.map((prod: any) => (
-                  <motion.div 
-                    initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
-                    key={prod.id}
-                  >
+                  <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} key={prod.id}>
                     <Link href={`/product/${prod.id}`} className="group flex flex-col hover:-translate-y-1 transition-transform duration-300">
                       <div className="relative aspect-[3/4] w-full bg-brand-dark overflow-hidden rounded-md mb-4 border border-transparent group-hover:border-white/10">
-                        <Image
-                          src={prod.image}
-                          alt={prod.name}
-                          fill
-                          referrerPolicy="no-referrer"
-                          className="object-cover group-hover:scale-[1.03] opacity-90 group-hover:opacity-100 transition-transform duration-700"
-                        />
+                        <Image src={prod.image} alt={prod.name} fill referrerPolicy="no-referrer" className="object-cover group-hover:scale-[1.03] opacity-90 group-hover:opacity-100 transition-transform duration-700" />
                       </div>
                       <div className="text-left w-full mt-auto">
-                        <h3 className="font-sans font-medium text-white line-clamp-2 mb-1 group-hover:text-brand-primary transition-colors text-sm sm:text-base leading-tight">
-                          {prod.name}
-                        </h3>
+                        <h3 className="font-sans font-medium text-white line-clamp-2 mb-1 group-hover:text-brand-primary transition-colors text-sm sm:text-base leading-tight">{prod.name}</h3>
                         <div className="font-sans font-medium text-white text-sm">{formatPrice(prod.price)}</div>
                       </div>
                     </Link>
@@ -643,18 +666,10 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
         {/* Recently Viewed */}
         <section className="py-20 bg-brand-dark border-t border-white/10 px-6">
           <div className="max-w-7xl mx-auto">
-            <motion.h2 
-              initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
-              className="text-xs uppercase font-bold tracking-[0.2em] text-gray-500 mb-8 border-b border-white/10 pb-4"
-            >
-              More To Discover
-            </motion.h2>
+            <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} className="text-xs uppercase font-bold tracking-[0.2em] text-gray-500 mb-8 border-b border-white/10 pb-4">More To Discover</motion.h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4">
                 {recentlyViewed.map((prod: any) => (
-                  <motion.div 
-                    initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
-                    key={prod.id}
-                  >
+                  <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} key={prod.id}>
                     <Link href={`/product/${prod.id}`} className="group">
                       <div className="relative aspect-square w-full bg-brand-card rounded-md overflow-hidden border border-white/5 group-hover:border-white/20 transition-colors">
                         <Image src={prod.image} alt={prod.name} fill className="object-cover" referrerPolicy="no-referrer" />
@@ -670,87 +685,36 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
         <AnimatePresence>
           {showSizeGuide && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setShowSizeGuide(false)}
-                className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-              />
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="relative w-full max-w-lg bg-brand-card border border-white/10 shadow-2xl overflow-hidden rounded-md z-10"
-              >
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowSizeGuide(false)} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+              <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative w-full max-w-lg bg-brand-card border border-white/10 shadow-2xl overflow-hidden rounded-md z-10">
                 <div className="flex justify-between items-center p-6 border-b border-white/10 bg-brand-dark">
                   <h3 className="font-display text-2xl uppercase tracking-wide text-white">Size Guide</h3>
-                  <button
-                    onClick={() => setShowSizeGuide(false)}
-                    className="p-2 bg-transparent hover:bg-white/10 rounded-md text-white transition-colors"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
+                  <button onClick={() => setShowSizeGuide(false)} className="p-2 bg-transparent hover:bg-white/10 rounded-md text-white transition-colors"><X className="h-5 w-5" /></button>
                 </div>
                 <div className="p-6">
-                  <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-                    Our products generally run true to size. If you are between sizes, we recommend ordering a size up.
-                  </p>
-                  
+                  <p className="text-sm text-gray-400 mb-6 leading-relaxed">Our products generally run true to size. If you are between sizes, we recommend ordering a size up.</p>
                   <div className="overflow-x-auto print:overflow-visible rounded-md border border-white/10">
                     {sizeGuides && sizeGuides.length > 1 && (
                       <div className="flex gap-2 p-4 border-b border-white/10 bg-white/5">
                         {sizeGuides.map((guide: any) => (
-                          <button
-                            key={guide.id}
-                            onClick={() => setActiveGuideTab(guide.id)}
-                            className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-md transition-colors ${
-                              activeGuideTab === guide.id ? 'bg-brand-primary text-black' : 'text-gray-400 hover:text-white bg-white/5'
-                            }`}
-                          >
-                            {guide.name}
-                          </button>
+                          <button key={guide.id} onClick={() => setActiveGuideTab(guide.id)} className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-md transition-colors ${activeGuideTab === guide.id ? 'bg-brand-primary text-black' : 'text-gray-400 hover:text-white bg-white/5'}`}>{guide.name}</button>
                         ))}
                       </div>
                     )}
-
                     <table className="w-full text-left text-sm whitespace-nowrap">
                       <thead>
                         <tr className="border-b border-white/10 bg-white/5">
-                          {(() => {
-                            const activeGuide = sizeGuides?.find((g: any) => g.id === activeGuideTab) || sizeGuides?.[0];
-                            return activeGuide?.headers?.map((header: string, idx: number) => (
-                              <th key={idx} className="px-4 py-3 font-bold text-white uppercase tracking-widest text-[10px]">
-                                {header}
-                              </th>
-                            ));
-                          })()}
+                          {(() => { const activeGuide = sizeGuides?.find((g: any) => g.id === activeGuideTab) || sizeGuides?.[0]; return activeGuide?.headers?.map((header: string, idx: number) => (<th key={idx} className="px-4 py-3 font-bold text-white uppercase tracking-widest text-[10px]">{header}</th>)); })()}
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/5">
-                        {(() => {
-                          const activeGuide = sizeGuides?.find((g: any) => g.id === activeGuideTab) || sizeGuides?.[0];
-                          return activeGuide?.rows?.map((row: string[], rowIdx: number) => (
-                            <tr key={rowIdx} className="hover:bg-white/5 transition-colors text-gray-300">
-                              {row.map((cell: string, cellIdx: number) => (
-                                <td key={cellIdx} className={`px-4 py-3 ${cellIdx === 0 ? 'font-bold text-brand-primary' : ''}`}>
-                                  {cell}
-                                </td>
-                              ))}
-                            </tr>
-                          ));
-                        })()}
+                        {(() => { const activeGuide = sizeGuides?.find((g: any) => g.id === activeGuideTab) || sizeGuides?.[0]; return activeGuide?.rows?.map((row: string[], rowIdx: number) => (<tr key={rowIdx} className="hover:bg-white/5 transition-colors text-gray-300">{row.map((cell: string, cellIdx: number) => (<td key={cellIdx} className={`px-4 py-3 ${cellIdx === 0 ? 'font-bold text-brand-primary' : ''}`}>{cell}</td>))}</tr>)); })()}
                       </tbody>
                     </table>
                   </div>
-                  
                   <div className="mt-8 bg-brand-primary/10 border border-brand-primary/20 p-4 flex items-start gap-4 rounded-md">
                     <MessageCircle className="w-6 h-6 text-brand-primary shrink-0" />
-                    <div>
-                      <h4 className="text-xs font-bold uppercase tracking-widest text-brand-primary mb-1">Still Unsure?</h4>
-                      <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-3 leading-relaxed">Send us a message and we&apos;ll help you find your perfect fit.</p>
-                      <a href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent("I need help with sizing/options!")}`} target="_blank" rel="noreferrer" className="text-xs font-bold text-white hover:text-brand-primary underline underline-offset-4 uppercase tracking-widest">Chat on WhatsApp</a>
-                    </div>
+                    <div><h4 className="text-xs font-bold uppercase tracking-widest text-brand-primary mb-1">Still Unsure?</h4><p className="text-[10px] uppercase tracking-widest text-gray-400 mb-3 leading-relaxed">Send us a message and we&apos;ll help you find your perfect fit.</p><a href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent("I need help with sizing/options!")}`} target="_blank" rel="noreferrer" className="text-xs font-bold text-white hover:text-brand-primary underline underline-offset-4 uppercase tracking-widest">Chat on WhatsApp</a></div>
                   </div>
                 </div>
               </motion.div>
@@ -760,84 +724,13 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
 
       </div>
 
-      {/* Write A Review Modal */}
-      <AnimatePresence>
-        {isReviewModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsReviewModalOpen(false)} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative w-full max-w-md bg-brand-card border border-white/10 shadow-2xl rounded-md z-10 p-6">
-              
-              <div className="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
-                <h3 className="font-display text-xl uppercase tracking-wide text-white">Write a Review</h3>
-                <button onClick={() => setIsReviewModalOpen(false)} className="text-gray-400 hover:text-white"><X className="h-5 w-5" /></button>
-              </div>
-
-              {reviewSuccess ? (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-brand-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle className="h-8 w-8 text-brand-primary" />
-                  </div>
-                  <h4 className="text-white font-bold uppercase tracking-widest mb-2">Review Submitted</h4>
-                  <p className="text-gray-400 text-sm">Thank you! Your review has been sent for moderation and will appear shortly.</p>
-                  <button onClick={() => { setIsReviewModalOpen(false); setReviewSuccess(false); }} className="mt-6 w-full h-12 bg-white text-black font-bold uppercase tracking-widest rounded-md text-xs hover:bg-gray-200">Close</button>
-                </div>
-              ) : (
-                <form onSubmit={async (e) => {
-                  e.preventDefault();
-                  setIsSubmittingReview(true);
-                  // TODO: Call your Server Action here to insert into D1
-                  const result = await submitProductReview({
-                    ...reviewForm,
-                    productId: product.id
-                  });
-                  if (result.success) {
-                    setIsSubmittingReview(false); 
-                    setReviewSuccess(true);
-                  } else {
-                    // Fallback if there's an error
-                    console.error(result.error);
-                    setIsSubmittingReview(false);
-                    alert("Failed to submit review. Please try again.");
-                  }
-                }} className="space-y-4">
-                  
-                  {/* Interactive Star Rating */}
-                  <div>
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Rating</label>
-                    <div className="flex gap-2">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button key={star} type="button" onClick={() => setReviewForm({...reviewForm, rating: star})} className="focus:outline-none">
-                          <Star className={`h-8 w-8 transition-colors ${star <= reviewForm.rating ? 'fill-brand-primary text-brand-primary' : 'text-white/10 fill-white/5 hover:text-white/30'}`} />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Name</label>
-                      <input required type="text" value={reviewForm.name} onChange={e => setReviewForm({...reviewForm, name: e.target.value})} className="w-full bg-brand-dark border border-white/10 rounded-md px-3 py-2 text-white text-sm focus:border-brand-primary focus:outline-none" placeholder="John D." />
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Location</label>
-                      <input required type="text" value={reviewForm.location} onChange={e => setReviewForm({...reviewForm, location: e.target.value})} className="w-full bg-brand-dark border border-white/10 rounded-md px-3 py-2 text-white text-sm focus:border-brand-primary focus:outline-none" placeholder="Nairobi" />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Your Review</label>
-                    <textarea required rows={4} value={reviewForm.text} onChange={e => setReviewForm({...reviewForm, text: e.target.value})} className="w-full bg-brand-dark border border-white/10 rounded-md px-3 py-2 text-white text-sm focus:border-brand-primary focus:outline-none resize-none" placeholder="How was the fit, quality, and delivery?" />
-                  </div>
-
-                  <button type="submit" disabled={isSubmittingReview} className="w-full h-12 bg-brand-primary text-black font-bold uppercase tracking-widest rounded-md text-xs hover:bg-brand-hover mt-4 flex items-center justify-center">
-                    {isSubmittingReview ? <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" /> : "Submit Review"}
-                  </button>
-                </form>
-              )}
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      {/* Universal Public Review Modal */}
+      <PublicReviewModal 
+        isOpen={isReviewModalOpen} 
+        onClose={() => setIsReviewModalOpen(false)} 
+        productId={product.id} 
+        productName={product.name} 
+      />
 
     </div>
   );

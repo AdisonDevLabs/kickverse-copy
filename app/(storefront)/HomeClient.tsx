@@ -10,6 +10,7 @@ import { fadeUp, fadeLeft, heroReveal, staggerContainer, staggerItem } from '@/l
 import { ArrowRight, Star, ShoppingBag, Truck, ShieldCheck, Clock, MessageCircle, Flame, Eye, Zap, Sparkles, Wallet, CheckCircle, Heart, Tag, Grid } from 'lucide-react';
 import { formatPrice } from '@/lib/data';
 import { brand } from '@/lib/data/brand';
+import { PublicReviewModal } from '@/components/PublicReviewModal';
 
 // Define the props we expect from the server
 export default function HomeClient({ initialProducts, initialCategories, initialTestimonials, storeSettings }: any) {
@@ -22,6 +23,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
   const copyWidthRef = useRef(0); // Holds the exact pixel width of 1 copy (including gaps)
   const isPausedRef = useRef(false);
   const interactionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   const [timeLeft, setTimeLeft] = useState(0);
   const [mounted, setMounted] = useState(false);
@@ -892,48 +894,35 @@ export default function HomeClient({ initialProducts, initialCategories, initial
       {/* Customer Reviews Section */}
       <section className="py-12 sm:py-16 md:py-24 bg-brand-dark relative overflow-hidden border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
-          <div className="flex flex-col md:flex-row justify-between md:items-end mb-8 sm:mb-12 md:mb-16">
+          
+          {/* Header - Centered Title & Subtitle */}
+          <div className="flex flex-col items-center text-center mb-8 sm:mb-12">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}>
-              <div className="inline-flex items-center text-brand-primary mb-2 sm:mb-4">
-                <Heart className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-                <span className="text-[9px] sm:text-xs font-bold uppercase tracking-widest">
-                  {brand.sections?.reviews?.badge || "Real Customer Reviews"}
-                </span>
-              </div>
-              <h2 className="font-display uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-3 sm:mb-6">
-                {brand.sections?.reviews?.titleTop || "WHAT OUR"} <br className="hidden md:block"/>
-                {brand.sections?.reviews?.titleBottom || "CUSTOMERS SAY"}
+              <h2 className="font-display uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-2 sm:mb-4">
+                WHAT OUR CUSTOMERS SAY
               </h2>
-              
-              <div className="flex items-center gap-3 sm:gap-4 mt-4 sm:mt-6">
-                <div className="flex -space-x-2 sm:-space-x-3">
-                  {/* DYNAMIC: Maps the first 3 overlapping avatars directly from the testimonials table's profile column */}
-                  {initialTestimonials.slice(0, 3).map((item: any, idx: number) => (
-                    <Image 
-                      key={idx} 
-                      src={item.profile || '/pexels-wedding-maps-130174465-10114295.jpg'} 
-                      width={40} 
-                      height={40} 
-                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white object-cover bg-brand-dark" 
-                      alt={`User ${idx + 1}`} 
-                    />
-                  ))}
-                </div>
-                <div>
-                  <div className="flex text-brand-accent mb-1">
-                    {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 sm:w-4 sm:h-4 fill-current" />)}
-                  </div>
-                  {/* DYNAMIC: Calculates real average rating + uses storeSettings for the marketing text */}
-                  <p className="text-white text-[8px] sm:text-[10px] md:text-xs font-bold tracking-widest uppercase">
-                    {initialTestimonials.length > 0 
-                      ? (initialTestimonials.reduce((acc: number, curr: any) => acc + curr.rating, 0) / initialTestimonials.length).toFixed(1) 
-                      : storeSettings?.fallbackRating || "4.8"}/5 Average Rating • {storeSettings?.happyCustomersText || "500+ Happy Customers"}
-                  </p>
-                </div>
-              </div>
+              <p className="text-gray-400 max-w-2xl mx-auto font-medium text-xs sm:text-sm md:text-lg mb-6">
+                Real experiences from our customers
+              </p>
             </motion.div>
           </div>
 
+          {/* Stats - Left Aligned */}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeLeft} className="mb-6 sm:mb-8 flex items-center">
+             <div className="flex items-center text-brand-primary bg-brand-primary/10 px-4 py-2 rounded-md border border-brand-primary/20">
+               <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-current mr-2.5" />
+               <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-white">
+                 <span className="text-brand-primary text-sm sm:text-base mr-1">
+                   {initialTestimonials.length > 0 
+                    ? (initialTestimonials.reduce((acc: number, curr: any) => acc + curr.rating, 0) / initialTestimonials.length).toFixed(1) 
+                    : storeSettings?.fallbackRating || "4.8"}/5
+                 </span> 
+                 from {storeSettings?.happyCustomersText || "500+ happy customers"}
+               </span>
+             </div>
+          </motion.div>
+
+          {/* Marquee Carousel */}
           <div className="overflow-hidden pb-4 sm:pb-8 md:pb-0 -mx-4 sm:-mx-6 px-4 sm:px-6 md:mx-0 md:px-0 relative group">
             {/* Edge fades for seamless look */}
             <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-r from-brand-dark to-transparent z-10 pointer-events-none hidden md:block" />
@@ -945,54 +934,86 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               transition={{ repeat: Infinity, ease: "linear", duration: 40 }}
             >
               {/* Map over the initialTestimonials passed from the server */}
-              {[...initialTestimonials, ...initialTestimonials, ...initialTestimonials, ...initialTestimonials].map((review: any, idx: number) => (
-                <div 
-                  key={`${review.id}-${idx}`} 
-                  className="w-[80vw] sm:w-[350px] md:w-[400px] shrink-0 bg-brand-card border border-white/5 hover:border-brand-primary/30 p-4 sm:p-5 md:p-6 flex flex-col group/review rounded-md transition-all duration-500 hover:-translate-y-2"
-                >
-                  <div className="flex justify-between items-start mb-4 sm:mb-6">
-                    <div className="flex text-brand-accent">
-                      {/* FIXED: Changed from Array(8) back to Array(5) */}
-                      {[...Array(5)].map((_, i) => (
-                         <Star key={i} className={`w-3 h-3 sm:w-4 sm:h-4 ${i < Math.floor(review.rating) ? 'fill-current' : 'text-gray-600'}`} />
-                      ))}
+              {[...initialTestimonials, ...initialTestimonials, ...initialTestimonials, ...initialTestimonials].map((review: any, idx: number) => {
+                
+                // Safely extract up to 2 review images from the schema's text column
+                const reviewImages = review.reviewImage ? review.reviewImage.split(',').slice(0, 2) : [];
+
+                return (
+                  <div 
+                    key={`${review.id}-${idx}`} 
+                    className="w-[85vw] sm:w-[380px] md:w-[420px] shrink-0 bg-brand-card border border-white/5 hover:border-brand-primary/30 p-5 sm:p-6 flex flex-col group/review rounded-xl transition-all duration-500 hover:-translate-y-2 shadow-xl"
+                  >
+                    {/* --- TOP SECTION: Identity --- */}
+                    <div className="flex justify-between items-center mb-5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 relative rounded-full overflow-hidden border border-white/10 shrink-0 bg-black">
+                          <Image src={review.profile || storeSettings?.defaultAvatar || '/pexels-wedding-maps-130174465-10114295.jpg'} alt={review.name} fill className="object-cover" />
+                        </div>
+                        <div className="flex flex-col">
+                          <h4 className="text-white font-bold text-sm sm:text-base tracking-wide leading-tight">{review.name}</h4>
+                          <p className="text-gray-500 text-[9px] sm:text-[10px] uppercase tracking-widest mt-0.5">{review.date || 'Recently'}</p>
+                        </div>
+                      </div>
+                      
+                      {review.purchased && (
+                        <div className="bg-brand-primary/10 text-brand-primary text-[8px] sm:text-[9px] font-bold px-2 py-1 uppercase rounded-md tracking-widest flex items-center border border-brand-primary/20 shrink-0">
+                          <CheckCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" /> Verified
+                        </div>
+                      )}
                     </div>
-                    {/* DYNAMIC: Only show the 'Verified Order' badge if 'purchased' is true in the DB */}
-                    {review.purchased && (
-                      <div className="bg-brand-primary/10 text-brand-primary text-[8px] sm:text-[10px] right-3 font-bold px-1.5 py-0.5 sm:px-2 sm:py-1 uppercase rounded-sm sm:rounded-md tracking-widest flex items-center border border-brand-primary/20">
-                        <CheckCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" /> Verified Order
+
+                    {/* --- MIDDLE SECTION: Content --- */}
+                    <div className="flex flex-col flex-1 mb-2">
+                      <div className="flex text-brand-accent mb-3">
+                        {[...Array(5)].map((_, i) => (
+                           <Star key={i} className={`w-3 h-3 sm:w-4 sm:h-4 ${i < Math.floor(review.rating) ? 'fill-current' : 'text-gray-600'}`} />
+                        ))}
+                      </div>
+                      <p className="text-gray-300 text-sm sm:text-base italic leading-relaxed">
+                        &ldquo;{review.text}&rdquo;
+                      </p>
+                      
+                      {/* Original Product Snapshot Reference */}
+                      {review.productName && (
+                        <p className="text-gray-400 text-[10px] sm:text-xs mt-3 flex items-center font-medium w-full max-w-[220px] sm:max-w-[260px]">
+                          <span className="whitespace-nowrap shrink-0 mr-1">Purchased:</span> 
+                          <span className="text-brand-primary truncate block">{review.productName}</span>
+                        </p>
+                      )}
+                    </div>
+
+                    {/* --- BOTTOM SECTION: Media --- */}
+                    {reviewImages.length > 0 && (
+                      <div className="mt-5 pt-4 border-t border-white/5">
+                        <p className="text-[9px] text-gray-500 uppercase tracking-widest mb-2 font-bold">
+                          Customer Photo{reviewImages.length > 1 ? 's' : ''}
+                        </p>
+                        <div className="flex gap-2">
+                          {reviewImages.map((imgUrl: string, imgIdx: number) => (
+                            <div key={imgIdx} className="relative h-24 sm:h-28 flex-1 rounded-md overflow-hidden border border-white/10 bg-black">
+                              <Image src={imgUrl.trim()} alt={`Review Image ${imgIdx + 1}`} fill className="object-cover" />
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
-                  
-                  <p className="text-gray-300 text-sm sm:text-base md:text-lg italic mb-6 sm:mb-8 flex-1 leading-relaxed">
-                    &ldquo;{review.text}&rdquo;
-                  </p>
-                  
-                  <div className="flex items-center gap-3 sm:gap-4 mt-auto">
-                    {/* DYNAMIC: Fetches the individual user's profile image */}
-                    <Image
-                      src={review.profile || '/pexels-wedding-maps-130174465-10114295.jpg'}
-                      alt={review.name}
-                      width={48}
-                      height={48}
-                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-white/10 group-hover/review:border-brand-primary/50 transition-colors bg-brand-dark"
-                    />
-                    <div>
-                      <p className="text-white font-bold text-xs sm:text-sm tracking-wide">{review.name}</p>
-                      {/* BULLETPROOF TRUNCATION LAYOUT */}
-                      <p className="text-gray-400 text-[10px] sm:text-xs mt-0.5 sm:mt-1 flex items-center font-medium w-full max-w-[220px] sm:max-w-[260px]">
-                        <span className="whitespace-nowrap shrink-0 mr-1">Purchased:</span> 
-                        <span className="text-brand-primary truncate block">
-                          {review.productName || 'Verified Style'}
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </motion.div>
           </div>
+
+          {/* --- BOTTOM PAGE SECTION: Call to Action --- */}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} className="mt-10 sm:mt-16 flex justify-center">
+             <button 
+               onClick={() => setIsReviewModalOpen(true)}
+               className="inline-flex h-10 sm:h-12 px-6 sm:px-8 bg-transparent border-2 border-brand-primary text-brand-primary font-bold text-xs sm:text-sm rounded-md items-center justify-center hover:bg-brand-primary hover:text-black transition-all uppercase tracking-widest cursor-pointer"
+             >
+               <MessageCircle className="mr-2 w-4 h-4 sm:w-5 sm:h-5" /> Share Your Experience
+             </button>
+          </motion.div>
+
         </div>
       </section>
 
@@ -1134,6 +1155,13 @@ export default function HomeClient({ initialProducts, initialCategories, initial
           </div>
         </div>
       </section>
+{/* Universal Review Modal */}
+      <PublicReviewModal 
+        isOpen={isReviewModalOpen} 
+        onClose={() => setIsReviewModalOpen(false)} 
+        // No productId passed here, so it automatically registers as a global store review!
+      />
+
     </div>
   );
 }

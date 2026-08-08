@@ -70,52 +70,27 @@ export default async function ProductPage({ params }: Props) {
     return <ProductDetailsClient product={null} relatedProducts={[]} recentlyViewed={[]} accessories={[]} />;
   }
 
-  const allSizeGuides = await db.select().from(sizeGuides);
-  const allColorMaps = await db.select().from(colorMap);
-
-  // 2. ZONE 1: Substitute Products (Same type, NOT an accessory)
-  // Fix: Fetch 12 newest items predictably, then shuffle in memory to save DB reads
-  const relatedPool = await db.select({
-    id: products.id,
-    name: products.name,
-    price: products.price,
-    image: products.image,
-  })
-    .from(products)
-    .where(and(
-      eq(products.productType, product.productType), 
-      eq(products.isAccessory, false), 
-      not(eq(products.id, product.id))
-    ))
-    .orderBy(desc(products.createdAt))
-    .limit(12);
-  
-  const productReviews = await db.select()
-    .from(testimonials)
-    .where(and(
-      eq(testimonials.product, product.id),
-      eq(testimonials.isApproved, true)
-    ))
-    .orderBy(desc(testimonials.id));
+  const [allSizeGuides, allColorMaps, relatedPool, productReviews, recentlyViewedPool] = await Promise.all([
+    db.select().from(sizeGuides),
+    db.select().from(colorMap),
+    db.select({ id: products.id, name: products.name, price: products.price, image: products.image })
+      .from(products)
+      .where(and(eq(products.productType, product.productType), eq(products.isAccessory, false), not(eq(products.id, product.id))))
+      .orderBy(desc(products.createdAt))
+      .limit(12),
+    db.select()
+      .from(testimonials)
+      .where(and(eq(testimonials.product, product.id), eq(testimonials.isApproved, true)))
+      .orderBy(desc(testimonials.id)),
+    db.select({ id: products.id, name: products.name, image: products.image })
+      .from(products)
+      .where(not(eq(products.id, product.id)))
+      .orderBy(sql`CASE WHEN ${products.productType} = ${product.productType} THEN 0 ELSE 1 END`, desc(products.createdAt))
+      .limit(20)
+  ]);
 
 
   const relatedProducts = relatedPool.sort(() => 0.5 - Math.random()).slice(0, 4);
-
-  // 3. Fetch recently viewed/others (prioritize current product type, then randomize, limit 8)
-  const recentlyViewedPool = await db.select({
-    id: products.id,
-    name: products.name,
-    image: products.image,
-  })
-    .from(products)
-    .where(not(eq(products.id, product.id)))
-    .orderBy(
-      sql`CASE WHEN ${products.productType} = ${product.productType} THEN 0 ELSE 1 END`, 
-      desc(products.createdAt)
-    )
-    .limit(20);
-
-
   const recentlyViewed = recentlyViewedPool.sort(() => 0.5 - Math.random()).slice(0, 8);
 
   const previewImage = product.images && product.images.length > 0 

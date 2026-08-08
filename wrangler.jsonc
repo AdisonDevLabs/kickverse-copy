@@ -42,6 +42,7 @@
 			"binding": "kickverse_copy_db",
 			"database_name": "kickverse-copy-db",
 			"database_id": "b593d3da-8a32-4534-93f9-55bacb44918e",
+			"migrations_dir": "drizzle",
 			"remote": true
 		}
 	]

@@ -58,8 +58,13 @@ export const testimonials = sqliteTable('testimonials', {
   location: text('location'),
   rating: integer('rating').default(5).notNull(),
   text: text('text').notNull(),
-  product: text('product'),
-  profile: text('profile').notNull(),
+  
+  product: text('product'), // Keeps existing relation (Stores the ID)
+  productName: text('product_name'), // NEW: Snapshot of the name
+  
+  profile: text('profile'), // CHANGED: Now nullable!
+  reviewImage: text('review_image'), // NEW: Photo of the actual shoes
+  
   date: text('date'),
   purchased: integer('purchased', { mode: 'boolean' }).default(false),
   isGlobal: integer('is_global', { mode: 'boolean' }).default(false),
