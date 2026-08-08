@@ -25,6 +25,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
   
   // Universal Modal Trigger State
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [visibleReviewsCount, setVisibleReviewsCount] = useState(6);
   
   const [showSizeGuide, setShowSizeGuide] = useState(false);
   const [activeGuideTab, setActiveGuideTab] = useState(sizeGuides?.[0]?.id || '');
@@ -531,40 +532,44 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
           </div>
         </div>
 
-        {/* Customer Reviews Section (3-Tier Card Redesign) */}
-        <section id="reviews" className="py-12 sm:py-16 md:py-24 bg-brand-dark relative overflow-hidden border-t border-white/10 px-4 sm:px-6">
-          <div className="max-w-7xl mx-auto relative z-10">
+        {/* Customer Reviews Section (Restored PDP Layout + New 3-Tier Cards + Pagination) */}
+        <section id="reviews" className="border-t border-white/10 bg-brand-dark py-20 px-6">
+          <div className="max-w-7xl mx-auto">
             
-            {/* Header - Centered Title & Subtitle */}
-            <div className="flex flex-col items-center text-center mb-8 sm:mb-12">
-              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}>
-                <h2 className="font-display uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-2 sm:mb-4">
-                  WHAT OUR CUSTOMERS SAY
+            {/* Header - PDP Style (Left Title, Right Button) */}
+            <motion.div 
+              initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
+              className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12"
+            >
+              <div>
+                <h2 className="font-display uppercase tracking-wide text-3xl md:text-5xl text-white mb-4">
+                  Why Customers Love It
                 </h2>
-                <p className="text-gray-400 max-w-2xl mx-auto font-medium text-xs sm:text-sm md:text-lg mb-6">
-                  Real experiences from verified buyers of this style
-                </p>
-              </motion.div>
-            </div>
-
-            {/* Product Specific Rating Stats */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeLeft} className="mb-6 sm:mb-8 flex items-center">
-               <div className="flex items-center text-brand-primary bg-brand-primary/10 px-4 py-2 rounded-md border border-brand-primary/20">
-                 <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-current mr-2.5" />
-                 <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-white">
-                   <span className="text-brand-primary text-sm sm:text-base mr-1">
-                     {product.rating ? Number(product.rating).toFixed(1) : "5.0"}/5
-                   </span> 
-                   from {reviews?.length || 0} verified reviews
-                 </span>
-               </div>
+                <div className="flex items-center text-brand-primary">
+                  {[1,2,3,4,5].map((s) => (
+                    <Star key={s} className="h-5 w-5 fill-current" />
+                  ))}
+                  <span className="ml-3 text-lg font-bold text-white tracking-widest">
+                    {product.rating ? Number(product.rating).toFixed(1) : '5.0'} OUT OF 5
+                  </span>
+                  <span className="text-gray-500 text-sm ml-3 font-medium uppercase tracking-widest">
+                    ({reviews?.length || 0} Reviews)
+                  </span>
+                </div>
+              </div>
+              <button 
+                onClick={() => setIsReviewModalOpen(true)} 
+                className="mt-6 md:mt-0 px-8 py-4 bg-brand-primary text-black rounded-md font-bold uppercase tracking-widest text-xs hover:bg-brand-hover transition-colors flex items-center"
+              >
+                <MessageCircle className="w-4 h-4 mr-2" /> Write a Review
+              </button>
             </motion.div>
 
-            {/* Reviews Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {/* Reviews Grid (Sliced by visibleReviewsCount) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {reviews && reviews.length > 0 ? (
-                reviews.map((review: any, idx: number) => {
-                  const reviewImages = review.reviewImage ? review.reviewImage.split(',').slice(0, 2) : [];
+                reviews.slice(0, visibleReviewsCount).map((review: any, idx: number) => {
+                  const reviewImages = review.reviewImage ? review.reviewImage.split(',').slice(0, 3) : [];
                   return (
                     <motion.div 
                       initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
@@ -579,7 +584,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                           </div>
                           <div className="flex flex-col">
                             <h4 className="text-white font-bold text-sm sm:text-base tracking-wide leading-tight">{review.name}</h4>
-                            <p className="text-gray-500 text-[9px] sm:text-[10px] uppercase tracking-widest mt-0.5">{review.date || 'Recently'}</p>
+                            <p className="text-gray-500 text-[9px] sm:text-[10px] uppercase tracking-widest mt-0.5">{review.location || 'Verified Buyer'}</p>
                           </div>
                         </div>
                         
@@ -592,10 +597,15 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
 
                       {/* --- MIDDLE SECTION: Content --- */}
                       <div className="flex flex-col flex-1 mb-2">
-                        <div className="flex text-brand-accent mb-3">
-                          {[...Array(5)].map((_, i) => (
-                             <Star key={i} className={`w-3 h-3 sm:w-4 sm:h-4 ${i < Math.floor(review.rating) ? 'fill-current' : 'text-gray-600'}`} />
-                          ))}
+                        <div className="flex justify-between items-center mb-3">
+                           <div className="flex text-brand-accent">
+                             {[...Array(5)].map((_, i) => (
+                                <Star key={i} className={`w-3 h-3 sm:w-4 sm:h-4 ${i < Math.floor(review.rating) ? 'fill-current' : 'text-gray-600'}`} />
+                             ))}
+                           </div>
+                           <span className="text-gray-600 text-[9px] font-bold uppercase tracking-widest">
+                             {review.date || 'Recently'}
+                           </span>
                         </div>
                         <p className="text-gray-300 text-sm sm:text-base italic leading-relaxed break-words">
                           &ldquo;{review.text}&rdquo;
@@ -627,15 +637,18 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
               )}
             </div>
 
-            {/* --- BOTTOM PAGE SECTION: Call to Action --- */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} className="mt-10 sm:mt-16 flex justify-center">
-               <button 
-                 onClick={() => setIsReviewModalOpen(true)}
-                 className="inline-flex h-10 sm:h-12 px-6 sm:px-8 bg-transparent border-2 border-brand-primary text-brand-primary font-bold text-xs sm:text-sm rounded-md items-center justify-center hover:bg-brand-primary hover:text-black transition-all uppercase tracking-widest cursor-pointer"
-               >
-                 <MessageCircle className="mr-2 w-4 h-4 sm:w-5 sm:h-5" /> Share Your Experience
-               </button>
-            </motion.div>
+            {/* Load More Button */}
+            {reviews && reviews.length > visibleReviewsCount && (
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} className="mt-10 flex justify-center">
+                <button
+                  onClick={() => setVisibleReviewsCount(prev => prev + 6)}
+                  className="h-12 px-8 bg-transparent border border-white/20 text-white font-bold uppercase tracking-widest text-xs hover:bg-white hover:text-black transition-colors rounded-md"
+                >
+                  Load More Reviews
+                </button>
+              </motion.div>
+            )}
+            
           </div>
         </section>
 
