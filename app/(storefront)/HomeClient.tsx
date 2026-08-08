@@ -393,7 +393,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
       </section>
 
       {/* Featured Collections Section */}
-      <section className="relative min-h-[100svh] w-full flex flex-col justify-center overflow-hidden bg-brand-card py-12 sm:py-16 md:py-24">
+      <section className="py-12 sm:py-16 md:py-24 bg-brand-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="flex flex-col md:flex-row justify-between md:items-end mb-8 sm:mb-12 md:mb-16">
             <motion.h2 
