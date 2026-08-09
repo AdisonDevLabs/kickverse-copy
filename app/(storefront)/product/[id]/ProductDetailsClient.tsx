@@ -601,7 +601,13 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                       <div className="flex justify-between items-center mb-5">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 sm:w-12 sm:h-12 relative rounded-full overflow-hidden border border-white/10 shrink-0 bg-black">
-                            <Image src={review.profile || '/pexels-wedding-maps-130174465-10114295.jpg'} alt={review.name} fill className="object-cover" />
+                            {review.profile ? (
+                              <Image src={review.profile} alt={review.name} fill className="object-cover" />
+                            ) : (
+                              <div className={`w-full h-full flex items-center justify-center text-white font-bold text-sm sm:text-base tracking-wider ${getAvatarColor(review.name)}`}>
+                                {getInitials(review.name)}
+                              </div>
+                            )}
                           </div>
                           <div className="flex flex-col">
                             <h4 className="text-white font-bold text-sm sm:text-base tracking-wide leading-tight">{review.name}</h4>

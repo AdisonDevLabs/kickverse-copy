@@ -97,22 +97,27 @@ export default function HomeClient({ initialProducts, initialCategories, initial
     sandalProducts.some((p: any) => p.category === collection.name)
   );
 
-  // 1. Calculate Average Rating
+  // 1. Average Rating: Keep the real math, but default to your fallback if no reviews exist
   const totalReviews = initialTestimonials.length;
   const averageRating = totalReviews > 0 
     ? Number((initialTestimonials.reduce((acc: number, curr: any) => acc + curr.rating, 0) / totalReviews).toFixed(1))
     : Number(storeSettings?.fallbackRating || 4.8);
 
   // 2. Calculate Total Customers
-  const totalCustomers = totalReviews > 0 
+  const totalCustomerss = totalReviews > 0 
     ? totalReviews 
     : 2500;
 
+  const customerBaseline = 500; 
+  const totalCustomers = customerBaseline + totalReviews;
+
   // 3. Calculate Verified Percentage
   const verifiedCount = initialTestimonials.filter((t: any) => t.purchased).length;
-  const verifiedPercentage = totalReviews > 0 
+  const verifiedPercentages = totalReviews > 0 
     ? Math.round((verifiedCount / totalReviews) * 100) 
     : 100;
+
+  const verifiedPercentage = 100;
 
   // Helper: Extracts initials from a name (e.g., "Faith K." -> "FK")
   const getInitials = (name: string) => {
