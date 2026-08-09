@@ -594,8 +594,8 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   
                   // Determine placeholder based on product type
                   const placeholderImg = product?.productType === 'Soccer Cleats' 
-                    ? 'https://kickverse.co.ke/product/p-1785502829927' 
-                    : 'https://kickverse.co.ke/product/p-1785876398966';
+                    ? '/IMG_0270.jpg' 
+                    : '/IMG_0946.jpg';
 
                   return (
                     <motion.div 
