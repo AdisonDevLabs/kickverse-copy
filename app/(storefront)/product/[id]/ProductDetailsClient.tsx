@@ -591,16 +591,74 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
               {reviews && reviews.length > 0 ? (
                 reviews.slice(0, visibleReviewsCount).map((review: any, idx: number) => {
                   const reviewImages = review.reviewImage ? review.reviewImage.split(',').slice(0, 3) : [];
+                  
+                  // Determine placeholder based on product type
+                  const placeholderImg = product?.productType === 'Soccer Cleats' 
+                    ? '/soccer-cleats-placeholder.jpg' 
+                    : '/sneaker-placeholder.jpg';
+
                   return (
                     <motion.div 
                       initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
                       key={`${review.id}-${idx}`} 
-                      className="bg-brand-card border border-white/5 hover:border-brand-primary/30 p-5 sm:p-6 flex flex-col group/review rounded-xl transition-all duration-500 shadow-xl"
+                      className="bg-brand-card border border-white/5 hover:border-brand-primary/30 flex flex-col group/review rounded-xl transition-all duration-500 shadow-xl overflow-hidden"
                     >
-                      {/* --- TOP SECTION: Identity --- */}
-                      <div className="flex justify-between items-center mb-5">
+                      {/* --- TOP SECTION: Hero Image & Quote --- */}
+                      <div className="relative w-full h-48 sm:h-56 bg-brand-dark/50 border-b border-white/5">
+                        {/* Quote Overlay */}
+                        <div className="absolute top-4 left-4 z-20">
+                          <span className="text-brand-primary text-5xl sm:text-6xl font-serif italic font-bold leading-none drop-shadow-lg opacity-90">&ldquo;</span>
+                        </div>
+
+                        {reviewImages.length > 0 ? (
+                          <>
+                            <Image src={reviewImages[0].trim()} alt="Customer Photo" fill className="object-cover" />
+                            {/* Subtle dark gradient overlay to ensure the quote pops against light images */}
+                            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent pointer-events-none z-10" />
+                          </>
+                        ) : (
+                          <>
+                            {/* Placeholder Image */}
+                            <Image src={placeholderImg} alt="Placeholder" fill className="object-cover" />
+                            {/* Darkened Overlay specifically for placeholders */}
+                            <div className="absolute inset-0 bg-black/70 pointer-events-none z-10" />
+                          </>
+                        )}
+                      </div>
+
+                      {/* --- BOTTOM SECTION: Content & Profile --- */}
+                      <div className="p-5 sm:p-6 flex flex-col flex-1">
+                        
+                        {/* Rating & Verified Badge Row */}
+                        <div className="flex justify-between items-center mb-4">
+                          <div className="flex items-center gap-2">
+                            <div className="flex text-brand-accent">
+                              {[...Array(5)].map((_, i) => (
+                                 <Star key={i} className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${i < Math.floor(review.rating) ? 'fill-current' : 'text-gray-600'}`} />
+                              ))}
+                            </div>
+                            <span className="text-white text-xs sm:text-sm font-semibold ml-1">
+                              {Number(review.rating).toFixed(1)}
+                            </span>
+                          </div>
+                          
+                          {review.purchased && (
+                            <div className="border border-brand-primary/60 text-brand-primary text-[9px] sm:text-[10px] font-medium px-2.5 py-1 rounded-full flex items-center shrink-0">
+                              <CheckCircle className="w-3 h-3 mr-1" /> Verified Purchaser
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Review Text Area */}
+                        <div className="flex-1 mb-6">
+                          <p className="text-gray-200 text-sm sm:text-base leading-relaxed break-words">
+                            {review.text}
+                          </p>
+                        </div>
+
+                        {/* Profile Footer */}
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 relative rounded-full overflow-hidden border border-white/10 shrink-0 bg-black">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 relative rounded-full overflow-hidden shrink-0 border border-white/10 bg-black">
                             {review.profile ? (
                               <Image src={review.profile} alt={review.name} fill className="object-cover" />
                             ) : (
@@ -609,51 +667,16 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                               </div>
                             )}
                           </div>
-                          <div className="flex flex-col">
-                            <h4 className="text-white font-bold text-sm sm:text-base tracking-wide leading-tight">{review.name}</h4>
-                            <p className="text-gray-500 text-[9px] sm:text-[10px] uppercase tracking-widest mt-0.5">{review.location || 'Verified Buyer'}</p>
+                          <div className="flex flex-col justify-center">
+                            <span className="text-white font-bold text-sm sm:text-base leading-tight tracking-wide">{review.name}</span>
+                            <span className="text-gray-400 text-[10px] sm:text-xs mt-0.5 truncate max-w-[200px] sm:max-w-[240px]">
+                              {review.location || 'Verified Buyer'}
+                            </span>
+                            <span className="text-gray-500 text-[9px] sm:text-[10px] mt-0.5 uppercase tracking-widest">{review.date || 'Recently'}</span>
                           </div>
                         </div>
                         
-                        {review.purchased && (
-                          <div className="bg-brand-primary/10 text-brand-primary text-[8px] sm:text-[9px] font-bold px-2 py-1 uppercase rounded-md tracking-widest flex items-center border border-brand-primary/20 shrink-0">
-                            <CheckCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" /> Verified
-                          </div>
-                        )}
                       </div>
-
-                      {/* --- MIDDLE SECTION: Content --- */}
-                      <div className="flex flex-col flex-1 mb-2">
-                        <div className="flex justify-between items-center mb-3">
-                           <div className="flex text-brand-accent">
-                             {[...Array(5)].map((_, i) => (
-                                <Star key={i} className={`w-3 h-3 sm:w-4 sm:h-4 ${i < Math.floor(review.rating) ? 'fill-current' : 'text-gray-600'}`} />
-                             ))}
-                           </div>
-                           <span className="text-gray-600 text-[9px] font-bold uppercase tracking-widest">
-                             {review.date || 'Recently'}
-                           </span>
-                        </div>
-                        <p className="text-gray-300 text-sm sm:text-base italic leading-relaxed break-words">
-                          &ldquo;{review.text}&rdquo;
-                        </p>
-                      </div>
-
-                      {/* --- BOTTOM SECTION: Media --- */}
-                      {reviewImages.length > 0 && (
-                        <div className="mt-5 pt-4 border-t border-white/5">
-                          <p className="text-[9px] text-gray-500 uppercase tracking-widest mb-2 font-bold">
-                            Customer Photo{reviewImages.length > 1 ? 's' : ''}
-                          </p>
-                          <div className="flex gap-2">
-                            {reviewImages.map((imgUrl: string, imgIdx: number) => (
-                              <div key={imgIdx} className="relative h-24 sm:h-28 flex-1 rounded-md overflow-hidden border border-white/10 bg-black">
-                                <Image src={imgUrl.trim()} alt={`Review Image ${imgIdx + 1}`} fill className="object-cover" />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
                     </motion.div>
                   );
                 })
