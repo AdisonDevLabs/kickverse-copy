@@ -31,9 +31,9 @@ export default async function AdminReviewsPage() {
   // --- NEW: Fetch Settings ---
   const settingsResult = await db.select().from(storeSettings).where(eq(storeSettings.id, 1)).limit(1);
   const config = settingsResult[0] || { 
-    happyCustomersText: '500+ Happy Customers', 
-    defaultAvatar: '/pexels-wedding-maps-130174465-10114295.jpg',
-    fallbackRating: '4.8'
+    happyCustomersText: '', 
+    defaultAvatar: '',
+    fallbackRating: ''
   };
 
   return <ReviewsClient initialReviews={allReviewsData} products={allProducts} initialConfig={config} />;
