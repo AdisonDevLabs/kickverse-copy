@@ -14,6 +14,27 @@ import { motion, AnimatePresence } from 'motion/react';
 import { fadeUp, fadeLeft, staggerContainer, staggerItem } from '@/lib/animations';
 import { PublicReviewModal } from '@/components/PublicReviewModal';
 
+// Helper: Extracts initials from a name (e.g., "Faith K." -> "FK")
+const getInitials = (name: string) => {
+  if (!name) return 'U';
+  const names = name.trim().split(' ');
+  if (names.length >= 2) return (names[0][0] + names[1][0]).toUpperCase();
+  return name.substring(0, 2).toUpperCase();
+};
+
+// Helper: Generates a consistent background color based on the name string
+const getAvatarColor = (name: string) => {
+  const colors = [
+    'bg-blue-600', 'bg-green-600', 'bg-purple-600', 
+    'bg-pink-600', 'bg-indigo-600', 'bg-teal-600', 'bg-orange-600'
+  ];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
+};
+
 export default function ProductDetailsClient({ product, reviews, relatedProducts, recentlyViewed, sizeGuides, colorMap }: any) {
   const router = useRouter();
   const { addToCart, setIsCartOpen } = useCart();
