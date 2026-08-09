@@ -7,10 +7,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, useAnimationFrame, useMotionValue } from 'motion/react';
 import { fadeUp, fadeLeft, heroReveal, staggerContainer, staggerItem } from '@/lib/animations';
-import { ArrowRight, Star, ShoppingBag, Truck, ShieldCheck, Clock, MessageCircle, Flame, Eye, Zap, Sparkles, Wallet, CheckCircle, Heart, Tag, Grid } from 'lucide-react';
+import { ArrowRight, Pencil, Star, ShoppingBag, Truck, ShieldCheck, Clock, MessageCircle, Flame, Eye, Zap, Sparkles, Wallet, CheckCircle, Users, Tag, Grid } from 'lucide-react';
 import { formatPrice } from '@/lib/data';
 import { brand } from '@/lib/data/brand';
 import { PublicReviewModal } from '@/components/PublicReviewModal';
+import AnimatedCounter from '@/components/AnimatedCounter'
 
 // Define the props we expect from the server
 export default function HomeClient({ initialProducts, initialCategories, initialTestimonials, storeSettings }: any) {
@@ -95,6 +96,23 @@ export default function HomeClient({ initialProducts, initialCategories, initial
   const displaySandalCategories = initialCategories.filter((collection: any) => 
     sandalProducts.some((p: any) => p.category === collection.name)
   );
+
+  // 1. Calculate Average Rating
+  const totalReviews = initialTestimonials.length;
+  const averageRating = totalReviews > 0 
+    ? Number((initialTestimonials.reduce((acc: number, curr: any) => acc + curr.rating, 0) / totalReviews).toFixed(1))
+    : Number(storeSettings?.fallbackRating || 4.8);
+
+  // 2. Calculate Total Customers
+  const totalCustomers = totalReviews > 0 
+    ? totalReviews 
+    : 2500;
+
+  // 3. Calculate Verified Percentage
+  const verifiedCount = initialTestimonials.filter((t: any) => t.purchased).length;
+  const verifiedPercentage = totalReviews > 0 
+    ? Math.round((verifiedCount / totalReviews) * 100) 
+    : 100;
 
   // --- FEATURED COLLECTIONS INFINITE SCROLL SETUP ---
   useEffect(() => {
@@ -892,34 +910,68 @@ export default function HomeClient({ initialProducts, initialCategories, initial
       </section>
 
       {/* Customer Reviews Section */}
-      <section className="py-12 sm:py-16 md:py-24 bg-brand-dark relative overflow-hidden border-t border-white/5">
+      <section className="py-10 sm:py-12 md:py-24 bg-brand-dark relative overflow-hidden border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
           
           {/* Header - Centered Title & Subtitle */}
-          <div className="flex flex-col items-center text-center mb-8 sm:mb-12">
+          <div className="flex flex-col items-center text-center mb-4 sm:mb-8">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}>
               <h2 className="font-display uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-2 sm:mb-4">
                 WHAT OUR CUSTOMERS SAY
               </h2>
-              <p className="text-gray-400 max-w-2xl mx-auto font-medium text-xs sm:text-sm md:text-lg mb-6">
-                Real experiences from our customers
+              <p className="text-gray-400 max-w-2xl mx-auto font-medium text-xs sm:text-sm md:text-lg mb-2">
+                Real experiences from people who shop with us.
               </p>
             </motion.div>
           </div>
 
-          {/* Stats - Left Aligned */}
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeLeft} className="mb-6 sm:mb-8 flex items-center">
-             <div className="flex items-center text-brand-primary px-4 py-2">
-               <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-current mr-2.5" />
-               <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-white">
-                 <span className="text-brand-primary text-sm sm:text-base mr-1">
-                   {initialTestimonials.length > 0 
-                    ? (initialTestimonials.reduce((acc: number, curr: any) => acc + curr.rating, 0) / initialTestimonials.length).toFixed(1) 
-                    : storeSettings?.fallbackRating || "4.8"}/5
-                 </span> 
-                 from {storeSettings?.happyCustomersText || "500+ happy customers"}
-               </span>
-             </div>
+          {/* Stats Bar */}
+          <motion.div 
+            initial="hidden" 
+            whileInView="visible" 
+            viewport={{ once: true, amount: 0.1 }} 
+            variants={fadeUp} 
+            className="mb-4 sm:mb-10 w-full max-w-4xl mx-auto"
+          >
+            <div className="flex flex-col sm:flex-row bg-brand-dark/40 overflow-hidden backdrop-blur-sm">
+              
+              {/* Stat 1: Average Rating */}
+              <div className="flex-1 flex flex-col items-center justify-center p-6 border-b sm:border-b-0 sm:border-r border-white/10 group">
+                <div className="flex items-center text-brand-primary mb-2 text-2xl sm:text-3xl font-display font-bold transition-transform duration-300 group-hover:scale-105">
+                  <Star className="w-5 h-5 sm:w-6 sm:h-6 fill-current mr-2.5" />
+                  <AnimatedCounter value={averageRating} decimals={1} />
+                  <span className="text-xl sm:text-2xl text-gray-500 ml-1">/5</span>
+                </div>
+                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400">
+                  Average Rating
+                </span>
+              </div>
+
+              {/* Stat 2: Happy Customers */}
+              <div className="flex-1 flex flex-col items-center justify-center p-6 border-b sm:border-b-0 sm:border-r border-white/10 group">
+                <div className="flex items-center text-white mb-2 text-2xl sm:text-3xl font-display font-bold transition-transform duration-300 group-hover:scale-105">
+                  <Users className="w-5 h-5 sm:w-6 sm:h-6 text-brand-primary mr-2.5" />
+                  <AnimatedCounter value={totalCustomers} decimals={0} />
+                  <span className="text-brand-primary ml-1">+</span>
+                </div>
+                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400">
+                  Happy Customers
+                </span>
+              </div>
+
+              {/* Stat 3: Verified Purchases */}
+              <div className="flex-1 flex flex-col items-center justify-center p-6 group">
+                <div className="flex items-center text-white mb-2 text-2xl sm:text-3xl font-display font-bold transition-transform duration-300 group-hover:scale-105">
+                  <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-brand-primary mr-2.5" />
+                  <AnimatedCounter value={verifiedPercentage} decimals={0} />
+                  <span className="text-brand-primary ml-1">%</span>
+                </div>
+                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400">
+                  Verified Purchases
+                </span>
+              </div>
+
+            </div>
           </motion.div>
 
           {/* Marquee Carousel */}
@@ -942,76 +994,106 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 return (
                   <div 
                     key={`${review.id}-${idx}`} 
-                    className="w-[85vw] sm:w-[380px] md:w-[420px] shrink-0 bg-brand-card border border-white/5 hover:border-brand-primary/30 p-5 sm:p-6 flex flex-col group/review rounded-xl transition-all duration-500 hover:-translate-y-2 shadow-xl"
+                    className="w-[85vw] sm:w-[380px] md:w-[420px] shrink-0 bg-brand-card border border-white/5 hover:border-brand-primary/30 flex flex-col group/review rounded-xl transition-all duration-500 hover:-translate-y-2 shadow-xl overflow-hidden"
                   >
-                    {/* --- TOP SECTION: Identity --- */}
-                    <div className="flex justify-between items-center mb-5">
+                    {/* --- TOP SECTION: Hero Image & Quote --- 
+                    <div className="relative w-full h-48 sm:h-56 bg-brand-dark/50 border-b border-white/5">
+                      {/* Quote Overlay 
+                      <div className="absolute top-3 left-4 z-20">
+                        <span className="text-brand-primary text-5xl sm:text-6xl font-serif italic font-bold leading-none drop-shadow-lg opacity-90">&ldquo;</span>
+                      </div>
+                      
+                      {reviewImages.length > 0 ? (
+                        <Image src={reviewImages[0].trim()} alt={review.productName || "Customer Photo"} fill className="object-cover" />
+                      ) : (
+                        /* Placeholder when no image exists 
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-gray-900/40">
+                          <span className="text-gray-600 font-medium uppercase tracking-widest text-[10px] sm:text-xs">No Image Provided</span>
+                        </div>*/}
+                    
+                      
+                      {/* Subtle dark gradient overlay to ensure the quote pops against light images 
+                      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent pointer-events-none z-10" />
+                    </div>*/}
+
+                    {/* --- BOTTOM SECTION: Content & Profile --- */}
+                    <div className="p-5 sm:p-6 flex flex-col flex-1">
+                      
+                      {/* Rating & Verified Badge Row */}
+                      <div className="flex justify-between items-center mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="flex text-brand-accent">
+                            {[...Array(5)].map((_, i) => (
+                               <Star key={i} className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${i < Math.floor(review.rating) ? 'fill-current' : 'text-gray-600'}`} />
+                            ))}
+                          </div>
+                          <span className="text-white text-xs sm:text-sm font-semibold ml-1">
+                            {Number(review.rating).toFixed(1)}
+                          </span>
+                        </div>
+                        
+                        {review.purchased && (
+                          <div className="border border-brand-primary/60 text-brand-primary text-[9px] sm:text-[10px] font-medium px-2.5 py-1 rounded-full flex items-center shrink-0">
+                            <CheckCircle className="w-3 h-3 mr-1" /> Verified Purchaser
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Review Text Area */}
+                      <div className="flex-1 mb-6">
+                        <p className="text-gray-200 text-sm sm:text-base leading-relaxed break-words">
+                          <span className="text-brand-primary font-serif text-xl sm:text-2xl font-bold mr-1 leading-none">
+                            &ldquo;
+                          </span>
+                          {review.text}
+                          <span className="text-brand-primary font-serif text-xl sm:text-2xl font-bold ml-1 leading-none">
+                            &rdquo;
+                          </span>
+                        </p>
+                      </div>
+
+                      {/* Profile Footer */}
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 relative rounded-full overflow-hidden border border-white/10 shrink-0 bg-black">
-                          <Image src={review.profile || storeSettings?.defaultAvatar || '/pexels-wedding-maps-130174465-10114295.jpg'} alt={review.name} fill className="object-cover" />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 relative rounded-full overflow-hidden shrink-0 border border-white/10 bg-black">
+                          <Image src={review.profile || storeSettings?.defaultAvatar} alt={review.name} fill className="object-cover" />
                         </div>
-                        <div className="flex flex-col">
-                          <h4 className="text-white font-bold text-sm sm:text-base tracking-wide leading-tight">{review.name}</h4>
-                          <p className="text-gray-500 text-[9px] sm:text-[10px] uppercase tracking-widest mt-0.5">{review.date || 'Recently'}</p>
+                        <div className="flex flex-col justify-center">
+                          <span className="text-white font-bold text-sm sm:text-base leading-tight tracking-wide">{review.name}</span>
+                          {review.productName && (
+                            <span className="text-brand-primary text-[10px] sm:text-xs mt-0.5 truncate max-w-[200px] sm:max-w-[240px]">
+                              {review.productName}
+                            </span>
+                          )}
+                          <span className="text-gray-500 text-[9px] sm:text-[10px] mt-0.5 uppercase tracking-widest">{review.date || 'Recently'}</span>
                         </div>
                       </div>
                       
-                      {review.purchased && (
-                        <div className="bg-brand-primary/10 text-brand-primary text-[8px] sm:text-[9px] font-bold px-2 py-1 uppercase rounded-md tracking-widest flex items-center border border-brand-primary/20 shrink-0">
-                          <CheckCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" /> Verified
-                        </div>
-                      )}
                     </div>
-
-                    {/* --- MIDDLE SECTION: Content --- */}
-                    <div className="flex flex-col flex-1 mb-2">
-                      <div className="flex text-brand-accent mb-3">
-                        {[...Array(5)].map((_, i) => (
-                           <Star key={i} className={`w-3 h-3 sm:w-4 sm:h-4 ${i < Math.floor(review.rating) ? 'fill-current' : 'text-gray-600'}`} />
-                        ))}
-                      </div>
-                      <p className="text-gray-300 text-sm sm:text-base italic leading-relaxed break-words">
-                        &ldquo;{review.text}&rdquo;
-                      </p>
-                      
-                      {/* Original Product Snapshot Reference */}
-                      {review.productName && (
-                        <p className="text-gray-400 text-[10px] sm:text-xs mt-3 flex items-center font-medium w-full max-w-[220px] sm:max-w-[260px]">
-                          <span className="whitespace-nowrap shrink-0 mr-1">Purchased:</span> 
-                          <span className="text-brand-primary truncate block">{review.productName}</span>
-                        </p>
-                      )}
-                    </div>
-
-                    {/* --- BOTTOM SECTION: Media --- */}
-                    {reviewImages.length > 0 && (
-                      <div className="mt-5 pt-4 border-t border-white/5">
-                        <p className="text-[9px] text-gray-500 uppercase tracking-widest mb-2 font-bold">
-                          Customer Photo{reviewImages.length > 1 ? 's' : ''}
-                        </p>
-                        <div className="flex gap-2">
-                          {reviewImages.map((imgUrl: string, imgIdx: number) => (
-                            <div key={imgIdx} className="relative h-24 sm:h-28 flex-1 rounded-md overflow-hidden border border-white/10 bg-black">
-                              <Image src={imgUrl.trim()} alt={`Review Image ${imgIdx + 1}`} fill className="object-cover" />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
                 );
               })}
             </motion.div>
           </div>
 
-          {/* --- BOTTOM PAGE SECTION: Call to Action --- */}
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} className="mt-10 sm:mt-16 flex justify-center">
+          {/* Integrated Call to Action */}
+          <motion.div 
+            initial="hidden" 
+            whileInView="visible" 
+            viewport={{ once: true, amount: 0.1 }} 
+            variants={fadeUp} 
+            className="mt-8 sm:mt-12 flex flex-col items-center justify-center"
+          >
              <button 
                onClick={() => setIsReviewModalOpen(true)}
-               className="inline-flex h-10 sm:h-12 px-6 sm:px-8 bg-transparent border-2 border-brand-primary text-brand-primary font-bold text-xs sm:text-sm rounded-md items-center justify-center hover:bg-brand-primary hover:text-black transition-all uppercase tracking-widest cursor-pointer"
+               className="group inline-flex items-center text-brand-primary hover:text-white transition-colors duration-300 font-bold text-sm sm:text-base uppercase tracking-widest cursor-pointer"
              >
-               <MessageCircle className="mr-2 w-4 h-4 sm:w-5 sm:h-5" /> Share Your Experience
+               <Pencil className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+               Share Your Experience
+               <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
              </button>
+             <p className="text-gray-400 text-xs sm:text-sm mt-2.5 font-medium">
+               We&apos;d love to hear what you think.
+             </p>
           </motion.div>
 
         </div>

@@ -196,7 +196,7 @@ export function PublicReviewModal({ isOpen, onClose, productId, productName }: {
 
                 <div>
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 block flex justify-between">
-                    <span>Product Photos (Max 3)</span>
+                    <span>Product Photo</span>
                   </label>
                   {reviewPreviews.length > 0 ? (
                     <div className="flex gap-2 h-24">
@@ -210,8 +210,8 @@ export function PublicReviewModal({ isOpen, onClose, productId, productName }: {
                   ) : (
                     <label className="flex flex-col items-center justify-center w-full h-20 bg-brand-dark border border-dashed border-white/20 hover:border-brand-primary rounded-md cursor-pointer transition-colors group">
                       <ImagePlus className="w-5 h-5 mb-1.5 text-gray-500 group-hover:text-brand-primary transition-colors" />
-                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Upload Photos</span>
-                      <input type="file" accept="image/*" multiple className="hidden" onChange={handleReviewImagesChange} />
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Upload Photo</span>
+                      <input type="file" accept="image/*" className="hidden" onChange={handleReviewImagesChange} />
                     </label>
                   )}
                 </div>
