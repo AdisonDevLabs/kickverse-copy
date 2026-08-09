@@ -933,7 +933,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             variants={fadeUp} 
             className="mb-4 sm:mb-10 w-full max-w-4xl mx-auto"
           >
-            <div className="flex flex-col bg-brand-dark/40 overflow-hidden backdrop-blur-sm">
+            <div className="flex flex-row divide-x bg-brand-dark/40 overflow-hidden backdrop-blur-sm">
               
               {/* Stat 1: Average Rating */}
               <div className="flex-1 flex flex-col items-center justify-center p-6 border-b sm:border-b-0 sm:border-r border-white/10 group">
