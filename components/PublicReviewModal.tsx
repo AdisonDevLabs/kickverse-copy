@@ -194,34 +194,34 @@ export function PublicReviewModal({ isOpen, onClose, productId, productName }: {
                   </div>
                 </div>
 
-                <div>
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 block flex justify-between">
-                    <span>Product Photo</span>
-                  </label>
-                  {reviewPreviews.length > 0 ? (
-                    <div className="flex gap-2 h-24">
-                      {reviewPreviews.map((preview, idx) => (
-                        <div key={idx} className="relative flex-1 rounded-md overflow-hidden border border-white/20 bg-black">
-                          <Image src={preview} alt={`Preview ${idx+1}`} fill className="object-cover" />
-                          <button type="button" onClick={() => handleRemoveReviewImage(idx)} className="absolute top-1 right-1 bg-black/70 rounded-full p-1 hover:bg-red-500 transition-colors"><X className="w-3 h-3 text-white" /></button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <label className="flex flex-col items-center justify-center w-full h-20 bg-brand-dark border border-dashed border-white/20 hover:border-brand-primary rounded-md cursor-pointer transition-colors group">
-                      <ImagePlus className="w-5 h-5 mb-1.5 text-gray-500 group-hover:text-brand-primary transition-colors" />
-                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Upload Photo</span>
-                      <input type="file" accept="image/*" className="hidden" onChange={handleReviewImagesChange} />
+                {productId && (
+                  <div>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 block flex justify-between">
+                      <span>Product Photo</span>
                     </label>
-                  )}
-                </div>
+                    {reviewPreviews.length > 0 ? (
+                      <div className="flex gap-2 h-24">
+                        {reviewPreviews.map((preview, idx) => (
+                          <div key={idx} className="relative flex-1 rounded-md overflow-hidden border border-white/20 bg-black">
+                            <Image src={preview} alt={`Preview ${idx+1}`} fill className="object-cover" />
+                            <button type="button" onClick={() => handleRemoveReviewImage(idx)} className="absolute top-1 right-1 bg-black/70 rounded-full p-1 hover:bg-red-500 transition-colors"><X className="w-3 h-3 text-white" /></button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <label className="flex flex-col items-center justify-center w-full h-20 bg-brand-dark border border-dashed border-white/20 hover:border-brand-primary rounded-md cursor-pointer transition-colors group">
+                        <ImagePlus className="w-5 h-5 mb-1.5 text-gray-500 group-hover:text-brand-primary transition-colors" />
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Upload Photo</span>
+                        <input type="file" accept="image/*" className="hidden" onChange={handleReviewImagesChange} />
+                      </label>
+                    )}
+                  </div>
+                )}
 
                 <div>
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 block">Review</label>
                   <textarea required rows={4} value={formData.text} onChange={e => setFormData({...formData, text: e.target.value})} className="w-full bg-brand-dark border border-white/10 rounded-md p-3 text-sm text-white focus:outline-none focus:border-brand-primary resize-none" placeholder="What did you think about our service or products?" />
                 </div>
-
-                
 
                 <button 
                   type="submit" 

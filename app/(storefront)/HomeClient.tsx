@@ -114,6 +114,26 @@ export default function HomeClient({ initialProducts, initialCategories, initial
     ? Math.round((verifiedCount / totalReviews) * 100) 
     : 100;
 
+  // Helper: Extracts initials from a name (e.g., "Faith K." -> "FK")
+  const getInitials = (name: string) => {
+    if (!name) return 'U';
+    const names = name.trim().split(' ');
+    if (names.length >= 2) return (names[0][0] + names[1][0]).toUpperCase();
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      'bg-blue-600', 'bg-green-600', 'bg-purple-600', 
+      'bg-pink-600', 'bg-indigo-600', 'bg-teal-600', 'bg-orange-600'
+    ];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+  };
+
   // --- FEATURED COLLECTIONS INFINITE SCROLL SETUP ---
   useEffect(() => {
     const measure = () => {
@@ -1055,7 +1075,13 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       {/* Profile Footer */}
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 relative rounded-full overflow-hidden shrink-0 border border-white/10 bg-black">
-                          <Image src={review.profile || storeSettings?.defaultAvatar} alt={review.name} fill className="object-cover" />
+                          {review.profile ? (
+                            <Image src={review.profile} alt={review.name} fill className="object-cover" />
+                          ) : (
+                            <div className={`w-full h-full flex items-center justify-center text-white font-bold text-[10px] sm:text-xs tracking-wider ${getAvatarColor(review.name)}`}>
+                              {getInitials(review.name)}
+                            </div>
+                          )}
                         </div>
                         <div className="flex flex-col justify-center">
                           <span className="text-white font-bold text-sm sm:text-base leading-tight tracking-wide">{review.name}</span>
