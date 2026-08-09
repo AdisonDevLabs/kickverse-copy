@@ -936,7 +936,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             <div className="flex flex-row divide-x bg-brand-dark/40 overflow-hidden backdrop-blur-sm">
               
               {/* Stat 1: Average Rating */}
-              <div className="flex-1 flex flex-col items-center justify-center p-6 border-b sm:border-b-0 sm:border-r border-white/10 group">
+              <div className="flex-1 flex flex-col items-center justify-center p-6 sm:border-r border-white/10 group">
                 <div className="flex items-center text-brand-primary mb-2 text-2xl sm:text-3xl font-display font-bold transition-transform duration-300 group-hover:scale-105">
                   <Star className="w-5 h-5 sm:w-6 sm:h-6 fill-current mr-2.5" />
                   <AnimatedCounter value={averageRating} decimals={1} />
@@ -948,7 +948,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               </div>
 
               {/* Stat 2: Happy Customers */}
-              <div className="flex-1 flex flex-col items-center justify-center p-6 border-b sm:border-b-0 sm:border-r border-white/10 group">
+              <div className="flex-1 flex flex-col items-center justify-center p-6 sm:border-r border-white/10 group">
                 <div className="flex items-center text-white mb-2 text-2xl sm:text-3xl font-display font-bold transition-transform duration-300 group-hover:scale-105">
                   <Users className="w-5 h-5 sm:w-6 sm:h-6 text-brand-primary mr-2.5" />
                   <AnimatedCounter value={totalCustomers} decimals={0} />
