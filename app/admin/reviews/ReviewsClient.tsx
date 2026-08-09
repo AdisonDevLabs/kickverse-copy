@@ -44,13 +44,34 @@ async function convertToWebpMemorySafe(file: File, maxDim = 400, quality = 0.82)
   return new File([webpBlob], webpName, { type: 'image/webp' });
 }
 
+// Helper: Extracts initials from a name (e.g., "Faith K." -> "FK")
+const getInitials = (name: string) => {
+  if (!name) return 'U';
+  const names = name.trim().split(' ');
+  if (names.length >= 2) return (names[0][0] + names[1][0]).toUpperCase();
+  return name.substring(0, 2).toUpperCase();
+};
+
+// Helper: Generates a consistent background color based on the name string
+const getAvatarColor = (name: string) => {
+  const colors = [
+    'bg-blue-600', 'bg-green-600', 'bg-purple-600', 
+    'bg-pink-600', 'bg-indigo-600', 'bg-teal-600', 'bg-orange-600'
+  ];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
+};
+
 export default function ReviewsClient({ initialReviews, products, initialConfig }: { initialReviews: any[], products: any[], initialConfig: any }) {
   const [activeTab, setActiveTab] = useState<'pending' | 'published' | 'settings'>('pending');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loadingId, setLoadingId] = useState<number | null>(null);
   
   // Review Form State (handles both Add and Edit)
-  const [formData, setFormData] = useState({ name: '', location: '', rating: 5, text: '', productId: '', profile: initialConfig.defaultAvatar });
+  const [formData, setFormData] = useState({ name: '', location: '', rating: 5, text: '', productId: '', profile: '' });
   const [editId, setEditId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -69,6 +90,7 @@ export default function ReviewsClient({ initialReviews, products, initialConfig 
 
   // --- ACTIONS ---
 
+  
   const handleApprove = async (id: number, productId: string | null) => {
     setLoadingId(id);
     await approveReview(id, productId);
@@ -96,7 +118,7 @@ export default function ReviewsClient({ initialReviews, products, initialConfig 
       rating: reviewItem.rating,
       text: reviewItem.text,
       productId: reviewItem.product || '',
-      profile: reviewItem.profile || initialConfig.defaultAvatar
+      profile: reviewItem.profile || ''
     });
     setProductSearch(productName || '');
     setIsModalOpen(true);
@@ -104,7 +126,7 @@ export default function ReviewsClient({ initialReviews, products, initialConfig 
 
   const openAddModal = () => {
     setEditId(null);
-    setFormData({ name: '', location: '', rating: 5, text: '', productId: '', profile: initialConfig.defaultAvatar });
+    setFormData({ name: '', location: '', rating: 5, text: '', productId: '', profile: '' });
     setProductSearch('');
     setIsModalOpen(true);
   };
@@ -197,13 +219,13 @@ export default function ReviewsClient({ initialReviews, products, initialConfig 
         </button>
         <button onClick={() => setActiveTab('published')} className={`px-6 py-3 text-sm font-bold uppercase tracking-widest transition-colors border-b-2 ${activeTab === 'published' ? 'border-brand-primary text-brand-primary' : 'border-transparent text-gray-500 hover:text-white'}`}>
           Published <span className="ml-2 bg-white/10 px-2 py-0.5 rounded-full text-[10px]">{publishedReviews.length}</span>
-        </button>
+        </button>{/*
         <button onClick={() => setActiveTab('settings')} className={`px-6 py-3 text-sm font-bold uppercase tracking-widest transition-colors border-b-2 flex items-center ${activeTab === 'settings' ? 'border-brand-primary text-brand-primary' : 'border-transparent text-gray-500 hover:text-white'}`}>
           <Settings className="w-4 h-4 mr-2" /> Global Settings
-        </button>
+        </button>*/}
       </div>
 
-      {/* Settings Tab */}
+      {/* Settings Tab 
       {activeTab === 'settings' && (
         <div className="max-w-xl bg-brand-card border border-white/10 rounded-md p-6">
           <h2 className="text-xl font-display uppercase tracking-widest text-white mb-6 flex items-center"><Settings className="w-5 h-5 mr-2 text-brand-primary" /> Storefront Marketing Data</h2>
@@ -226,7 +248,7 @@ export default function ReviewsClient({ initialReviews, products, initialConfig 
             </button>
           </form>
         </div>
-      )}
+      )}*/}
 
       {/* Review Cards Grid */}
       {activeTab !== 'settings' && (
@@ -247,7 +269,13 @@ export default function ReviewsClient({ initialReviews, products, initialConfig 
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 relative rounded-full overflow-hidden bg-brand-dark border border-white/10 shrink-0">
-                      <Image src={review.profile || initialConfig.defaultAvatar} alt={review.name} fill className="object-cover" />
+                      {review.profile ? (
+                        <Image src={review.profile} alt={review.name} fill className="object-cover" />
+                      ) : (
+                        <div className={`w-full h-full flex items-center justify-center text-white font-bold text-[10px] tracking-wider ${getAvatarColor(review.name)}`}>
+                          {getInitials(review.name)}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <h4 className="font-bold text-sm uppercase tracking-widest">{review.name}</h4>
@@ -303,8 +331,12 @@ export default function ReviewsClient({ initialReviews, products, initialConfig 
                   <div className="w-14 h-14 relative rounded-full overflow-hidden bg-black border border-white/20 shrink-0">
                     {isUploadingImage ? (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/60"><Loader2 className="w-5 h-5 animate-spin text-brand-primary" /></div>
-                    ) : (
+                    ) : formData.profile ? (
                       <Image src={formData.profile} alt="Avatar" fill className="object-cover" />
+                    ) : (
+                      <div className={`w-full h-full flex items-center justify-center text-white font-bold text-lg tracking-wider ${getAvatarColor(formData.name)}`}>
+                        {getInitials(formData.name)}
+                      </div>
                     )}
                   </div>
                   <div className="flex-1">
