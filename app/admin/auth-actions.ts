@@ -7,6 +7,11 @@ import { eq } from 'drizzle-orm';
 import { cookies } from 'next/headers';
 import nodemailer from 'nodemailer';
 import { brand } from '@/lib/data/brand';
+import { SignJWT } from 'jose';
+
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || 'super-secret-fallback-key-change-me'
+);
 
 // --- ZERO-DEPENDENCY NATIVE CRYPTO UTILS (Worker & Edge Safe) ---
 function buf2hex(buffer: ArrayBuffer) {
@@ -73,9 +78,15 @@ export async function loginAdmin(formData: FormData) {
         email,
         passwordHash: hash,
       });
+
+      const token = await new SignJWT({ email })
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt()
+        .setExpirationTime('24h')
+        .sign(JWT_SECRET);
       
       const cookieStore = await cookies();
-      cookieStore.set('admin_session', email, { httpOnly: true, secure: true, path: '/' });
+      cookieStore.set('admin_session', token, { httpOnly: true, secure: true, path: '/' });
       return { success: true };
     }
 
@@ -85,8 +96,14 @@ export async function loginAdmin(formData: FormData) {
       throw new Error('Invalid email or password');
     }
 
+    const token = await new SignJWT({ email: user.email })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('24h')
+      .sign(JWT_SECRET);
+
     const cookieStore = await cookies();
-    cookieStore.set('admin_session', user.email, { httpOnly: true, secure: true, path: '/' });
+    cookieStore.set('admin_session', token, { httpOnly: true, secure: true, path: '/' });
     
     return { success: true };
   } catch (error: any) {

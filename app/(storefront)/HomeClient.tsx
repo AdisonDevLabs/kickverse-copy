@@ -767,7 +767,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       href={`/product/${product.id}`}
                       className="w-full bg-transparent border border-white/20 text-white font-bold py-1.5 sm:py-2 rounded-md transition-colors flex justify-center items-center uppercase tracking-widest text-[8px] sm:text-[10px] md:text-xs hover:bg-white hover:text-black"
                      >
-                       Select Option
+                       View Details
                      </Link>
                   </div>
                 </div>
@@ -859,7 +859,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       href={`/product/${product.id}`}
                       className="w-full bg-transparent border border-white/20 text-white font-bold py-1.5 sm:py-2 rounded-md transition-colors flex justify-center items-center uppercase tracking-widest text-[8px] sm:text-[10px] md:text-xs hover:bg-white hover:text-black"
                      >
-                       Select Option
+                       View Details
                      </Link>
                   </div>
                 </div>

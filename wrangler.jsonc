@@ -7,6 +7,11 @@
 		"nodejs_compat",
 		"global_fetch_strictly_public"
 	],
+	"vars": {
+		"SMTP_HOST": "smtp.gmail.com",
+		"SMTP_PORT": "465",
+		"SMTP_USER": "adisoncheruiyot55@gmail.com"
+	},
 	"assets": {
 		"directory": ".open-next/assets",
 		"binding": "ASSETS"
