@@ -52,7 +52,7 @@ export default async function ShopPage({ searchParams }: Props) {
   .from(products)
   .orderBy(
     desc(products.isPinned),
-    desc(products.createdAt)
+    desc(products.id)
   );
 
   const jsonLd = {
