@@ -102,7 +102,7 @@ export async function createProduct(formData: FormData) {
       isFlashDeal: formData.get('isFlashDeal') === 'on',
       rating: 5.0,
       reviews: 0,
-      created_at: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
     };
 
     await db.insert(products).values(newProduct);

@@ -13,7 +13,7 @@ export default async function HomePage() {
   const db = await getDb();
 
   // --- PERFORMANCE FIX: Fire all 4 database queries concurrently! ---
-  const [allProducts, heroCategories, globalTestimonials, settingsResult] = await Promise.all([
+  const [allProducts, heroCategories, globalTestimonials, settingsResult] = await db.batch([
     
     // Query 1: Products
     db.select({

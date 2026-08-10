@@ -39,7 +39,7 @@ export default async function AdminDashboard(props: { searchParams: SearchParams
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
   // 4. Execute Optimized Queries concurrently
-  const [allCategories, fetchedProducts, totalCountResult] = await Promise.all([
+  const [allCategories, fetchedProducts, totalCountResult] = await db.batch([
     db.select().from(categories),
     db.select().from(products)
       .where(whereClause)
