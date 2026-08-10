@@ -29,13 +29,6 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'kickverse.storxia.tech',
-        port: '',
-        pathname: '/**',
-      },
-
-      {
-        protocol: 'https',
         hostname: 'kickverse.co.ke',
         port: '',
         pathname: '/**',

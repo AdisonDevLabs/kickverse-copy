@@ -4,7 +4,6 @@ import { products } from '@/lib/db/schema';
 import { brand } from '@/lib/data/brand';
 import ShopWrapper from './ShopWrapper';
 import { desc } from 'drizzle-orm';
-import { redirect } from 'next/navigation';
 
 export const revalidate = 60;
 
@@ -18,18 +17,10 @@ export const metadata: Metadata = {
   },
 };
 
-type Props = {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-};
 
 // 2. Add searchParams to the component props
-export default async function ShopPage({ searchParams }: Props) {
-  const params = await searchParams;
+export default async function ShopPage() {
   
-  // 3. Force redirect if no type is in the URL
-  if (!params.type) {
-    redirect('/shop?type=sneakers');
-  }
   const db = await getDb();
   const allProducts = await db.select({
     id: products.id,
@@ -53,7 +44,7 @@ export default async function ShopPage({ searchParams }: Props) {
   .orderBy(
     desc(products.isPinned),
     desc(products.id)
-  );
+  ).limit(500);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -70,11 +61,13 @@ export default async function ShopPage({ searchParams }: Props) {
     })),
   };
 
+  const safeJsonLd = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
+
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd }}
       />
       {/* Render the wrapper which safely handles the dynamic client load */}
       <ShopWrapper initialProducts={allProducts} />
