@@ -3,16 +3,20 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
+
 import { motion, useAnimationFrame, useMotionValue } from 'motion/react';
 import { fadeUp, fadeLeft, heroReveal, staggerContainer, staggerItem } from '@/lib/animations';
 import { ArrowRight, Pencil, Star, ShoppingBag, Truck, ShieldCheck, Clock, MessageCircle, Flame, Eye, Zap, Sparkles, Wallet, CheckCircle, Users, Tag, Grid } from 'lucide-react';
+
 import { formatPrice } from '@/lib/data';
 import { brand } from '@/lib/data/brand';
-import { PublicReviewModal } from '@/components/PublicReviewModal';
-import AnimatedCounter from '@/components/AnimatedCounter'
 
+const PublicReviewModal = dynamic(() => import('@/components/PublicReviewModal').then(mod => mod.PublicReviewModal), { ssr: false });
+const AnimatedCounter = dynamic(() => import('@/components/AnimatedCounter'), { ssr: false });
 // Define the props we expect from the server
 export default function HomeClient({ initialProducts, initialCategories, initialTestimonials, storeSettings }: any) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -265,7 +269,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             {/* Subheadline */}
             <motion.p 
               variants={staggerItem}
-              className="text-gray-200 text-[11px] sm:text-sm md:text-base max-w-[280px] sm:max-w-lg mb-3 sm:mb-5 font-medium leading-relaxed drop-shadow-xl shadow-black mx-auto"
+              className="text-gray-200 text-[13px] sm:text-sm md:text-base max-w-[280px] sm:max-w-lg mb-3 sm:mb-5 font-medium leading-relaxed drop-shadow-xl shadow-black mx-auto"
             >
               {brand.description}
             </motion.p>
@@ -295,7 +299,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 href={`https://wa.me/${brand.whatsappNumber}`} 
                 target="_blank"
                 rel="noreferrer"
-                className="h-9 sm:h-12 px-3 sm:px-6 rounded-md bg-brand-primary text-black font-bold uppercase tracking-widest text-[9px] sm:text-xs flex items-center justify-center hover:bg-brand-hover transition-colors shadow-lg shadow-brand-primary/20 flex-1 sm:flex-none"
+                className="h-9 sm:h-12 px-3 sm:px-6 rounded-md bg-brand-primary text-black font-bold uppercase tracking-widest text-[11px] sm:text-xs flex items-center justify-center hover:bg-brand-hover transition-colors shadow-lg shadow-brand-primary/20 flex-1 sm:flex-none"
                >
                  <MessageCircle className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" /> Order on WhatsApp
                </a>
@@ -326,13 +330,10 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     src={displayCategories?.[0]?.image || brand.hero?.sneakersImage}
                     alt="Shop Sneakers"
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
+                    className="object-cover group-hover:scale-103 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                   />
                   <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-3 text-left">
-                    <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full border border-brand-primary flex items-center justify-center mb-1 sm:mb-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-primary w-2.5 h-2.5 sm:w-4 sm:h-4"><path d="M2 14h20.4l-1.9-6H5.5L2 14z"/><path d="M22 14v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4"/><path d="M9 14v4"/><path d="M15 14v4"/></svg>
-                    </div>
-                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-lg lg:text-2xl drop-shadow-lg group-hover:text-brand-primary transition-colors leading-none">
+                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-sm lg:text-lg drop-shadow-lg group-hover:text-brand-primary transition-colors leading-none">
                       SNEAKERS
                     </h3>
                     <div className="flex justify-between items-center w-full mt-1.5 sm:mt-2">
@@ -355,13 +356,10 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     src={displayCleatCategories?.[0]?.image || brand.hero?.soccerCleatsImage}
                     alt="Shop Soccer Cleats"
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
+                    className="object-cover group-hover:scale-103 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                   />
                   <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-3 text-left">
-                    <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full border border-brand-primary flex items-center justify-center mb-1 sm:mb-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-primary w-2.5 h-2.5 sm:w-4 sm:h-4"><circle cx="12" cy="12" r="10"/><path d="M12 12 7.5 9"/><path d="M12 12v5.5"/><path d="M12 12l4.5-3"/><path d="m14 19-2-1.5-2 1.5"/><path d="m5 15 2.5-1.5"/><path d="m19 15-2.5-1.5"/><path d="m10 5 2 1.5 2-1.5"/></svg>
-                    </div>
-                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-lg lg:text-2xl drop-shadow-lg group-hover:text-brand-primary transition-colors leading-none">
+                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-sm lg:text-lg drop-shadow-lg group-hover:text-brand-primary transition-colors leading-none">
                       SOCCER CLEATS
                     </h3>
                     <div className="flex justify-between items-center w-full mt-1.5 sm:mt-2">
@@ -384,14 +382,11 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     src={displayOfficialCategories?.[0]?.image || brand.hero?.officialsImage}
                     alt="Shop Official Shoes"
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
+                    className="object-cover group-hover:scale-103 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                   />
                   <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-3 text-left">
-                    <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full border border-brand-primary flex items-center justify-center mb-1 sm:mb-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-primary w-2.5 h-2.5 sm:w-4 sm:h-4"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                    </div>
-                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-lg lg:text-2xl drop-shadow-lg group-hover:text-brand-primary transition-colors leading-none">
-                      OFFICIAL
+                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-sm lg:text-lg drop-shadow-lg group-hover:text-brand-primary transition-colors leading-none">
+                      OFFICIAL SHOES
                     </h3>
                     <div className="flex justify-between items-center w-full mt-1.5 sm:mt-2">
                       <p className="text-gray-300 text-[11px] sm:text-xs md:text-sm font-medium truncate pr-2">Formal • Business</p>
@@ -413,14 +408,11 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     src={displaySandalCategories?.[0]?.image || brand.hero?.opensSandalsImage}
                     alt="Shop Opens & Sandals"
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
+                    className="object-cover group-hover:scale-103 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                   />
                   <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-3 text-left">
-                    <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full border border-brand-primary flex items-center justify-center mb-1 sm:mb-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-primary w-2.5 h-2.5 sm:w-4 sm:h-4"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-                    </div>
-                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-lg lg:text-2xl drop-shadow-lg group-hover:text-brand-primary transition-colors leading-none">
-                      OPENS & SANDALS
+                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-sm lg:text-lg drop-shadow-lg group-hover:text-brand-primary transition-colors leading-none">
+                      OPEN SHOES & SANDALS
                     </h3>
                     <div className="flex justify-between items-center w-full mt-1.5 sm:mt-2">
                       <p className="text-gray-300 text-[11px] sm:text-xs md:text-sm font-medium truncate pr-2">Casual • Summer</p>
@@ -521,38 +513,56 @@ export default function HomeClient({ initialProducts, initialCategories, initial
           <div className="absolute inset-x-0 top-0 h-full bg-gradient-to-b from-[#1a0a00] to-transparent pointer-events-none opacity-50 z-0" />
           
           <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12">
+            
+            {/* Header Container */}
+            <div className="flex flex-row justify-between items-start md:items-center mb-8 sm:mb-12">
+              
+              {/* Desktop Left / Mobile Left */}
               <motion.div 
                 initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
-                className="w-full md:w-auto"
+                className="flex flex-col justify-center w-1/2 md:w-1/3 pr-2"
               >
-                <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
-                  <div className="bg-brand-accent text-white text-[9px] sm:text-xs font-bold px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-md uppercase tracking-widest flex items-center animate-pulse">
-                     <Zap className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" /> {brand.sections?.flashDeals?.badge || "Live Now"}
-                  </div>
-                  <div className="flex items-center text-brand-accent font-mono text-[10px] sm:text-xl lg:text-3xl font-bold rounded-md bg-brand-accent/10 px-2.5 sm:px-4 py-1 sm:py-2 border border-brand-accent/30 shadow-lg shadow-brand-accent/20">
-                    <Clock className="h-3 w-3 sm:h-5 sm:w-5 mr-1.5 sm:mr-3" />
-                    <span>{formatTime(timeLeft)}</span>
-                  </div>
-                </div>
-                <h2 className="font-display uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-white drop-shadow-lg leading-none mb-1 sm:mb-0">
+                <h2 className="font-display uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white drop-shadow-lg leading-none mb-2 sm:mb-3">
                   {brand.sections?.flashDeals?.title || "Flash Deals"}
                 </h2>
-                <p className="text-brand-primary font-bold uppercase tracking-widest text-[9px] sm:text-sm mt-2 sm:mt-3 flex items-center">
-                  <Flame className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" /> {brand.sections?.flashDeals?.subtitle || "Grab your favorite styles before they're gone."}
+                <p className="text-brand-primary font-bold uppercase tracking-widest text-[10px] sm:text-xs md:text-sm">
+                  {brand.sections?.flashDeals?.subtitle || "Grab your favorite styles before they're gone."}
                 </p>
               </motion.div>
+
+              {/* Desktop Center (Hidden on Mobile) */}
               <motion.div 
                 initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
-                className="mt-4 md:mt-0"
+                className="hidden md:flex justify-center items-center w-1/3"
               >
-                <Link href="/shop?type=sneakers&category=deals" className="h-7 sm:h-8 px-4 sm:px-8 bg-transparent border sm:border-2 border-white text-white font-bold hover:bg-white hover:text-brand-accent rounded-md transition-colors flex items-center justify-center uppercase tracking-widest text-[9px] sm:text-sm w-max">
+                <div className="flex items-center text-brand-accent font-mono text-xl lg:text-3xl font-bold rounded-md bg-brand-accent/10 px-4 py-2 border border-brand-accent/30 shadow-lg shadow-brand-accent/20">
+                  <span className="text-white text-xs lg:text-sm font-sans tracking-widest uppercase mr-3">Ends In</span>
+                  <Clock className="h-5 w-5 mr-3" />
+                  <span>{formatTime(timeLeft)}</span>
+                </div>
+              </motion.div>
+
+              {/* Desktop Right / Mobile Right (Timer on Top, CTA below) */}
+              <motion.div 
+                initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
+                className="flex flex-col items-end justify-between w-1/2 md:w-1/3 gap-4 md:gap-0 h-full"
+              >
+                {/* Mobile Right TOP (Hidden on Desktop) */}
+                <div className="flex md:hidden items-center text-brand-accent font-mono text-[10px] sm:text-sm font-bold rounded-md bg-brand-accent/10 px-2.5 py-1.5 border border-brand-accent/30 shadow-lg shadow-brand-accent/20">
+                  <span className="text-white text-[9px] font-sans tracking-widest uppercase mr-2">Ends In</span>
+                  <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                  <span>{formatTime(timeLeft)}</span>
+                </div>
+
+                {/* Below Countdown right (Mobile) / Far Right (Desktop) */}
+                <Link href="/shop?type=sneakers&category=deals" className="h-8 sm:h-10 px-4 sm:px-8 bg-transparent border sm:border-2 border-white text-white font-bold hover:bg-white hover:text-brand-accent rounded-md transition-colors flex items-center justify-center uppercase tracking-widest text-[9px] sm:text-sm w-max md:ml-auto">
                   {brand.sections?.flashDeals?.cta || "View All Deals"} <ArrowRight className="ml-1.5 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
                 </Link>
               </motion.div>
+
             </div>
             
-            <div className="flex -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:grid md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 overflow-x-auto pb-6 sm:pb-8 md:pb-0 after:content-[''] after:min-w-[16px] sm:after:min-w-[24px] md:after:hidden">
+            <div className="flex -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:grid md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 overflow-x-auto pb-6 sm:pb-8 md:pb-0 after:content-[''] after:min-w-[16px] sm:after:min-w-[24px] md:after:hidden">
               {flashDeals.map((product: any) => {
                 return (
                  <motion.div 
@@ -578,14 +588,13 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       alt={product.name}
                       fill
                       referrerPolicy="no-referrer"
-                      className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out opacity-80 group-hover:opacity-100"
+                      className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-100 group-hover:opacity-100"
                     />
                   </Link>
                   
                   {/* Stock Indicator Progress Bar */}
                   <div className="px-3 sm:px-5 pt-3 sm:pt-4">
                     <div className="flex justify-between text-[8px] sm:text-xs uppercase tracking-widest text-brand-accent mb-1.5 sm:mb-2 font-bold">
-                       <span>Selling Fast</span>
                        <span>Limited Stock</span>
                     </div>
                     <div className="w-full bg-white/10 h-1 sm:h-1.5 rounded-full">
@@ -595,7 +604,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
 
                   <div className="px-3 sm:px-5 pt-3 sm:pt-4 pb-0 flex flex-col">
                     <Link href={`/product/${product.id}`}>
-                      <h3 className="font-poppins font-semibold text-sm sm:text-md text-white group-hover:text-brand-accent transition-colors">
+                      <h3 className="font-poppins font-semibold text-sm sm:text-base text-white group-hover:text-brand-accent transition-colors">
                         {product.name}
                       </h3>
                       <div className="mt-1.5 sm:mt-2 flex items-center gap-2 sm:gap-3">
@@ -622,7 +631,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                         href={`/product/${product.id}`}
                         className="w-full bg-transparent border rounded-md border-white/20 text-white font-bold py-1.5 sm:py-2.5 hover:bg-white hover:text-black transition-colors flex justify-center items-center uppercase tracking-widest text-[8px] sm:text-xs"
                        >
-                         Select Option
+                         View Details
                        </Link>
                   </div>
                 </motion.div>

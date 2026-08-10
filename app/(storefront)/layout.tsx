@@ -1,9 +1,10 @@
 // app/(storefront)/layout.tsx
 import { Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { CartProvider } from '@/lib/CartContext';
 import { NavBar } from '@/components/NavBar';
 import { Footer } from '@/components/Footer';
-import { CartDrawer } from '@/components/CartDrawer';
+const CartDrawer = dynamic(() => import('@/components/CartDrawer').then(mod => mod.CartDrawer), { ssr: false });
 
 export default function StorefrontLayout({children}: {children: React.ReactNode}) {
   return (
