@@ -514,54 +514,47 @@ export default function HomeClient({ initialProducts, initialCategories, initial
           
           <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
             
-            {/* Header Container */}
-            <div className="flex flex-row justify-between items-start md:items-center mb-8 sm:mb-12">
+            {/* 
+              Redesigned Responsive Header
+              Mobile: Full stacked vertical hierarchy
+              Tablet (md): Left title group, right-aligned stacked controls
+              Desktop (lg): Left title group, right-aligned horizontal controls 
+            */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-5 md:gap-8 mb-8 sm:mb-12">
               
-              {/* Desktop Left / Mobile Left */}
+              {/* Title & Subtitle Group */}
               <motion.div 
                 initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
-                className="flex flex-col justify-center w-1/2 md:w-1/3 pr-2"
+                className="flex flex-col w-full md:w-auto md:max-w-[55%]"
               >
-                <h2 className="font-display uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white drop-shadow-lg leading-none mb-2 sm:mb-3">
+                <h2 className="font-display uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white drop-shadow-lg leading-tight md:leading-none mb-2 sm:mb-3">
                   {brand.sections?.flashDeals?.title || "Flash Deals"}
                 </h2>
-                <p className="text-brand-primary font-bold uppercase tracking-widest text-[10px] sm:text-xs md:text-sm">
-                  {brand.sections?.flashDeals?.subtitle || "Grab your favorite styles before they're gone."}
+                <p className="font-poppins text-brand-primary text-xs sm:text-sm md:text-base">
+                  {brand.sections?.flashDeals?.subtitle || "Selected styles. Limited-time prices."}
                 </p>
               </motion.div>
 
-              {/* Desktop Center (Hidden on Mobile) */}
+              {/* Controls Group: Countdown & CTA */}
               <motion.div 
                 initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
-                className="hidden md:flex justify-center items-center w-1/3"
+                className="flex flex-col md:items-end gap-3 sm:gap-4 lg:flex-row lg:items-center lg:gap-6 w-full md:w-auto mt-2 md:mt-0"
               >
-                <div className="flex items-center text-brand-accent font-mono text-xl lg:text-3xl font-bold rounded-md bg-brand-accent/10 px-4 py-2 border border-brand-accent/30 shadow-lg shadow-brand-accent/20">
-                  <span className="text-white text-xs lg:text-sm font-sans tracking-widest uppercase mr-3">Ends In</span>
-                  <Clock className="h-5 w-5 mr-3" />
-                  <span>{formatTime(timeLeft)}</span>
-                </div>
-              </motion.div>
-
-              {/* Desktop Right / Mobile Right (Timer on Top, CTA below) */}
-              <motion.div 
-                initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
-                className="flex flex-col items-end justify-between w-1/2 md:w-1/3 gap-4 md:gap-0 h-full"
-              >
-                {/* Mobile Right TOP (Hidden on Desktop) */}
-                <div className="flex md:hidden items-center text-brand-accent font-mono text-[10px] sm:text-sm font-bold rounded-md bg-brand-accent/10 px-2.5 py-1.5 border border-brand-accent/30 shadow-lg shadow-brand-accent/20">
-                  <span className="text-white text-[9px] font-sans tracking-widest uppercase mr-2">Ends In</span>
-                  <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-                  <span>{formatTime(timeLeft)}</span>
+                {/* Static, Premium Countdown */}
+                <div className="flex items-center text-brand-accent font-mono text-sm sm:text-base font-bold rounded-md bg-brand-accent/10 px-3.5 sm:px-5 py-2 sm:py-2.5 border border-brand-accent/20 shadow-lg shadow-brand-accent/5">
+                  <Zap className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                  <span className="text-white text-xs sm:text-sm font-sans tracking-widest uppercase mr-2 sm:mr-3">Ends In</span>
+                  <span className="tracking-wider">{formatTime(timeLeft)}</span>
                 </div>
 
-                {/* Below Countdown right (Mobile) / Far Right (Desktop) */}
-                <Link href="/shop?type=sneakers&category=deals" className="h-8 sm:h-10 px-4 sm:px-8 bg-transparent border sm:border-2 border-white text-white font-bold hover:bg-white hover:text-brand-accent rounded-md transition-colors flex items-center justify-center uppercase tracking-widest text-[9px] sm:text-sm w-max md:ml-auto">
-                  {brand.sections?.flashDeals?.cta || "View All Deals"} <ArrowRight className="ml-1.5 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+                {/* Subordinate Outlined CTA */}
+                <Link href="/shop?type=sneakers&category=deals" className="inline-flex h-10 sm:h-11 px-5 sm:px-6 bg-transparent border border-white/30 text-white font-bold hover:bg-white hover:text-brand-dark hover:border-white rounded-md transition-colors duration-300 items-center justify-center uppercase tracking-widest text-xs w-max">
+                  {brand.sections?.flashDeals?.cta || "View All Deals"} <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </motion.div>
-
             </div>
             
+            {/* Unchanged Product Card Rail/Grid */}
             <div className="flex -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:grid md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 overflow-x-auto pb-6 sm:pb-8 md:pb-0 after:content-[''] after:min-w-[16px] sm:after:min-w-[24px] md:after:hidden">
               {flashDeals.map((product: any) => {
                 return (
