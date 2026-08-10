@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { CartProvider } from '@/lib/CartContext';
 import { NavBar } from '@/components/NavBar';
 import { Footer } from '@/components/Footer';
-const CartDrawer = dynamic(() => import('@/components/CartDrawer').then(mod => mod.CartDrawer), { ssr: false });
+const CartDrawer = dynamic(() => import('@/components/CartDrawer').then(mod => mod.CartDrawer));
 
 export default function StorefrontLayout({children}: {children: React.ReactNode}) {
   return (
