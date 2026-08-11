@@ -24,7 +24,7 @@ export function CartDrawer() {
     let message = `Hello ${brand.name}\n\nI would like to order:\n\n`;
     
     items.forEach(item => {
-      message += `• ${item.product.name} × ${item.quantity}\n  Option: ${item.size}${item.color ? ` | Color: ${item.color}` : ''}\n\n`;
+      message += `• ${item.product.name} × ${item.quantity}\n  Size: ${item.size}${item.color ? ` | Color: ${item.color}` : ''}\n\n`;
     });
 
     message += `Delivery: \n\n`;

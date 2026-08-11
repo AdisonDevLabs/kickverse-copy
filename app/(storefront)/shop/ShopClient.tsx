@@ -140,8 +140,8 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
     return () => clearTimeout(timer);
   }, [filterCategory, filterProductType, filterPrice, filterSize, sortOption, discoveryMode]);
 
-  // 1. Dynamically extract categories based ONLY on the active Product Type
-  // 1. Dynamically extract categories based ONLY on the active Product Type
+  // 1. Dynamically extract categories based ONLY on the active Product Type 
+  // 1. Dynamically extract categories based ONLY on the active Product Type kickverse.storxia.tech
   const dynamicCategories = useMemo(() => {
     const filteredByType = initialProducts.filter(p => {
       const pType = (p.productType || 'Sneakers').toLowerCase();

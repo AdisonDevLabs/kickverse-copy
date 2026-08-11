@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 
-// 2. Add searchParams to the component props
+// 2. Add searchParams to the component props kickverse.storxia.tech
 export default async function ShopPage() {
   
   const db = await getDb();

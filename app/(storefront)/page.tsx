@@ -45,7 +45,7 @@ export default async function HomePage() {
       rating: testimonials.rating,
       text: testimonials.text,
       profile: testimonials.profile,
-      reviewImage: testimonials.reviewImage, // <--- IMAGE FIX: Added the missing image column!
+      reviewImage: testimonials.reviewImage, // <--- IMAGE FIX: Added the missing image column! 
       date: testimonials.date,
       purchased: testimonials.purchased,
       isGlobal: testimonials.isGlobal,
