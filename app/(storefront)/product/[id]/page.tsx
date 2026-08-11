@@ -31,12 +31,37 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? previewImage 
     : `${brand.url.replace(/\/$/, '')}${previewImage.startsWith('/') ? '' : '/'}${previewImage}`;
 
+  // 1. Generate highly specific, intent-driven keywords dynamically
+  const baseKeywords = [
+    product.name,
+    `${product.name} Kenya`,
+    `Buy ${product.name} online`,
+    `${product.category} Nairobi`,
+    `${product.productType} delivery Kenya`,
+    'Kickverse'
+  ];
+
+  // 2. Inject niche keywords based on the exact product type
+  if (product.productType === 'Soccer Cleats') {
+    baseKeywords.push('Football boots Kenya', 'Soccer cleats Nairobi', 'Firm ground boots');
+  } else {
+    baseKeywords.push('Sneakers Kenya', 'Streetwear shoes Nairobi', 'Original sneakers');
+  }
+
+  // 3. Craft a localized, conversion-focused meta description
+  const cleanDescription = product.description.replace(/(<([^>]+)>)/gi, "").substring(0, 90);
+  const localDescription = `Buy the ${product.name} at ${brand.name}. Premium ${product.category.toLowerCase()} available for fast delivery in Nairobi and across Kenya. ${cleanDescription}...`;
+
   return {
     title: product.name, 
-    description: product.description,
+    description: localDescription,
+    keywords: baseKeywords,
+    alternates: {
+      canonical: `${brand.url}product/${id}`,
+    },
     openGraph: {
-      title: product.name,
-      description: `Order the ${product.name} directly on WhatsApp.`,
+      title: `${product.name} | ${brand.shortName}`,
+      description: localDescription,
       url: `${brand.url}product/${id}`,
       siteName: brand.name,
       images: [
@@ -44,15 +69,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           url: absoluteImageUrl,
           width: 800,
           height: 800,
-          alt: `${product.name} preview image`,
+          alt: `Buy ${product.name} in kenya`,
         },
       ],
+      locale: 'en_KE',
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
       title: product.name,
-      description: `Order the ${product.name} directly on WhatsApp.`,
+      description: localDescription,
       images: [absoluteImageUrl],
     },
   };
