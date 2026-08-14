@@ -233,7 +233,6 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             fill
             priority
             fetchPriority="high"
-            sizes="100vw"
             referrerPolicy="no-referrer"
             className="hero-image object-cover object-right md:object-center opacity-80 md:opacity-100"
           />
