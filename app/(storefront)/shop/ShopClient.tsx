@@ -597,7 +597,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                               {product.originalPrice && (
                                 <span className="text-[10px] sm:text-xs text-gray-500 line-through">{formatPrice(product.originalPrice)}</span>
                               )}
-                            </div>
+                            </div>{/*
                             <div className="flex items-center text-[10px] sm:text-xs text-gray-400 mb-4 h-4">
                               {product.rating ? (
                                 <span className="flex items-center text-gray-400">
@@ -606,7 +606,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                               ) : product.reviews ? (
                                 <span>{product.reviews}+ Reviews</span>
                               ) : null}
-                            </div>
+                            </div>*/}
                           </Link>
 
                           {/* CTAs */}
@@ -737,7 +737,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                 
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-bold uppercase tracking-widest text-xs text-gray-400">Size / Option</h3>
+                    <h3 className="font-bold uppercase tracking-widest text-xs text-gray-400">Size</h3>
                     {filterSize && (
                        <button onClick={() => setFilterSize(null)} className="text-xs text-brand-primary hover:text-white transition-colors">Clear</button>
                     )}

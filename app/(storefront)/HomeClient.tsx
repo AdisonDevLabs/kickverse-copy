@@ -76,7 +76,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
 
   const sneakerProducts = initialProducts.filter((p: any) => p.productType === 'Sneakers');
 
-  const newArrivals = initialProducts.filter((p: any) => p.isNewArrival).slice(0, 4);
+  const newArrivals = initialProducts.filter((p: any) => p.isNewArrival).slice(0, 6);
   const bestSellers = initialProducts.filter((p: any) => p.isBestSeller);
   const flashDeals = initialProducts.filter((p: any) => p.isFlashDeal);
 
@@ -475,13 +475,13 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     href={`/shop?type=sneakers&category=${collection.slug}`} 
                     className="block w-full h-full overflow-hidden group/card rounded-md sm:rounded-lg bg-neutral-900 border border-white/5 relative"
                   >
-                    <div className="absolute inset-0 bg-black/40 group-hover/card:bg-black/60 transition-colors duration-500 z-10" />
+                    <div className="absolute inset-0 bg-black/20 group-hover/card:bg-black/30 transition-colors duration-500 z-10" />
                     <Image
                       src={collection.image}
                       alt={collection.name}
                       fill
                       referrerPolicy="no-referrer"
-                      className="object-cover transition-transform duration-1000 group-hover/card:scale-110 opacity-80 group-hover/card:opacity-100"
+                      className="object-cover transition-transform duration-1000 group-hover/card:scale-110 opacity-90 group-hover/card:opacity-100"
                     />
                     
                     <div className="absolute inset-x-0 top-0 p-4 sm:p-6 z-20 flex justify-between items-start opacity-100 transition-opacity">
@@ -801,7 +801,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-8">
-            {bestSellers.slice(0, 4).map((product: any) => (
+            {bestSellers.slice(0, 6).map((product: any) => (
               <motion.div 
                 initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
                 key={product.id} 
