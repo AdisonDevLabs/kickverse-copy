@@ -78,7 +78,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
 
   const newArrivals = initialProducts.filter((p: any) => p.isNewArrival).slice(0, 6);
   const bestSellers = initialProducts.filter((p: any) => p.isBestSeller);
-  const flashDeals = initialProducts.filter((p: any) => p.isFlashDeal);
+  const flashDeals = initialProducts.filter((p: any) => p.isFlashDeal).slice(12);
 
   const sneakerCategories = initialCategories.filter((collection: any) => 
     sneakerProducts.some((p: any) => p.category === collection.name)
@@ -232,6 +232,8 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             alt="Hero Background"
             fill
             priority
+            fetchPriority="high"
+            sizes="100vw"
             referrerPolicy="no-referrer"
             className="hero-image object-cover object-right md:object-center opacity-80 md:opacity-100"
           />
@@ -262,7 +264,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 className="font-display uppercase tracking-wider text-[2.8rem] sm:text-[3.5rem] md:text-[5rem] lg:text-[7.5rem] leading-[0.9] text-white drop-shadow-2xl"
               >
                 {brand.hero?.headlineTop || "HOME OF THE BEST"} <br/> 
-                <span className="text-brand-primary mt-4">{brand.hero?.headlineHighlight || "SNEAKERS & CLEATS"}</span>
+                <span className="text-brand-primary inline-block mt-3 sm:mt-5">{brand.hero?.headlineHighlight || "SNEAKERS & CLEATS"}</span>
               </motion.h1>
             </div>
 
@@ -581,6 +583,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       alt={product.name}
                       fill
                       referrerPolicy="no-referrer"
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                       className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-100 group-hover:opacity-100"
                     />
                   </Link>
@@ -734,6 +737,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       alt={product.name}
                       fill
                       referrerPolicy="no-referrer"
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                       className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out opacity-90 group-hover:opacity-100"
                     />
                   </Link>
@@ -814,6 +818,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       alt={product.name}
                       fill
                       referrerPolicy="no-referrer"
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                       className="object-cover transition-transform duration-700 ease-in-out opacity-90 group-hover:opacity-100 group-hover:scale-105"
                     />
                   </Link>

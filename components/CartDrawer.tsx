@@ -101,6 +101,7 @@ export function CartDrawer() {
                           alt={item.product.name}
                           fill
                           referrerPolicy="no-referrer"
+                          sizes= "96px"
                           className="object-cover opacity-90"
                         />
                       </div>

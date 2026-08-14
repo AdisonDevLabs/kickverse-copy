@@ -159,7 +159,7 @@ Thank you.`,
 };
 
 export const announcementMessages = [
-  { text: "Call/WhatsApp: 0713625575/0794584404", icon: Sparkles },
+  { text: "Call / WhatsApp: 0713 625 575 | 0794 584 404", icon: Sparkles },
   { text: "We Deliver countrywide", icon: Truck },
   { text: "Comes Boxed & Well Packed", icon: Package },
   { text: "Tested, trusted and approved", icon: Star },
