@@ -262,7 +262,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 className="font-display uppercase tracking-wider text-[2.8rem] sm:text-[3.5rem] md:text-[5rem] lg:text-[7.5rem] leading-[0.9] text-white drop-shadow-2xl"
               >
                 {brand.hero?.headlineTop || "HOME OF THE BEST"} <br/> 
-                <span className="text-brand-primary">{brand.hero?.headlineHighlight || "SNEAKERS & CLEATS"}</span>
+                <span className="text-brand-primary mt-4">{brand.hero?.headlineHighlight || "SNEAKERS & CLEATS"}</span>
               </motion.h1>
             </div>
 

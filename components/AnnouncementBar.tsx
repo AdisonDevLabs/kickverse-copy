@@ -49,7 +49,7 @@ export function AnnouncementBar() {
       {/* Desktop Split View (1024px and above) */}
       <div className="hidden lg:flex w-full items-center justify-between max-w-7xl mx-auto px-4 font-semibold text-xs xl:text-sm">
         <div className="flex items-center space-x-2">
-          <Sparkles className="h-4 w-4" />
+          <Sparkles className="h-4 w-4 tracking-wider" />
           <span>{messages[0].text}</span>
         </div>
         <div className="flex items-center space-x-2">
