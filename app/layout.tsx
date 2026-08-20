@@ -1,6 +1,7 @@
 // app/layout.tsx
 import type { Metadata } from 'next';
 import { Inter, Anton, Poppins } from 'next/font/google';
+import { GoogleAnalytics } from '@next/third-parties/google';
 import './globals.css';
 import { brand } from '@/lib/data/brand';
 
@@ -131,6 +132,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
       <body className="font-sans bg-brand-dark text-white antialiased selection:bg-brand-primary selection:text-black min-h-screen flex flex-col">
         {children}
       </body>
+      <GoogleAnalytics gaId="G-ZQBZMLZNS1" />
     </html>
   );
 }

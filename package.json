@@ -19,6 +19,7 @@
     "@google/genai": "^2.4.0",
     "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.2.1",
+    "@next/third-parties": "^16.3.1",
     "autoprefixer": "^10.4.21",
     "bcrypt-ts": "^9.0.1",
     "browser-image-compression": "^2.0.2",
