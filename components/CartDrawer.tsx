@@ -27,8 +27,8 @@ export function CartDrawer() {
       message += `• ${item.product.name} × ${item.quantity}\n  Size: ${item.size}${item.color ? ` | Color: ${item.color}` : ''}\n\n`;
     });
 
-    message += `Delivery: \n\n`;
-    message += `\nSubtotal: ${formatPrice(cartTotal)}\n\nPlease confirm availability, total payable and payment method\n\nThank you.\n\n${productUrl}`;
+    message += `Delivery Location: (Please type here)\n`;
+    message += `Subtotal: ${formatPrice(cartTotal)}\n\nPlease confirm availability, total payable and payment method\n\nThank you.\n\n${productUrl}`;
     
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/${brand.whatsappNumber}?text=${encodedMessage}`, '_blank');

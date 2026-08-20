@@ -57,12 +57,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: localDescription,
     keywords: baseKeywords,
     alternates: {
-      canonical: `${brand.url}product/${id}`,
+      canonical: `${brand.url}/product/${id}`,
     },
     openGraph: {
       title: `${product.name} | ${brand.shortName}`,
       description: localDescription,
-      url: `${brand.url}product/${id}`,
+      url: `${brand.url}/product/${id}`,
       siteName: brand.name,
       images: [
         {
@@ -93,7 +93,7 @@ export default async function ProductPage({ params }: Props) {
   const product = result[0];
 
   if (!product) {
-    return <ProductDetailsClient product={null} relatedProducts={[]} recentlyViewed={[]} accessories={[]} />;
+    return <ProductDetailsClient product={null} relatedProducts={[]} recentlyViewed={[]} />;
   }
 
   const [allSizeGuides, allColorMaps, relatedPool, productReviews, recentlyViewedPool] = await Promise.all([
@@ -138,7 +138,7 @@ export default async function ProductPage({ params }: Props) {
       '@type': 'Offer',
       priceCurrency: 'KES',
       price: product.price,
-      url: `${brand.url}product/${product.id}`,
+      url: `${brand.url}/product/${product.id}`,
       availability: 'https://schema.org/InStock',
       seller: {
         '@type': 'Organization',

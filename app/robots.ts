@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next';
 import { brand } from '@/lib/data/brand';
 
 export default function robots(): MetadataRoute.Robots {
+  const baseUrl = brand.url.replace(/\/$/, '');
   return {
     rules: [
       {
@@ -13,6 +14,6 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: `${brand.url}sitemap.xml`,
+    sitemap: `${brand.url}/sitemap.xml`,
   };
 }

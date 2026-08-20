@@ -58,12 +58,12 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     keywords: dynamicKeywords,
     alternates: {
       // This tells Google the exact URL to index, ignoring extraneous query parameters
-      canonical: `${brand.url}shop${categoryRaw ? `?category=${categoryRaw}` : ''}`,
+      canonical: `${brand.url}/shop${categoryRaw ? `?category=${categoryRaw}` : ''}`,
     },
     openGraph: {
       title: `${dynamicTitle} | ${brand.shortName}`,
       description: dynamicDescription,
-      url: `${brand.url}shop${categoryRaw ? `?category=${categoryRaw}` : ''}`,
+      url: `${brand.url}/shop${categoryRaw ? `?category=${categoryRaw}` : ''}`,
       siteName: brand.name,
       locale: 'en_KE',
       type: 'website',

@@ -68,17 +68,14 @@ export default async function HomePage() {
   // 3. Construct JSON-LD Schema.org Data for the Storefront Homepage
   const storeJsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'OnlineStore',
+    '@type': 'WebSite',
     name: brand.name,
     url: brand.url,
-    logo: `${brand.url.replace(/\/$/, '')}${brand.logo.startsWith('/') ? '' : '/'}${brand.logo}`,
-    description: brand.description,
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: brand.location.split(',')[0].trim(), 
-      addressCountry: 'KE',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${brand.url}/shop?q={search_term_string}`,
+      'query-input': 'required name=search_term_string',
     },
-    priceRange: 'KSh 3,000 - KSh 25,000', 
   };
 
   return (

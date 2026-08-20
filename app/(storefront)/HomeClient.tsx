@@ -78,7 +78,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
 
   const newArrivals = initialProducts.filter((p: any) => p.isNewArrival).slice(0, 6);
   const bestSellers = initialProducts.filter((p: any) => p.isBestSeller);
-  const flashDeals = initialProducts.filter((p: any) => p.isFlashDeal).slice(12);
+  const flashDeals = initialProducts.filter((p: any) => p.isFlashDeal).slice(0, 12);
 
   const sneakerCategories = initialCategories.filter((collection: any) => 
     sneakerProducts.some((p: any) => p.category === collection.name)

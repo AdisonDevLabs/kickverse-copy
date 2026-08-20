@@ -93,9 +93,17 @@ export function PublicReviewModal({ isOpen, onClose, productId, productName }: {
 
   // Remove Handlers
   const handleRemoveReviewImage = (idxToRemove: number) => {
+    URL.revokeObjectURL(reviewPreviews[idxToRemove]);
     setReviewPreviews(prev => prev.filter((_, idx) => idx !== idxToRemove));
     setUploadedReviewUrls(prev => prev.filter((_, idx) => idx !== idxToRemove));
   };
+
+  useEffect(() => {
+    return () => {
+      if (profilePreview) URL.revokeObjectURL(profilePreview);
+      reviewPreviews.forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [profilePreview, reviewPreviews]);
 
   // INSTANT SUBMIT
   const handleSubmit = async (e: React.FormEvent) => {

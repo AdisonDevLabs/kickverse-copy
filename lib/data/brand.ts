@@ -3,7 +3,7 @@ import { Truck, Package, Star, Sparkles, Tag, CheckCircle, ShieldCheck } from 'l
 
 export const brand = {
   name: "KICKVERSE KE",
-  url: "https://kickverse.co.ke/",
+  url: "https://kickverse.co.ke",
   shortName: "KICKVERSE",
   logo: "/kickverse.png",
   logo1: "/android-chrome-512x512.png",
@@ -92,9 +92,9 @@ export const brand = {
   socialLinks: {
     instagram: "https://instagram.com/kickverse.ke_",
     facebook: "https://facebook.com/", // Add your FB link here later
-    tiktok: "https://www.tiktok.com/@kickverse_?_r=1&_t=ZS-98UxHbNXiWS",
-    tiktokBootRoom: "https://www.tiktok.com/@bootroomkenya?_r=1&_t=ZS-98UxJXGo06H",
-    tiktokSoleKraft: "https://www.tiktok.com/@solekraft?_r=1&_t=ZS-98UxNemc1X3",
+    tiktok: "https://www.tiktok.com/@kickverse_",
+    tiktokBootRoom: "https://www.tiktok.com/@bootroomkenya",
+    tiktokSoleKraft: "https://www.tiktok.com/@solekraft",
     whatsappCommunity: "https://chat.whatsapp.com/DZMzWpLnP9WDFjZ4PCrENq"
   },
   deliveryInfo: {
