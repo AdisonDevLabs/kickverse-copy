@@ -1,4 +1,5 @@
 // app/(storefront)/product/[id]/page.tsx
+import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { brand } from '@/lib/data/brand';
 import ProductDetailsClient from './ProductDetailsClient';
@@ -20,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = result[0];
   
   if (!product) {
-    return { title: 'Product Not Found' };
+    notFound(); // <-- 2. Trigger true 404 here
   }
 
   const previewImage = product.images && product.images.length > 0 
@@ -93,7 +94,7 @@ export default async function ProductPage({ params }: Props) {
   const product = result[0];
 
   if (!product) {
-    return <ProductDetailsClient product={null} relatedProducts={[]} recentlyViewed={[]} />;
+    notFound(); // <-- 3. Trigger true 404 here too
   }
 
   const [allSizeGuides, allColorMaps, relatedPool, productReviews, recentlyViewedPool] = await Promise.all([
