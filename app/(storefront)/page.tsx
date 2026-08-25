@@ -70,6 +70,7 @@ export default async function HomePage() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: brand.name,
+    alternateName: ['Kickverse', 'Kickverse Kenya', 'KickVerse', 'kickverse.co.ke'],
     url: brand.url,
     potentialAction: {
       '@type': 'SearchAction',
