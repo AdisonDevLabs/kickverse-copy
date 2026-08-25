@@ -15,32 +15,43 @@ type Props = {
 // 2. Replace static metadata with dynamic generateMetadata
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const resolvedParams = await searchParams;
-  const categoryRaw = resolvedParams.category as string | undefined;
-  const typeRaw = resolvedParams.type as string | undefined;
+  const categoryRaw = typeof resolvedParams.category === 'string' ? resolvedParams.category : undefined;
+  const typeRaw = typeof resolvedParams.type === 'string' ? resolvedParams.type : undefined;
 
   // Helper to format URL slugs (e.g., 'official-shoes' -> 'Official Shoes')
   const formatString = (str?: string) => {
     if (!str) return '';
-    return str.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    return str
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   };
 
   const categoryName = formatString(categoryRaw);
   const typeName = formatString(typeRaw);
 
   // 3. Construct intelligent fallbacks based on available parameters
-  let dynamicTitle = 'Shop All Footwear';
-  let dynamicDescription = `Browse our complete catalog of authentic sneakers, firm ground soccer cleats, and astro turf boots. Swift delivery across Nairobi and Kenya.`;
+  let dynamicTitle = 'Shop Footwear Collection';
+  let dynamicDescription = `Browse authentic footwear at ${brand.name}. Swift delivery across Nairobi and Country Wide.`;
   
   if (categoryName && typeName) {
-    dynamicTitle = `Shop ${categoryName} ${typeName}`;
-    dynamicDescription = `Explore our premium collection of ${categoryName} ${typeName}. Authentic and affordable footwear with fast delivery across Kenya.`;
+    dynamicTitle = `Shop ${categoryName} | ${typeName}`;
+    dynamicDescription = `Explore our collection of ${categoryName} under ${typeName}. Fast delivery across Kenya.`;
   } else if (categoryName) {
     dynamicTitle = `Shop ${categoryName}`;
-    dynamicDescription = `Buy the latest ${categoryName} at ${brand.name}. Quality guaranteed with delivery in Nairobi and across Kenya.`;
+    dynamicDescription = `Buy authentic ${categoryName} online at ${brand.name}. Quality guaranteed across Kenya.`;
   } else if (typeName) {
     dynamicTitle = `Shop ${typeName}`;
     dynamicDescription = `Browse our complete catalog of ${typeName}. Find the perfect fit with fast, reliable delivery in Kenya.`;
   }
+
+  // Build clean, accurate self-referencing canonical URL
+  const canonicalParams = new URLSearchParams();
+  if (typeRaw) canonicalParams.set('type', typeRaw);
+  if (categoryRaw) canonicalParams.set('category', categoryRaw);
+  
+  const queryString = canonicalParams.toString();
+  const canonicalUrl = `${brand.url.replace(/\/$/, '')}/shop${queryString ? `?${queryString}` : ''}`;
 
   // 4. Inject highly specific, localized search keywords dynamically
   const dynamicKeywords = [
@@ -57,13 +68,12 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     description: dynamicDescription,
     keywords: dynamicKeywords,
     alternates: {
-      // This tells Google the exact URL to index, ignoring extraneous query parameters
-      canonical: `${brand.url}/shop${categoryRaw ? `?category=${categoryRaw}` : ''}`,
+      canonical: canonicalUrl,
     },
     openGraph: {
       title: `${dynamicTitle} | ${brand.shortName}`,
       description: dynamicDescription,
-      url: `${brand.url}/shop${categoryRaw ? `?category=${categoryRaw}` : ''}`,
+      url: canonicalUrl,
       siteName: brand.name,
       locale: 'en_KE',
       type: 'website',
