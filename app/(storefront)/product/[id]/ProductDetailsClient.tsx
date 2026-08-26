@@ -271,7 +271,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   >
                     <Image
                       src={images[activeImage]}
-                      alt={`${product.name} - View ${activeImage + 1}`}
+                      alt={`Buy ${product.name} in Nairobi - View ${activeImage + 1}`}
                       fill
                       priority
                       referrerPolicy="no-referrer"
@@ -294,7 +294,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                     onClick={() => handleImageSelect(idx)}
                     className={`relative w-24 aspect-square flex-shrink-0 bg-brand-card border rounded-md overflow-hidden transition-all ${activeImage === idx ? 'border-brand-primary opacity-100' : 'border-white/10 opacity-50 hover:opacity-100'}`}
                   >
-                    <Image src={img} alt={`Thumbnail ${idx + 1}`} fill referrerPolicy="no-referrer" className="object-cover" />
+                    <Image src={img} alt={`${product.name} detail shot ${idx + 1} Nairobi`} fill referrerPolicy="no-referrer" className="object-cover" />
                   </button>
                 ))}
               </div>
@@ -464,9 +464,9 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                 <div className="flex items-start">
                   <Truck className="h-5 w-5 mr-3 text-gray-400 shrink-0" />
                   <div>
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-1">Fast Delivery</h4>
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-1">Nairobi Delivery</h4>
                     <p className="text-[10px] text-gray-500 uppercase tracking-widest">
-                      {product.productType === 'Soccer Cleats' ? 'Ready for Matchday Delivery' : 'Across Kenya within 24-48 hrs'}
+                      {product.productType === 'Soccer Cleats' ? 'Fast dispatch within Nairobi CBD' : 'Expedited delivery across Kenya'}
                     </p>
                   </div>
                 </div>
@@ -483,7 +483,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   <CheckCircle className="h-5 w-5 mr-3 text-gray-400 shrink-0" />
                   <div>
                     <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-1">Secure Packaging</h4>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Delivered in pristine condition</p>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Pay on delivery available locally</p>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -689,13 +689,13 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
         {relatedProducts.length > 0 && (
           <section className="py-20 bg-brand-card border-t border-white/10 px-6">
             <div className="max-w-7xl mx-auto">
-              <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} className="font-display uppercase tracking-wide text-3xl md:text-5xl text-center mb-12 text-white">You Might Also Like</motion.h2>
+              <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} className="font-display uppercase tracking-wide text-3xl md:text-5xl text-center mb-12 text-white">Trending in Nairobi & You Might Also Like</motion.h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 {relatedProducts.map((prod: any) => (
                   <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} key={prod.id}>
                     <Link href={`/product/${prod.id}`} className="group flex flex-col hover:-translate-y-1 transition-transform duration-300">
                       <div className="relative aspect-[3/4] w-full bg-brand-dark overflow-hidden rounded-md mb-4 border border-transparent group-hover:border-white/10">
-                        <Image src={prod.image} alt={prod.name} fill referrerPolicy="no-referrer" className="object-cover group-hover:scale-[1.03] opacity-90 group-hover:opacity-100 transition-transform duration-700" />
+                        <Image src={prod.image} alt={`Buy ${prod.name} online in Nairobi`} fill referrerPolicy="no-referrer" className="object-cover group-hover:scale-[1.03] opacity-90 group-hover:opacity-100 transition-transform duration-700" />
                       </div>
                       <div className="text-left w-full mt-auto">
                         <h3 className="font-sans font-medium text-white line-clamp-2 mb-1 group-hover:text-brand-primary transition-colors text-sm sm:text-base leading-tight">{prod.name}</h3>
@@ -718,7 +718,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} key={prod.id}>
                     <Link href={`/product/${prod.id}`} className="group">
                       <div className="relative aspect-square w-full bg-brand-card rounded-md overflow-hidden border border-white/5 group-hover:border-white/20 transition-colors">
-                        <Image src={prod.image} alt={prod.name} fill className="object-cover" referrerPolicy="no-referrer" />
+                        <Image src={prod.image} alt={`${prod.name} Kenya catalog`} fill className="object-cover" referrerPolicy="no-referrer" />
                       </div>
                     </Link>
                   </motion.div>

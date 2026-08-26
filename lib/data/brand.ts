@@ -7,23 +7,23 @@ export const brand = {
   shortName: "KICKVERSE",
   logo: "/kickverse.png",
   logo1: "/android-chrome-512x512.png",
-  tagline: "HOME OF THE BEST SNEAKERS & CLEATS",
+  tagline: "PREMIUM SNEAKERS, SOCCER CLEATS & OFFICIAL SHOES IN NAIROBI",
   description:
-    "Shop with us for Genuine quality and best prices. 100% Verified Secure Shopping",
+    "Leading online footwear store in Nairobi, Kenya. Shop original sneakers, professional artificial turf soccer cleats, pure leather official shoes, and casual clogs with complimentary Nairobi CBD delivery and pay on delivery.",
   location: "Nairobi, Kenya",
   seo: {
-    title: "KICKVERSE KE | HOME OF THE BEST SNEAKERS & CLEATS",
-    description: "Shop with us for Genuine quality and best prices.",
+    title: "Kickverse KE | Premium Sneakers, Soccer Cleats & Official Shoes in Nairobi, Kenya",
+    description: "Buy original sneakers, artificial turf soccer cleats (TF/AG/FG), pure leather official shoes, and casual sandals in Nairobi, Kenya. Enjoy free Nairobi CBD delivery, countrywide shipping, and secure pay on delivery.",
     ogImage: "/kickverse.png",
     favicon: "/favicon.ico",
     appleIcon: "/apple-touch-icon.png",
   },
 
   hero: {
-    badge: "Tested, trusted and approved",
+    badge: "Tested, Trusted & Approved in Nairobi",
     headlineTop: "HOME OF THE BEST",
     headlineHighlight: "SNEAKERS & CLEATS",
-    backgroundImage: "/IMG_3305.jpg",
+    backgroundImage: "/background-image7.jpeg",
     sneakersImage: "/sneakers.jpg",
     soccerCleatsImage: "/soccer-cleats.jpg",
     officialsImage: "/officials.jpg",
@@ -34,35 +34,35 @@ export const brand = {
 
   sections: {
     featured: {
-      title: "Featured Collection",
-      subtitle: "Browse our curated selection of genuine quality sneakers and soccer cleats."
+      title: "Featured Footwear Collection",
+      subtitle: "Browse our curated selection of original sneakers, turf cleats, and pure leather official shoes in Nairobi."
     },
     flashDeals: {
-      badge: "Live Offers",
-      title: "Flash Deals",
-      subtitle: "Grab your favorite styles before they are gone",
+      badge: "Limited Time Offers",
+      title: "Flash Deals on Trending Footwear",
+      subtitle: "Grab your favorite sneaker and cleat styles before they are gone — best prices in Kenya.",
       cta: "View All Deals"
     },
     newArrivals: {
       badge: "Updated Weekly",
-      title: "Latest Styles",
-      subtitle: "Fresh styles added weekly — be the first to own them.",
+      title: "Trending Men's & Women's Footwear in Nairobi",
+      subtitle: "Fresh sneaker drops, artificial turf football boots, and official shoes added weekly in Kenya.",
       cta: "View All Arrivals",
       trendingBadgePrefix: "Trending in"
     },
     bestSellers: {
       badge: "Customer Favorites",
-      title: "BEST SELLERS",
-      subtitle: "Tested, trusted and approved.",
+      title: "Nairobi Best Sellers",
+      subtitle: "Top-rated original sneakers and soccer cleats tested, trusted, and approved by happy customers across Kenya.",
       cta: "View All Favorites"
     },
     whyUs: {
       badge: "Trust & Reliability",
-      titleTop: "WHY SHOP WITH",
-      subtitle: "Shop with us for Genuine quality and best prices."
+      titleTop: "WHY BUY FOOTWEAR FROM",
+      subtitle: "Authentic quality, genuine leather, artificial turf studs, and verified pay on delivery across Nairobi."
     },
     reviews: {
-      badge: "Tested, trusted and approved",
+      badge: "100% Verified Customer Reviews",
       titleTop: "WHAT OUR",
       titleBottom: "CUSTOMERS SAY"
     },
@@ -70,7 +70,7 @@ export const brand = {
       badge: "We Are Online",
       titleTop: "START YOUR",
       titleBottom: "ORDER NOW",
-      subtitle: "Chat with us directly on WhatsApp to confirm size, price, and delivery details."
+      subtitle: "Chat directly with our Nairobi sales team on WhatsApp to confirm size, stock, and instant CBD dispatch."
     }
   },
 
@@ -98,38 +98,38 @@ export const brand = {
     whatsappCommunity: "https://chat.whatsapp.com/DZMzWpLnP9WDFjZ4PCrENq"
   },
   deliveryInfo: {
-    standard: "Small delivery fee charged for orders outside CBD & Doorstep deliveries.",
-    nairobi: "Complimentary delivery exclusively within the Nairobi CBD",
+    standard: "Fast doorstep delivery across Nairobi environs and reliable countrywide parcel dispatch.",
+    nairobi: "Complimentary same-day delivery exclusively within the Nairobi CBD boundaries.",
   },
   trustStatements: [
-    "We Deliver countrywide",
-    "Genuine quality and best prices",
-    "Order and Pay on delivery",
-    "Tested, trusted and approved",
+    "Countrywide Delivery Across Kenya",
+    "100% Genuine Quality Footwear",
+    "Pay on Delivery in Nairobi",
+    "Tested, Trusted and Approved",
   ],
   features: [
     {
-      title: "Genuine Quality",
-      description: "Shop with us for Genuine quality and best prices."
+      title: "100% Genuine Quality",
+      description: "Curated collection of original streetwear sneakers, turf soccer boots, and pure leather official shoes."
     },
     {
-      title: "Countrywide Delivery",
-      description: "We Deliver countrywide."
+      title: "Countrywide Kenya Delivery",
+      description: "Fast, reliable parcel delivery to all major towns and estates across Kenya."
     },
     {
-      title: "Nairobi CBD Delivery",
-      description: "Enjoy complimentary delivery exclusively within the Nairobi CBD boundaries."
+      title: "Free Nairobi CBD Delivery",
+      description: "Enjoy complimentary, expedited delivery exclusively within the Nairobi CBD boundaries."
     },
     {
-      title: "Pay after Delivery",
-      description: "Order and Pay after delivery (locations around Nairobi) and its environs."
+      title: "Pay After Delivery",
+      description: "Order with confidence and pay upon delivery in Nairobi and surrounding metropolitan areas."
     }
   ],
   whatsappTrustSignals: [
-    "We Deliver countrywide",
-    "Genuine quality",
-    "Tested, trusted and approved",
-    "Pay on delivery available"
+    "Fast Countrywide Delivery",
+    "100% Genuine Quality",
+    "Tested, Trusted & Approved",
+    "Pay on Delivery Available"
   ],
   whatsappMockChat: [
     {
@@ -155,29 +155,29 @@ Thank you.`,
       time: "10:06 AM"
     }
   ],
-  salesCallout: "Tested, trusted and approved"
+  salesCallout: "Tested, Trusted & Approved in Kenya"
 };
 
 export const announcementMessages = [
   { text: "Call / WhatsApp: 0713 625 575 | 0794 584 404", icon: Sparkles },
   { text: "We Deliver countrywide", icon: Truck },
   { text: "Comes Boxed & Well Packed", icon: Package },
-  { text: "Tested, trusted and approved", icon: Star },
-  { text: "Order and Pay on delivery", icon: Tag },
+  { text: "Tested, Trusted & Approved Footwear", icon: Star },
+  { text: "Order & Pay on Delivery in Nairobi", icon: Tag },
 ];
 
 export const cartTrustFeatures = [
-  { text: "We Deliver countrywide", icon: Truck },
-  { text: "Genuine quality", icon: CheckCircle },
-  { text: "Tested, trusted and approved", icon: ShieldCheck },
-  { text: "Order and Pay on delivery", icon: Package },
+  { text: "Fast Countrywide Delivery", icon: Truck },
+  { text: "100% Genuine Quality", icon: CheckCircle },
+  { text: "Tested, Trusted & Approved", icon: ShieldCheck },
+  { text: "Pay on Delivery in Nairobi", icon: Package },
 ];
 
 export const footerQuickShopLinks = [
   { label: "Sneakers", href: "/shop?type=sneakers" },
   { label: "Soccer Cleats", href: "/shop?type=soccer-cleats" },
-  { label: "Official Shoes", href: "/shop?category=official-shoes" },
-  { label: "Opens & Sandals", href: "/shop?category=opens-sandals" },
+  { label: "Official Shoes", href: "/shop?type=official-shoes" },
+  { label: "Opens & Sandals", href: "/shop?type=opens-sandals" },
 ];
 
 export const footerSupportLinks = [

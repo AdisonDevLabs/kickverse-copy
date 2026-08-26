@@ -24,6 +24,12 @@
 }
 
 @layer utilities {
+  /* Core Web Vitals: Rendering performance & CLS prevention for catalogs */
+  .content-visibility-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 500px;
+  }
+  
   /* Hides scrollbar completely but keeps functionality */
   .scrollbar-hide,
   .hide-scrollbar {

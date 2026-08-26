@@ -3,13 +3,16 @@ import { brand } from '@/lib/data/brand';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: brand.name,
+    name: `${brand.name} Kenya | Sneakers & Footwear`,
     short_name: brand.shortName,
-    description: brand.description,
+    description: 'Shop quality sneakers, soccer cleats, and official shoes with Nairobi CBD delivery.',
     start_url: '/',
     display: 'standalone',
-    background_color: '#ffffff',
-    theme_color: '#000000',
+    orientation: 'portrait',
+    background_color: '#0A0A0A',
+    theme_color: '#E5FF00',
+    categories: ['shopping', 'lifestyle', 'footwear', 'sports'],
+    lang: 'en-KE',
     icons: [
       {
         src: brand.seo.favicon,
