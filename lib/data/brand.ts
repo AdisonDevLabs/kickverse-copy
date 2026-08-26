@@ -9,7 +9,7 @@ export const brand = {
   logo1: "/android-chrome-512x512.png",
   tagline: "PREMIUM SNEAKERS, SOCCER CLEATS & OFFICIAL SHOES IN NAIROBI",
   description:
-    "Leading online footwear store in Nairobi, Kenya. Shop original sneakers, professional artificial turf soccer cleats, pure leather official shoes, and casual clogs with complimentary Nairobi CBD delivery and pay on delivery.",
+    "Leading online footwear store in Nairobi, Kenya. Shop original sneakers, professional artificial turf soccer cleats, pure leather official shoes, and casual clogs with free Nairobi CBD delivery and pay on delivery.",
   location: "Nairobi, Kenya",
   seo: {
     title: "Kickverse KE | Premium Sneakers, Soccer Cleats & Official Shoes in Nairobi, Kenya",
@@ -46,7 +46,7 @@ export const brand = {
     },
     newArrivals: {
       badge: "Updated Weekly",
-      title: "Trending Men's & Women's Footwear in Nairobi",
+      title: "Latest Men's & Women's Footwear in Nairobi",
       subtitle: "Fresh sneaker drops, artificial turf football boots, and official shoes added weekly in Kenya.",
       cta: "View All Arrivals",
       trendingBadgePrefix: "Trending in"

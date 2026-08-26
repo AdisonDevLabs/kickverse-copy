@@ -299,7 +299,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
   return (
     <div className="bg-brand-dark min-h-screen text-white">
       {/* Page Header */}
-      <div className="bg-brand-card pt-4 md:pt-6 pb-4 px-6 relative overflow-hidden">
+      <div className="bg-brand-dark pt-4 md:pt-6 pb-4 px-6 relative overflow-hidden">
         {/* Subtle background glow for visual hierarchy 
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-full bg-brand-primary/5 blur-3xl rounded-full pointer-events-none"></div>*/}
         
@@ -318,9 +318,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
              filterProductType !== 'All' ? `Premium ${filterProductType}` :
              'Shop Collection'}
           </motion.h1>
-          <motion.p variants={staggerItem} className="text-gray-400 mt-2 text-sm max-w-xl">
-             Explore 100% authentic footwear. Complimentary CBD Delivery in Nairobi & Pay on Delivery nationwide.
-          </motion.p>
         </motion.div>
       </div>
 

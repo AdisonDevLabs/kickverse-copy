@@ -262,14 +262,14 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               >
                 <span className="sr-only">Premium Sneakers, Soccer Cleats & Official Shoes at Kickverse Nairobi, Kenya - </span>
                 {brand.hero?.headlineTop || "HOME OF THE BEST"} <br/> 
-                <span className="text-brand-primary inline-block mt-5 sm:mt-5">{brand.hero?.headlineHighlight || "SNEAKERS & CLEATS"}</span>
+                <span className="text-brand-primary inline-block mt-5 sm:mt-6">{brand.hero?.headlineHighlight || "SNEAKERS & CLEATS"}</span>
               </motion.h1>
             </div>
 
             {/* Subheadline */}
             <motion.p 
               variants={staggerItem}
-              className="bg-gray-100 text-gray-100 text-[13px] sm:text-sm md:text-base max-w-[480px] sm:max-w-lg mb-5 sm:mb-5 font-medium leading-relaxed drop-shadow-xl shadow-black mx-auto"
+              className="bg-gray-100 text-gray-100 text-[13px] sm:text-sm md:text-base max-w-[480px] sm:max-w-lg mb-5 sm:mb-6 font-medium leading-relaxed drop-shadow-xl shadow-black mx-auto"
             >
               {brand.description}
             </motion.p>
@@ -412,7 +412,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   />
                   <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-3 text-left">
                     <h2 className="text-white font-display uppercase tracking-widest text-xs sm:text-sm lg:text-lg drop-shadow-lg group-hover:text-brand-primary transition-colors leading-none">
-                      OPEN SHOES & SANDALS
+                      OPENS & SANDALS
                     </h2>
                     <div className="flex justify-between items-center w-full mt-1.5 sm:mt-2">
                       <p className="text-gray-300 text-[11px] sm:text-xs md:text-sm font-medium truncate pr-2">Suede Clogs • Summer</p>
