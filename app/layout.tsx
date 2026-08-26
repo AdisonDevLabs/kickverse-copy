@@ -79,7 +79,6 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
     '@context': 'https://schema.org',
     '@type': 'ShoeStore',
     'name': brand.name,
-    alternateName: ['Kickverse', 'Kickverse Kenya', 'KickVerse'],
     'url': brand.url,
     'logo': `${brand.url}${brand.logo}`,
     'description': brand.description,
