@@ -258,7 +258,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             <div className="overflow-hidden mb-2 sm:mb-4 w-full">
               <motion.h1 
                 variants={heroReveal}
-                className="font-display uppercase tracking-wider text-[2.8rem] sm:text-[3.5rem] md:text-[5rem] lg:text-[7.2rem] leading-[0.9] text-white drop-shadow-2xl"
+                className="font-display uppercase tracking-wider text-[2.8rem] sm:text-[3.5rem] md:text-[5rem] lg:text-[7rem] leading-[0.9] text-white drop-shadow-2xl"
               >
                 <span className="sr-only">Premium Sneakers, Soccer Cleats & Official Shoes at Kickverse Nairobi, Kenya - </span>
                 {brand.hero?.headlineTop || "HOME OF THE BEST"} <br/> 
@@ -269,12 +269,26 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             {/* Subheadline */}
             <motion.p 
               variants={staggerItem}
-              className="text-gray-200 text-[13px] sm:text-sm md:text-base max-w-[480px] sm:max-w-2xl mb-3 sm:mb-5 font-medium leading-relaxed drop-shadow-xl shadow-black mx-auto"
+              className="text-gray-100 text-[13px] sm:text-sm md:text-base max-w-[480px] sm:max-w-lg mb-3 sm:mb-5 font-medium leading-relaxed drop-shadow-xl shadow-black mx-auto"
             >
               {brand.description}
             </motion.p>
             
-
+            {/* Micro Trust List - Centered vertically 
+            <motion.div 
+              variants={staggerItem}
+              className="flex flex-col items-center justify-center gap-y-2 sm:gap-y-3 mb-4 sm:mb-6 text-[9px] sm:text-[11px] md:text-xs font-bold uppercase tracking-widest text-white drop-shadow-xl shadow-black"
+            >
+              <div className="flex items-center">
+                <Truck className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-brand-primary" /> {brand.trustStatements[0] || "We Deliver countrywide"}
+              </div>
+              <div className="flex items-center">
+                <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-brand-primary" /> {brand.trustStatements[1] || "Genuine quality"}
+              </div>
+               <div className="flex items-center">
+                <Wallet className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-brand-primary" /> {brand.trustStatements[2] || "Pay on delivery"}
+              </div>
+            </motion.div>*/}
 
             {/* CTA Section - Added justify-center */}
             <motion.div 
