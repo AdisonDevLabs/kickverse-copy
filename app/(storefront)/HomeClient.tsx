@@ -248,28 +248,28 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               variants={staggerItem}
               className="inline-flex items-center justify-center space-x-1.5 bg-transparent border border-white/20 rounded-full px-2.5 py-1 mb-2 sm:mb-4"
             >
-              <ShieldCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-brand-primary" />
+              <ShieldCheck className="h-3.5 w-3.5 sm:h-3.5 sm:w-3.5 text-brand-primary" />
               <span className="text-white text-[10px] sm:text-[10px] font-bold tracking-widest uppercase">
                 {brand.hero?.badge || "TESTED, TRUSTED AND APPROVED IN NAIROBI"}
               </span>
             </motion.div>
 
             {/* Main Headline - Increased text sizes for all breakpoints */}
-            <div className="overflow-hidden mb-2 sm:mb-4 w-full">
+            <div className="overflow-hidden mb-4 sm:mb-6 w-full">
               <motion.h1 
                 variants={heroReveal}
                 className="font-display uppercase tracking-wider text-[2.8rem] sm:text-[3.5rem] md:text-[5rem] lg:text-[7rem] leading-[0.9] text-white drop-shadow-2xl"
               >
                 <span className="sr-only">Premium Sneakers, Soccer Cleats & Official Shoes at Kickverse Nairobi, Kenya - </span>
                 {brand.hero?.headlineTop || "HOME OF THE BEST"} <br/> 
-                <span className="text-brand-primary inline-block mt-3 sm:mt-5">{brand.hero?.headlineHighlight || "SNEAKERS & CLEATS"}</span>
+                <span className="text-brand-primary inline-block mt-5 sm:mt-5">{brand.hero?.headlineHighlight || "SNEAKERS & CLEATS"}</span>
               </motion.h1>
             </div>
 
             {/* Subheadline */}
             <motion.p 
               variants={staggerItem}
-              className="text-gray-100 text-[13px] sm:text-sm md:text-base max-w-[480px] sm:max-w-lg mb-3 sm:mb-5 font-medium leading-relaxed drop-shadow-xl shadow-black mx-auto"
+              className="text-gray-100 text-[13px] sm:text-sm md:text-base max-w-[480px] sm:max-w-lg mb-5 sm:mb-5 font-medium leading-relaxed drop-shadow-xl shadow-black mx-auto"
             >
               {brand.description}
             </motion.p>
