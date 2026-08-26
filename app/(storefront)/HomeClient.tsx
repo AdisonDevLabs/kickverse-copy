@@ -269,7 +269,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             {/* Subheadline */}
             <motion.p 
               variants={staggerItem}
-              className="text-gray-100 text-[13px] sm:text-sm md:text-base max-w-[480px] sm:max-w-lg mb-5 sm:mb-5 font-medium leading-relaxed drop-shadow-xl shadow-black mx-auto"
+              className="bg-gray-100 text-gray-100 text-[13px] sm:text-sm md:text-base max-w-[480px] sm:max-w-lg mb-5 sm:mb-5 font-medium leading-relaxed drop-shadow-xl shadow-black mx-auto"
             >
               {brand.description}
             </motion.p>
