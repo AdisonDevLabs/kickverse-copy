@@ -227,14 +227,28 @@ export default function HomeClient({ initialProducts, initialCategories, initial
         
         {/* Full Section Background Image */}
         <div className="absolute inset-0 z-0">
+          {/* Mobile Hero Image (Visible on screens smaller than md) */}
           <Image
-            src={brand.hero?.backgroundImage}
+            src={brand.hero?.mobileBackgroundImage}
             alt="Kickverse KE - Original Sneakers, Soccer Cleats and Official Shoes in Nairobi Kenya"
             fill
             priority
             fetchPriority="high"
             referrerPolicy="no-referrer"
-            className="hero-image object-cover object-right md:object-center opacity-80 md:opacity-100"
+            className="hero-image object-cover object-right opacity-80 block md:hidden"
+            sizes="100vw"
+          />
+
+          {/* Desktop Hero Image (Visible on md screens and larger) */}
+          <Image
+            src={brand.hero?.desktopBackgroundImage}
+            alt="Kickverse KE - Original Sneakers, Soccer Cleats and Official Shoes in Nairobi Kenya"
+            fill
+            priority
+            fetchPriority="high"
+            referrerPolicy="no-referrer"
+            className="hero-image object-cover object-center opacity-100 hidden md:block"
+            sizes="100vw"
           />
         </div>
 
@@ -324,7 +338,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   href="/shop?type=sneakers" 
                   className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
+                  
                   
                   <Image
                     src={displayCategories?.[0]?.image || brand.hero?.sneakersImage}
@@ -350,7 +364,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   href="/shop?type=soccer-cleats" 
                   className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
+                  
                   
                   <Image
                     src={displayCleatCategories?.[0]?.image || brand.hero?.soccerCleatsImage}
@@ -376,7 +390,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                    href="/shop?type=official-shoes"
                   className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
+                  
                   
                   <Image
                     src={displayOfficialCategories?.[0]?.image || brand.hero?.officialsImage}
@@ -402,7 +416,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   href="/shop?type=opens-sandals"
                   className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
+                  
                   
                   <Image
                     src={displaySandalCategories?.[0]?.image || brand.hero?.opensSandalsImage}
