@@ -24,7 +24,7 @@ export const brand = {
     headlineTop: "HOME OF THE BEST",
     headlineHighlight: "SNEAKERS & CLEATS",
     desktopBackgroundImage: "/background-image7.jpeg",
-    mobileBackgroundImage: "/mobile-background-image-hero.png",
+    mobileBackgroundImage: "/IMG_3305.jpg",
     sneakersImage: "/sneakers.jpg",
     soccerCleatsImage: "/soccer-cleats.jpg",
     officialsImage: "/officials.jpg",
