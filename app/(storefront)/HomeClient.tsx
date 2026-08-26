@@ -227,19 +227,6 @@ export default function HomeClient({ initialProducts, initialCategories, initial
         
         {/* Full Section Background Image */}
         <div className="absolute inset-0 z-0">
-          {/* Mobile Hero Image (Visible on screens smaller than md) */}
-          <Image
-            src={brand.hero?.mobileBackgroundImage}
-            alt="Kickverse KE - Original Sneakers, Soccer Cleats and Official Shoes in Nairobi Kenya"
-            fill
-            priority
-            fetchPriority="high"
-            referrerPolicy="no-referrer"
-            className="hero-image object-cover object-right opacity-80 block md:hidden"
-            sizes="100vw"
-          />
-
-          {/* Desktop Hero Image (Visible on md screens and larger) */}
           <Image
             src={brand.hero?.desktopBackgroundImage}
             alt="Kickverse KE - Original Sneakers, Soccer Cleats and Official Shoes in Nairobi Kenya"
@@ -247,8 +234,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             priority
             fetchPriority="high"
             referrerPolicy="no-referrer"
-            className="hero-image object-cover object-center opacity-100 hidden md:block"
-            sizes="100vw"
+            className="hero-image object-cover object-left md:object-center opacity-80 md:opacity-100"
           />
         </div>
 
