@@ -393,7 +393,8 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                   const params = new URLSearchParams(searchParams.toString());
                   params.set('type', filterProductType === 'Soccer Cleats' ? 'soccer-cleats' : 'sneakers');
                   params.delete('category');
-                  router.push(`${pathname}?${params.toString()}`, { scroll: false });
+                  const newUrl = `${pathname}?${params.toString()}`;
+                  window.history.replaceState(null, '', newUrl);
                 }}
                 className={`whitespace-nowrap px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
                   filterCategory === 'All' && discoveryMode === 'all'
@@ -433,7 +434,8 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                          params.set('category', newCategory.toLowerCase().replace(/\s+/g, '-'));
                       }
                       
-                      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+                      const newUrl = `${pathname}?${params.toString()}`;
+                      window.history.replaceState(null, '', newUrl);
                     }}
                     className={`whitespace-nowrap px-4 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
                       isActive
@@ -586,7 +588,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                 key={`${filterCategory}-${sortOption}-${searchQuery}-${discoveryMode}`}
                 className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-3 gap-y-6 sm:gap-x-4 sm:gap-y-8 md:gap-x-6 md:gap-y-12 border-t border-white/10 pt-8"
               >
-                {sortedAndFilteredProducts.slice(0, visibleCount).map((product) => (
+                {sortedAndFilteredProducts.slice(0, visibleCount).map((product, index) => (
                   <motion.div 
                     key={product.id}
                     initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
@@ -611,7 +613,8 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                             alt={`${product.name} - Buy online in Nairobi, Kenya`}
                             fill
                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                            priority
+                            priority={index < 6}
+                            loading={index >= 6 ? "lazy" : undefined}
                             referrerPolicy="no-referrer"
                             className="object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100"
                           />

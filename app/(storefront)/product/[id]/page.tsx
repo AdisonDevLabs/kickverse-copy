@@ -6,6 +6,7 @@ import ProductDetailsClient from './ProductDetailsClient';
 import { getDb } from '@/lib/db';
 import { products, testimonials, sizeGuides, colorMap } from '@/lib/db/schema';
 import { eq, and, not, sql, desc } from 'drizzle-orm';
+import { unstable_cache } from 'next/cache';
 
 export const revalidate = 60;
 
@@ -19,12 +20,51 @@ function detectBrand(productName: string): string {
   return matched || 'Kickverse';
 }
 
+// 1. Cache the single product fetch to deduplicate calls between Metadata and the Page
+const getCachedProduct = unstable_cache(
+  async (id: string) => {
+    const db = await getDb();
+    const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
+    return result[0];
+  },
+  ['single-product'], 
+  { revalidate: 3600, tags: ['products'] }
+);
+
+// 2. Cache the heavy relational queries together. 
+// FIX: productType is strictly typed to prevent the Drizzle ORM TypeScript error.
+const getCachedProductAssets = unstable_cache(
+  async (productId: string, productType: 'Sneakers' | 'Soccer Cleats') => {
+    const db = await getDb();
+    const [allSizeGuides, allColorMaps, relatedPool, productReviews, recentlyViewedPool] = await Promise.all([
+      db.select().from(sizeGuides),
+      db.select().from(colorMap),
+      db.select({ id: products.id, name: products.name, price: products.price, image: products.image })
+        .from(products)
+        .where(and(eq(products.productType, productType), eq(products.isAccessory, false), not(eq(products.id, productId))))
+        .orderBy(desc(products.createdAt))
+        .limit(12),
+      db.select()
+        .from(testimonials)
+        .where(and(eq(testimonials.product, productId), eq(testimonials.isApproved, true)))
+        .orderBy(desc(testimonials.id)),
+      db.select({ id: products.id, name: products.name, image: products.image })
+        .from(products)
+        .where(not(eq(products.id, productId)))
+        .orderBy(sql`CASE WHEN ${products.productType} = ${productType} THEN 0 ELSE 1 END`, desc(products.createdAt))
+        .limit(20)
+    ]);
+    return { allSizeGuides, allColorMaps, relatedPool, productReviews, recentlyViewedPool };
+  },
+  ['product-assets-relational'],
+  { revalidate: 3600, tags: ['products', 'reviews', 'settings'] }
+);
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const db = await getDb();
   
-  const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
-  const product = result[0];
+  // 3. Use the cached function instead of raw DB call
+  const product = await getCachedProduct(id);
   
   if (!product) {
     notFound(); 
@@ -51,7 +91,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     'Kickverse KE',
   ];
 
-  // FIXED: Checked product.category for Official Shoes and Sandals instead of productType
   if (product.productType === 'Soccer Cleats') {
     baseKeywords.push(
       'Football boots Kenya',
@@ -140,33 +179,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductPage({ params }: Props) {
   const { id } = await params;
-  const db = await getDb();
   
-  const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
-  const product = result[0];
+  // 4. Instantly fetches from cache (no DB query since metadata already cached it)
+  const product = await getCachedProduct(id);
 
   if (!product) {
     notFound(); 
   }
 
-  const [allSizeGuides, allColorMaps, relatedPool, productReviews, recentlyViewedPool] = await Promise.all([
-    db.select().from(sizeGuides),
-    db.select().from(colorMap),
-    db.select({ id: products.id, name: products.name, price: products.price, image: products.image })
-      .from(products)
-      .where(and(eq(products.productType, product.productType), eq(products.isAccessory, false), not(eq(products.id, product.id))))
-      .orderBy(desc(products.createdAt))
-      .limit(12),
-    db.select()
-      .from(testimonials)
-      .where(and(eq(testimonials.product, product.id), eq(testimonials.isApproved, true)))
-      .orderBy(desc(testimonials.id)),
-    db.select({ id: products.id, name: products.name, image: products.image })
-      .from(products)
-      .where(not(eq(products.id, product.id)))
-      .orderBy(sql`CASE WHEN ${products.productType} = ${product.productType} THEN 0 ELSE 1 END`, desc(products.createdAt))
-      .limit(20)
-  ]);
+  // 5. Instantly fetches related assets from cache
+  const { allSizeGuides, allColorMaps, relatedPool, productReviews, recentlyViewedPool } = await getCachedProductAssets(product.id, product.productType);
 
   const relatedProducts = relatedPool.sort(() => 0.5 - Math.random()).slice(0, 4);
   const recentlyViewed = recentlyViewedPool.sort(() => 0.5 - Math.random()).slice(0, 8);
@@ -234,7 +256,6 @@ export default async function ProductPage({ params }: Props) {
     productSchema.review = productReviews.slice(0, 5).map((rev) => ({
       '@type': 'Review',
       author: { '@type': 'Person', name: rev.name || 'Verified Buyer' },
-      // FIXED: Used rev.date instead of rev.createdAt
       datePublished: rev.date ? new Date(rev.date).toISOString().split('T')[0] : '2026-01-01',
       reviewBody: rev.text,
       reviewRating: { '@type': 'Rating', ratingValue: rev.rating || 5, bestRating: '5', worstRating: '1' },

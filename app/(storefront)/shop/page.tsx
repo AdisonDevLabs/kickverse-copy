@@ -4,6 +4,7 @@ import { products } from '@/lib/db/schema';
 import { brand } from '@/lib/data/brand';
 import ShopWrapper from './ShopWrapper';
 import { desc } from 'drizzle-orm';
+import { unstable_cache } from 'next/cache'
 
 export const revalidate = 60;
 
@@ -89,12 +90,46 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   };
 }
 
+// 2. Wrap the D1 query in a dedicated cached function
+const getCachedProducts = unstable_cache(
+  async () => {
+    const db = await getDb();
+    return db.select({
+      id: products.id,
+      name: products.name,
+      price: products.price,
+      originalPrice: products.originalPrice,
+      image: products.image,
+      productType: products.productType,
+      category: products.category,
+      rating: products.rating,
+      reviews: products.reviews,
+      sizes: products.sizes,
+      isNewArrival: products.isNewArrival,
+      isBestSeller: products.isBestSeller,
+      isFlashDeal: products.isFlashDeal,
+      isPinned: products.isPinned,
+      isAccessory: products.isAccessory,
+      createdAt: products.createdAt,
+    })
+    .from(products)
+    .orderBy(
+      desc(products.isPinned),
+      desc(products.id)
+    ).limit(500);
+  },
+  ['shop-products-500'], // Cache key
+  { 
+    revalidate: 3600, // Revalidate every hour
+    tags: ['products'] // Allows you to call revalidateTag('products') on upload
+  }
+);
 
 // 2. Add searchParams to the component props kickverse.storxia.tech
 export default async function ShopPage({ searchParams }: Props) {
   
-  const db = await getDb();
-  const allProducts = await db.select({
+  
+  const allProducts = await getCachedProducts();{/*await db.select({
     id: products.id,
     name: products.name,
     price: products.price,
@@ -116,7 +151,7 @@ export default async function ShopPage({ searchParams }: Props) {
   .orderBy(
     desc(products.isPinned),
     desc(products.id)
-  ).limit(500);
+  ).limit(500);*/}
 
   const baseUrl = brand.url.replace(/\/$/, '');
 
@@ -168,21 +203,6 @@ export default async function ShopPage({ searchParams }: Props) {
         ]
       }
     ]
-  };
-
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: 'Kickverse Complete Collection',
-    description: 'All available sneakers and football boots at Kickverse Kenya.',
-    url: `${brand.url.replace(/\/$/, '')}/shop`,
-    numberOfItems: allProducts.length,
-    itemListElement: allProducts.map((product, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      url: `${brand.url.replace(/\/$/, '')}/product/${product.id}`,
-      name: product.name,
-    })),
   };
 
   const safeJsonLd = JSON.stringify(jsonLdGraph).replace(/</g, '\\u003c');
