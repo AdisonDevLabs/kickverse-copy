@@ -387,8 +387,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                 onClick={() => {
                   setFilterCategory('All');
                   setDiscoveryMode('all');
-<<<<<<< HEAD
-=======
                   
                   // NEW: Push to URL
                   const params = new URLSearchParams(searchParams.toString());
@@ -396,7 +394,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                   params.delete('category');
                   const newUrl = `${pathname}?${params.toString()}`;
                   window.history.replaceState(null, '', newUrl);
->>>>>>> c89ed85 (fix:image and cloudflare database reads)
                 }}
                 className={`whitespace-nowrap px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
                   filterCategory === 'All' && discoveryMode === 'all'
@@ -416,8 +413,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                     onClick={() => {
                       setFilterCategory(isActive ? 'All' : cat);
                       setDiscoveryMode('all');
-<<<<<<< HEAD
-=======
                       
                       // NEW: Push to URL dynamically based on the specific category clicked
                       const params = new URLSearchParams(searchParams.toString());
@@ -439,7 +434,6 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                       
                       const newUrl = `${pathname}?${params.toString()}`;
                       window.history.replaceState(null, '', newUrl);
->>>>>>> c89ed85 (fix:image and cloudflare database reads)
                     }}
                     className={`whitespace-nowrap px-4 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
                       isActive
@@ -616,12 +610,9 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                             src={product.image}
                             alt={product.name}
                             fill
-<<<<<<< HEAD
-=======
                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                             priority={index < 6}
                             loading={index >= 6 ? "lazy" : undefined}
->>>>>>> c89ed85 (fix:image and cloudflare database reads)
                             referrerPolicy="no-referrer"
                             className="object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100"
                           />

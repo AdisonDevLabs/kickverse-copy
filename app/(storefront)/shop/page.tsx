@@ -150,24 +150,6 @@ export default async function ShopPage({ searchParams }: Props) {
     desc(products.id)
   ).limit(500);*/}
 
-<<<<<<< HEAD
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: 'Kickverse Complete Collection',
-    description: 'All available sneakers and football boots at Kickverse Kenya.',
-    url: `${brand.url.replace(/\/$/, '')}/shop`,
-    numberOfItems: allProducts.length,
-    itemListElement: allProducts.map((product, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      url: `${brand.url.replace(/\/$/, '')}/product/${product.id}`,
-      name: product.name,
-    })),
-  };
-
-  const safeJsonLd = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
-=======
   const baseUrl = brand.url.replace(/\/$/, '');
 
   const jsonLdGraph = {
@@ -221,7 +203,6 @@ export default async function ShopPage({ searchParams }: Props) {
   };
 
   const safeJsonLd = JSON.stringify(jsonLdGraph).replace(/</g, '\\u003c');
->>>>>>> c89ed85 (fix:image and cloudflare database reads)
 
   return (
     <>
