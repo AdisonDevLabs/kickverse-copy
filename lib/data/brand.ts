@@ -23,7 +23,7 @@ export const brand = {
     badge: "Tested, Trusted & Approved in Nairobi",
     headlineTop: "HOME OF THE BEST",
     headlineHighlight: "SNEAKERS & CLEATS",
-    desktopBackgroundImage: "/background-image7.jpeg",
+    desktopBackgroundImage: "/IMG_3305.jpg",
     mobileBackgroundImage: "/IMG_3305.jpg",
     sneakersImage: "/sneakers.jpg",
     soccerCleatsImage: "/soccer-cleats.jpg",
