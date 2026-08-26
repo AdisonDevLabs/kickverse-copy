@@ -4,6 +4,7 @@ import { products } from '@/lib/db/schema';
 import { brand } from '@/lib/data/brand';
 import ShopWrapper from './ShopWrapper';
 import { desc } from 'drizzle-orm';
+import { unstable_cache } from 'next/cache'
 
 export const revalidate = 60;
 
@@ -86,12 +87,46 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   };
 }
 
+// 2. Wrap the D1 query in a dedicated cached function
+const getCachedProducts = unstable_cache(
+  async () => {
+    const db = await getDb();
+    return db.select({
+      id: products.id,
+      name: products.name,
+      price: products.price,
+      originalPrice: products.originalPrice,
+      image: products.image,
+      productType: products.productType,
+      category: products.category,
+      rating: products.rating,
+      reviews: products.reviews,
+      sizes: products.sizes,
+      isNewArrival: products.isNewArrival,
+      isBestSeller: products.isBestSeller,
+      isFlashDeal: products.isFlashDeal,
+      isPinned: products.isPinned,
+      isAccessory: products.isAccessory,
+      createdAt: products.createdAt,
+    })
+    .from(products)
+    .orderBy(
+      desc(products.isPinned),
+      desc(products.id)
+    ).limit(500);
+  },
+  ['shop-products-500'], // Cache key
+  { 
+    revalidate: 3600, // Revalidate every hour
+    tags: ['products'] // Allows you to call revalidateTag('products') on upload
+  }
+);
 
 // 2. Add searchParams to the component props kickverse.storxia.tech
 export default async function ShopPage({ searchParams }: Props) {
   
-  const db = await getDb();
-  const allProducts = await db.select({
+  
+  const allProducts = await getCachedProducts();{/*await db.select({
     id: products.id,
     name: products.name,
     price: products.price,
@@ -113,8 +148,9 @@ export default async function ShopPage({ searchParams }: Props) {
   .orderBy(
     desc(products.isPinned),
     desc(products.id)
-  ).limit(500);
+  ).limit(500);*/}
 
+<<<<<<< HEAD
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -131,6 +167,61 @@ export default async function ShopPage({ searchParams }: Props) {
   };
 
   const safeJsonLd = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
+=======
+  const baseUrl = brand.url.replace(/\/$/, '');
+
+  const jsonLdGraph = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${baseUrl}/shop/#breadcrumb`,
+        'itemListElement': [
+          { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': baseUrl },
+          { '@type': 'ListItem', 'position': 2, 'name': 'Shop', 'item': `${baseUrl}/shop` }
+        ]
+      },
+      {
+        '@type': 'ItemList',
+        '@id': `${baseUrl}/shop/#itemlist`,
+        'name': 'Kickverse Footwear Collection Nairobi',
+        'description': 'Comprehensive catalog of sneakers, soccer cleats, and official shoes available for delivery in Nairobi, Kenya.',
+        'url': `${baseUrl}/shop`,
+        'numberOfItems': allProducts.length,
+        'itemListElement': allProducts.slice(0, 50).map((product, index) => ({
+          '@type': 'ListItem',
+          'position': index + 1,
+          'url': `${baseUrl}/product/${product.id}`,
+          'name': product.name
+        }))
+      },
+      {
+        '@type': 'FAQPage',
+        '@id': `${baseUrl}/shop/#faq`,
+        'mainEntity': [
+          {
+            '@type': 'Question',
+            'name': 'Do you offer delivery in Nairobi CBD?',
+            'acceptedAnswer': {
+              '@type': 'Answer',
+              'text': 'Yes, we offer complimentary expedited delivery exclusively within the Nairobi CBD.'
+            }
+          },
+          {
+            '@type': 'Question',
+            'name': 'Can I pay on delivery for shoes in Kenya?',
+            'acceptedAnswer': {
+              '@type': 'Answer',
+              'text': 'Absolutely. We operate a trusted pay-on-delivery service for Nairobi and immediate environs to ensure 100% secure shopping.'
+            }
+          }
+        ]
+      }
+    ]
+  };
+
+  const safeJsonLd = JSON.stringify(jsonLdGraph).replace(/</g, '\\u003c');
+>>>>>>> c89ed85 (fix:image and cloudflare database reads)
 
   return (
     <>
