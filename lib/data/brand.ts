@@ -36,7 +36,7 @@ export const brand = {
   sections: {
     featured: {
       title: "Featured Footwear Collection",
-      subtitle: "Browse our curated selection of original sneakers, turf cleats, and pure leather official shoes in Nairobi."
+      subtitle: "Browse our curated selection of original sneakers, pure leather official shoes and casual opens & sandals in Nairobi."
     },
     flashDeals: {
       badge: "Limited Time Offers",
