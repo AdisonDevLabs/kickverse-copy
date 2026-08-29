@@ -228,16 +228,14 @@ export default function HomeClient({ initialProducts, initialCategories, initial
         {/* Full Section Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
-            src={brand.hero?.backgroundImage}
-            alt="Hero Background"
+            src={brand.hero?.desktopBackgroundImage}
+            alt="Kickverse KE - Original Sneakers, Soccer Cleats and Official Shoes in Nairobi Kenya"
             fill
             priority
             fetchPriority="high"
             referrerPolicy="no-referrer"
-            className="hero-image object-cover object-right md:object-center opacity-80 md:opacity-100"
+            className="hero-image object-cover object-left md:object-center opacity-80 md:opacity-100"
           />
-          {/* Mobile dark overlay for guaranteed readability */}
-          <div className="absolute inset-0 bg-black/40 z-0" />
         </div>
 
         {/* Content Wrapper */}
@@ -250,32 +248,33 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               variants={staggerItem}
               className="inline-flex items-center justify-center space-x-1.5 bg-transparent border border-white/20 rounded-full px-2.5 py-1 mb-2 sm:mb-4"
             >
-              <ShieldCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-brand-primary" />
+              <ShieldCheck className="h-3.5 w-3.5 sm:h-3.5 sm:w-3.5 text-brand-primary" />
               <span className="text-white text-[10px] sm:text-[10px] font-bold tracking-widest uppercase">
-                {brand.hero?.badge || "TESTED, TRUSTED AND APPROVED"}
+                {brand.hero?.badge || "TESTED, TRUSTED AND APPROVED IN NAIROBI"}
               </span>
             </motion.div>
 
             {/* Main Headline - Increased text sizes for all breakpoints */}
-            <div className="overflow-hidden mb-2 sm:mb-4 w-full">
+            <div className="overflow-hidden mb-4 sm:mb-6 w-full">
               <motion.h1 
                 variants={heroReveal}
-                className="font-display uppercase tracking-wider text-[2.8rem] sm:text-[3.5rem] md:text-[5rem] lg:text-[7.5rem] leading-[0.9] text-white drop-shadow-2xl"
+                className="font-display uppercase tracking-wider text-[2.8rem] sm:text-[3.5rem] md:text-[5rem] lg:text-[7rem] leading-[0.9] text-white drop-shadow-2xl"
               >
+                <span className="sr-only">Premium Sneakers, Soccer Cleats & Official Shoes at Kickverse Nairobi, Kenya - </span>
                 {brand.hero?.headlineTop || "HOME OF THE BEST"} <br/> 
-                <span className="text-brand-primary inline-block mt-3 sm:mt-5">{brand.hero?.headlineHighlight || "SNEAKERS & CLEATS"}</span>
+                <span className="text-brand-primary inline-block mt-5 sm:mt-6">{brand.hero?.headlineHighlight || "SNEAKERS & CLEATS"}</span>
               </motion.h1>
             </div>
 
             {/* Subheadline */}
             <motion.p 
               variants={staggerItem}
-              className="text-gray-200 text-[13px] sm:text-sm md:text-base max-w-[280px] sm:max-w-lg mb-3 sm:mb-5 font-medium leading-relaxed drop-shadow-xl shadow-black mx-auto"
+              className="text-gray-100 sm:text-gray-200 text-[13px] sm:text-sm md:text-base max-w-[480px] sm:max-w-lg mb-5 sm:mb-6 font-medium leading-relaxed drop-shadow-xl shadow-black mx-auto"
             >
               {brand.description}
             </motion.p>
             
-            {/* Micro Trust List - Centered vertically */}
+            {/* Micro Trust List - Centered vertically 
             <motion.div 
               variants={staggerItem}
               className="flex flex-col items-center justify-center gap-y-2 sm:gap-y-3 mb-4 sm:mb-6 text-[9px] sm:text-[11px] md:text-xs font-bold uppercase tracking-widest text-white drop-shadow-xl shadow-black"
@@ -289,7 +288,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                <div className="flex items-center">
                 <Wallet className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-brand-primary" /> {brand.trustStatements[2] || "Pay on delivery"}
               </div>
-            </motion.div>
+            </motion.div>*/}
 
             {/* CTA Section - Added justify-center */}
             <motion.div 
@@ -325,18 +324,18 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   href="/shop?type=sneakers" 
                   className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
+                  
                   
                   <Image
                     src={displayCategories?.[0]?.image || brand.hero?.sneakersImage}
-                    alt="Shop Sneakers"
+                    alt="Buy Original Sneakers in Nairobi - Nike, Jordan, Adidas, New Balance"
                     fill
                     className="object-cover group-hover:scale-103 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                   />
                   <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-3 text-left">
-                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-sm lg:text-lg drop-shadow-lg group-hover:text-brand-primary transition-colors leading-none">
+                    <h2 className="text-white font-display uppercase tracking-widest text-xs sm:text-sm lg:text-lg drop-shadow-lg group-hover:text-brand-primary transition-colors leading-none">
                       SNEAKERS
-                    </h3>
+                    </h2>
                     <div className="flex justify-between items-center w-full mt-1.5 sm:mt-2">
                       <p className="text-gray-300 text-[11px] sm:text-xs md:text-sm font-medium truncate pr-2">Lifestyle • Streetwear</p>
                       <div className="bg-white text-black text-[6px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2 py-1 sm:px-3 sm:py-1.5 rounded-sm w-max flex items-center group-hover:bg-brand-primary transition-colors shrink-0">
@@ -351,20 +350,20 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   href="/shop?type=soccer-cleats" 
                   className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
+                  
                   
                   <Image
                     src={displayCleatCategories?.[0]?.image || brand.hero?.soccerCleatsImage}
-                    alt="Shop Soccer Cleats"
+                    alt="Buy Professional Soccer Cleats and Artificial Turf Trainers in Nairobi"
                     fill
                     className="object-cover group-hover:scale-103 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                   />
                   <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-3 text-left">
-                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-sm lg:text-lg drop-shadow-lg group-hover:text-brand-primary transition-colors leading-none">
+                    <h2 className="text-white font-display uppercase tracking-widest text-xs sm:text-sm lg:text-lg drop-shadow-lg group-hover:text-brand-primary transition-colors leading-none">
                       SOCCER CLEATS
-                    </h3>
+                    </h2>
                     <div className="flex justify-between items-center w-full mt-1.5 sm:mt-2">
-                      <p className="text-gray-300 text-[11px] sm:text-xs md:text-sm font-medium truncate pr-2">Matchday • Training</p>
+                      <p className="text-gray-300 text-[11px] sm:text-xs md:text-sm font-medium truncate pr-2">Turf • Matchday</p>
                       <div className="bg-white text-black text-[6px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2 py-1 sm:px-3 sm:py-1.5 rounded-sm w-max flex items-center group-hover:bg-brand-primary transition-colors shrink-0">
                         <span className="hidden sm:inline-block mr-1">SHOP</span> <ArrowRight className="sm:ml-1 h-2 w-2 sm:h-2.5 sm:w-2.5" />
                       </div>
@@ -374,23 +373,23 @@ export default function HomeClient({ initialProducts, initialCategories, initial
 
                 {/* 3. Official Shoes Card */}
                 <Link 
-                   href="/shop?type=sneakers&category=official-shoes"
+                   href="/shop?type=official-shoes"
                   className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
+                  
                   
                   <Image
                     src={displayOfficialCategories?.[0]?.image || brand.hero?.officialsImage}
-                    alt="Shop Official Shoes"
+                    alt="Buy Pure Leather Official Shoes in Nairobi CBD"
                     fill
                     className="object-cover group-hover:scale-103 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                   />
                   <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-3 text-left">
-                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-sm lg:text-lg drop-shadow-lg group-hover:text-brand-primary transition-colors leading-none">
+                    <h2 className="text-white font-display uppercase tracking-widest text-xs sm:text-sm lg:text-lg drop-shadow-lg group-hover:text-brand-primary transition-colors leading-none">
                       OFFICIAL SHOES
-                    </h3>
+                    </h2>
                     <div className="flex justify-between items-center w-full mt-1.5 sm:mt-2">
-                      <p className="text-gray-300 text-[11px] sm:text-xs md:text-sm font-medium truncate pr-2">Formal • Business</p>
+                      <p className="text-gray-300 text-[11px] sm:text-xs md:text-sm font-medium truncate pr-2">Pure Leather • Formal</p>
                       <div className="bg-white text-black text-[6px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2 py-1 sm:px-3 sm:py-1.5 rounded-sm w-max flex items-center group-hover:bg-brand-primary transition-colors shrink-0">
                         <span className="hidden sm:inline-block mr-1">SHOP</span> <ArrowRight className="sm:ml-1 h-2 w-2 sm:h-2.5 sm:w-2.5" />
                       </div>
@@ -400,23 +399,23 @@ export default function HomeClient({ initialProducts, initialCategories, initial
 
                 {/* 4. Opens & Sandals Card */}
                 <Link 
-                  href="/shop?type=sneakers&category=opens-sandals"
+                  href="/shop?type=opens-sandals"
                   className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10 group-hover:from-black/80 transition-colors duration-500" />
+                  
                   
                   <Image
                     src={displaySandalCategories?.[0]?.image || brand.hero?.opensSandalsImage}
-                    alt="Shop Opens & Sandals"
+                    alt="Buy Casual Suede Clogs and Sandals Online in Kenya"
                     fill
                     className="object-cover group-hover:scale-103 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                   />
                   <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-3 text-left">
-                    <h3 className="text-white font-display uppercase tracking-widest text-xs sm:text-sm lg:text-lg drop-shadow-lg group-hover:text-brand-primary transition-colors leading-none">
-                      OPEN SHOES & SANDALS
-                    </h3>
+                    <h2 className="text-white font-display uppercase tracking-widest text-xs sm:text-sm lg:text-lg drop-shadow-lg group-hover:text-brand-primary transition-colors leading-none">
+                      OPENS & SANDALS
+                    </h2>
                     <div className="flex justify-between items-center w-full mt-1.5 sm:mt-2">
-                      <p className="text-gray-300 text-[11px] sm:text-xs md:text-sm font-medium truncate pr-2">Casual • Summer</p>
+                      <p className="text-gray-300 text-[11px] sm:text-xs md:text-sm font-medium truncate pr-2">Suede Clogs • Summer</p>
                       <div className="bg-white text-black text-[6px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2 py-1 sm:px-3 sm:py-1.5 rounded-sm w-max flex items-center group-hover:bg-brand-primary transition-colors shrink-0">
                         <span className="hidden sm:inline-block mr-1">SHOP</span> <ArrowRight className="sm:ml-1 h-2 w-2 sm:h-2.5 sm:w-2.5" />
                       </div>
@@ -438,13 +437,13 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
               className="font-display uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-white"
             >
-              Featured Collections
+              {brand.sections?.featured?.title || "Featured Collections"}
             </motion.h2>
             <motion.p 
               initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
               className="text-gray-300 max-w-sm mt-2 sm:mt-3 md:mt-0 font-medium text-xs sm:text-sm md:text-base"
             >
-              {brand.sections?.featured?.subtitle || "Find your type. Browse by style and step out in confidence."}
+              {brand.sections?.featured?.subtitle || "Browse our curated selection of original quality sneakers in Nairobi."}
             </motion.p>
           </div>
           
@@ -479,7 +478,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     <div className="absolute inset-0 bg-black/20 group-hover/card:bg-black/30 transition-colors duration-500 z-10" />
                     <Image
                       src={collection.image}
-                      alt={collection.name}
+                      alt={`${collection.name} Footwear Collection in Nairobi Kenya`}
                       fill
                       referrerPolicy="no-referrer"
                       className="object-cover transition-transform duration-1000 group-hover/card:scale-110 opacity-90 group-hover/card:opacity-100"
@@ -487,7 +486,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     
                     <div className="absolute inset-x-0 top-0 p-4 sm:p-6 z-20 flex justify-between items-start opacity-100 transition-opacity">
                        <div className="bg-brand-primary text-black rounded-sm sm:rounded-md text-[8px] sm:text-[10px] md:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 uppercase tracking-widest">
-                         {collection.label}
+                         {collection.label || "Authentic"}
                        </div>
                     </div>
 
@@ -529,10 +528,10 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 className="flex flex-col w-full md:w-auto md:max-w-[55%]"
               >
                 <h2 className="font-display uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white drop-shadow-lg leading-tight md:leading-none mb-2 sm:mb-3">
-                  {brand.sections?.flashDeals?.title || "Flash Deals"}
+                  {brand.sections?.flashDeals?.title || "Flash Deals on Trending Footwear"}
                 </h2>
                 <p className="font-poppins text-brand-primary text-xs sm:text-sm md:text-base">
-                  {brand.sections?.flashDeals?.subtitle || "Selected styles. Limited-time prices."}
+                  {brand.sections?.flashDeals?.subtitle || "Selected styles. Limited-time prices in Kenya."}
                 </p>
               </motion.div>
 
@@ -579,7 +578,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
 
                     <Image
                       src={product.image}
-                      alt={product.name}
+                      alt={`${product.name} - Buy online in Nairobi Kenya with Pay on Delivery`}
                       fill
                       referrerPolicy="no-referrer"
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -644,19 +643,19 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             <div className="text-center mb-8 sm:mb-12 md:mb-16">
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} className="inline-flex items-center text-brand-primary mb-2 sm:mb-4">
                 <Tag className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-                <span className="text-[9px] sm:text-xs font-bold uppercase tracking-widest">Dominate The Pitch</span>
+                <span className="text-[9px] sm:text-xs font-bold uppercase tracking-widest">Professional Soccer Cleats & Turf Trainers</span>
               </motion.div>
               <motion.h2 
                 initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
                 className="font-display uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-2 sm:mb-4"
               >
-                Soccer Cleats
+                Soccer Cleats & Turf Boots in Nairobi
               </motion.h2>
               <motion.p 
                 initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
                 className="text-gray-300 max-w-2xl mx-auto font-medium text-xs sm:text-sm md:text-lg"
               >
-                Engineered for speed, precision, and control. Find the perfect fit for your game.
+                Engineered for artificial turf (TF), firm ground (FG), and artificial grass (AG). Find the perfect boot for Nairobi pitches.
               </motion.p>
             </div>
 
@@ -675,7 +674,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
                     <Image
                       src={collection.image}
-                      alt={collection.name}
+                      alt={`${collection.name} Soccer Cleats and Turf Trainers in Kenya`}
                       fill
                       referrerPolicy="no-referrer"
                       className="object-cover group-hover:scale-110 transition-transform duration-700 opacity-90 group-hover:opacity-100"
@@ -709,7 +708,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 <span className="text-[9px] sm:text-xs font-bold uppercase tracking-widest">{brand.sections?.newArrivals?.badge || "Updated Weekly"}</span>
               </div>
               <h2 className="font-display uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-white">
-                {brand.sections?.newArrivals?.title || "Latest Styles"}
+                {brand.sections?.newArrivals?.title || "Trending Men's and Women's Footwear in Nairobi"}
               </h2>
               <p className="text-gray-300 mt-2 sm:mt-4 max-w-xl font-medium text-xs sm:text-sm md:text-lg">
                 {brand.sections?.newArrivals?.subtitle || "Fresh styles added weekly — be the first to own them."}
@@ -733,7 +732,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   <Link href={`/product/${product.id}`} className="block w-full h-full absolute inset-0 z-10">
                     <Image
                       src={product.image}
-                      alt={product.name}
+                      alt={`Buy ${product.name} Online Nairobi - Authentic Footwear Delivery`}
                       fill
                       referrerPolicy="no-referrer"
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -793,7 +792,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 {brand.sections?.bestSellers?.title || "BEST SELLERS"}
               </h2>
               <p className="text-gray-300 mt-2 sm:mt-4 max-w-xl font-medium text-xs sm:text-sm md:text-lg">
-                {brand.sections?.bestSellers?.subtitle || "Trusted and loved by hundreds of happy customers."}
+                {brand.sections?.bestSellers?.subtitle || "Trusted and loved by hundreds of happy customers across Kenya."}
               </p>
             </motion.div>
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} className="mt-4 md:mt-0">
@@ -814,7 +813,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   <Link href={`/product/${product.id}`} className="block w-full h-full absolute inset-0 z-10">
                     <Image
                       src={product.image}
-                      alt={product.name}
+                      alt={`${product.name} - Best Selling Footwear in Nairobi Kenya`}
                       fill
                       referrerPolicy="no-referrer"
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -951,7 +950,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 WHAT OUR CUSTOMERS SAY
               </h2>
               <p className="text-gray-400 max-w-2xl mx-auto font-medium text-xs sm:text-sm md:text-lg mb-2">
-                Real experiences from people who shop with us.
+                Real experiences from footwear buyers across Nairobi and Kenya.
               </p>
             </motion.div>
           </div>
@@ -1159,7 +1158,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               </motion.h2>
               
               <motion.p initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} className="text-gray-300 font-medium text-sm sm:text-base md:text-lg lg:text-xl mb-6 sm:mb-10 max-w-lg leading-relaxed">
-                {brand.sections?.whatsappCta?.subtitle || "Chat with us directly on WhatsApp to confirm size, price, and delivery in minutes."}
+                {brand.sections?.whatsappCta?.subtitle || "Chat directly with our Nairobi sales team on WhatsApp to confirm size, price, and instant CBD dispatch."}
               </motion.p>
 
               {/* Trust Signals Grid */}

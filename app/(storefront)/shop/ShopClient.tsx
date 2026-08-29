@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useEffect, Suspense, useMemo, useRef, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Filter, ChevronDown, Check, X, SlidersHorizontal, MessageCircle, Search, Heart, Eye, Star, SearchX } from 'lucide-react';
@@ -14,6 +14,9 @@ import { staggerContainer, staggerItem, fadeIn, fadeUp } from '@/lib/animations'
 
 export default function ShopClient({ initialProducts }: { initialProducts: any[] }) {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const rawCategory = searchParams.get('category');
   const normalizeSlug = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
 
@@ -21,6 +24,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
   const rawQuery = searchParams.get('q');
   const rawBrand = searchParams.get('brand');
   const rawModel = searchParams.get('model');
+  
   
   const getInitialFilterCategory = (cat: string | null) => {
     if (!cat) return 'All';
@@ -37,14 +41,19 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
     return 'all'; 
   };
 
-  const getInitialProductType = (typeVal: string | null) => {
-    if (!typeVal) return 'Sneakers';
-    if (typeVal.toLowerCase().replace(/-/g, ' ') === 'soccer cleats') return 'Soccer Cleats';
-    return 'Sneakers';
+  const getInitialStatesFromType = (typeVal: string | null) => {
+    if (!typeVal) return { pType: 'Sneakers', cat: 'All' };
+    const normalized = typeVal.toLowerCase();
+    if (normalized === 'soccer-cleats') return { pType: 'Soccer Cleats', cat: 'All' };
+    if (normalized === 'official-shoes') return { pType: 'Sneakers', cat: 'Official Shoes' };
+    if (normalized === 'opens-and-sandals' || normalized === 'opens-sandals') return { pType: 'Sneakers', cat: 'Opens & Sandals' };
+    if (normalized === 'sneakers') return { pType: 'Sneakers', cat: 'All' };
+    return { pType: 'Sneakers', cat: 'All' };
   };
 
+  const initialStates = getInitialStatesFromType(rawType);
   const [filterCategory, setFilterCategory] = useState<string>(() => getInitialFilterCategory(rawCategory));
-  const [filterProductType, setFilterProductType] = useState<string>(() => getInitialProductType(rawType));
+  const [filterProductType, setFilterProductType] = useState<string>(initialStates.pType);
   const [filterPrice, setFilterPrice] = useState<string | null>(null);
   const [filterSize, setFilterSize] = useState<string | null>(null);
   
@@ -68,34 +77,26 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
 
   useEffect(() => {
     // 1. Handle Categories & Types
-    if (rawCategory && rawType) {
+    const { pType, cat } = getInitialStatesFromType(rawType);
+    setFilterProductType(pType);
+
+    if (rawCategory) {
       setFilterCategory(getInitialFilterCategory(rawCategory));
       setDiscoveryMode(getInitialDiscoveryMode(rawCategory));
-      setFilterProductType(getInitialProductType(rawType));
-    } else if (rawCategory) {
-      setFilterCategory(getInitialFilterCategory(rawCategory));
-      setDiscoveryMode(getInitialDiscoveryMode(rawCategory));
-      setFilterProductType('Sneakers'); 
-    } else if (rawType) {
-      setFilterProductType(getInitialProductType(rawType));
-      setFilterCategory('All'); 
+    } else {
+      setFilterCategory(cat);
+      setDiscoveryMode('all'); 
     }
 
     // 2. Handle Search, Brands, and Models overriding state via Navigation
     if (rawQuery) {
       setSearchQuery(rawQuery);
-      if (!rawCategory && !rawType) {
-        setFilterCategory('All');
-        setFilterProductType('All');
-      }
     } else if (rawBrand) {
       setSearchQuery(rawBrand.replace(/-/g, ' '));
     } else if (rawModel) {
       setSearchQuery(rawModel.replace(/-/g, ' '));
     } else {
-      if (rawCategory || rawType) {
         setSearchQuery('');
-      }
     }
   }, [rawCategory, rawType, rawQuery, rawBrand, rawModel]);
 
@@ -298,7 +299,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
   return (
     <div className="bg-brand-dark min-h-screen text-white">
       {/* Page Header */}
-      <div className="bg-brand-card pt-4 md:pt-6 pb-4 px-6 relative overflow-hidden">
+      <div className="bg-brand-dark pt-4 md:pt-6 pb-4 px-6 relative overflow-hidden">
         {/* Subtle background glow for visual hierarchy 
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-full bg-brand-primary/5 blur-3xl rounded-full pointer-events-none"></div>*/}
         
@@ -310,11 +311,11 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
             variants={staggerItem}
             className="font-display font-black uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl text-white leading-none"
           >
-            {discoveryMode === 'deals' && filterCategory === 'All' ? 'Flash Deals' : 
-             discoveryMode === 'just-dropped' && filterCategory === 'All' ? 'New Arrivals' :
-             discoveryMode === 'best-sellers' && filterCategory === 'All' ? 'Best Sellers' :
-             filterCategory && filterCategory !== 'All' ? filterCategory : 
-             filterProductType !== 'All' ? filterProductType :
+            {discoveryMode === 'deals' && filterCategory === 'All' ? 'Flash Deals in Nairobi' : 
+             discoveryMode === 'just-dropped' && filterCategory === 'All' ? 'New Footwear Arrivals' :
+             discoveryMode === 'best-sellers' && filterCategory === 'All' ? 'Best Sellers in Kenya' :
+             filterCategory && filterCategory !== 'All' ? `${filterCategory} in Nairobi` :
+             filterProductType !== 'All' ? `Premium ${filterProductType}` :
              'Shop Collection'}
           </motion.h1>
         </motion.div>
@@ -379,7 +380,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
           </div>
 
           {/* Row 2: Scrollable Pill Navigation for Types & Collections */}
-          <div className="flex items-center overflow-x-auto hide-scrollbar gap-3 pb-2 -mx-6 px-6 lg:mx-0 lg:px-0">
+          <nav aria-label="Category Navigation" className="flex items-center overflow-x-auto hide-scrollbar gap-3 pb-2 -mx-6 px-6 lg:mx-0 lg:px-0">
 
             <div className="flex items-center gap-2 flex-nowrap pl-1 pr-3">
               {/* 1. Main Product Type Pill (Acts as the "All" reset button) */}
@@ -411,7 +412,8 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                   <button
                     key={cat}
                     onClick={() => {
-                      setFilterCategory(isActive ? 'All' : cat);
+                      const newCategory = isActive ? 'All' : cat;
+                      setFilterCategory(newCategory);
                       setDiscoveryMode('all');
                       
                       // NEW: Push to URL dynamically based on the specific category clicked
@@ -446,11 +448,11 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                 );
               })}
             </div>
-          </div>
+          </nav>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-2">
+      <main className="max-w-7xl mx-auto px-6 py-2">
         <div className="flex-1 w-full">
           
           {/* Active Discovery State & Filter Summary */}
@@ -535,7 +537,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                 <SearchX className="h-8 w-8 text-gray-400" />
               </motion.div>
               <motion.h3 variants={staggerItem} className="font-display text-2xl md:text-3xl text-white uppercase tracking-wide mb-3">We Couldn&apos;t Find A Match</motion.h3>
-              <motion.p variants={staggerItem} className="text-gray-400 max-w-md mx-auto mb-10 text-sm md:text-base">Try adjusting your filters or explore our most popular styles. We receive new arrivals weekly.</motion.p>
+              <motion.p variants={staggerItem} className="text-gray-400 max-w-md mx-auto mb-10 text-sm md:text-base">Try adjusting your filters or explore our most popular styles. We receive new arrivals weekly in Nairobi.</motion.p>
               
               <motion.div variants={staggerItem} className="flex flex-wrap justify-center gap-3 mb-12">
                 <button 
@@ -608,7 +610,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                           
                           <Image
                             src={product.image}
-                            alt={product.name}
+                            alt={`${product.name} - Buy online in Nairobi, Kenya`}
                             fill
                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                             priority={index < 6}
@@ -685,7 +687,24 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
             </>
           )}
         </div>
-      </div>
+      </main>
+
+      {/* SEO Context Block: Placed to prevent keyword cannibalization and inject trust/local signals directly to Google's Crawler */}
+      <section className="max-w-7xl mx-auto px-6 py-12 md:py-16 border-t border-white/10 mt-12 bg-brand-dark">
+        <div className="max-w-3xl">
+          <h2 className="text-white font-display uppercase tracking-widest text-lg sm:text-xl mb-4">
+            Professional Sneakers, Soccer Cleats & Official Shoes in Nairobi
+          </h2>
+          <div className="space-y-4 text-xs sm:text-sm text-gray-400 leading-relaxed font-sans">
+            <p>
+              Discover the ultimate destination for authentic and trending footwear in Kenya. Whether you are searching for affordable premium sneakers, professional Firm Ground (FG) and Artificial Grass (AG) turf soccer cleats, or pure leather official shoes for the corporate environment, {brand.name} curates the highest quality selection. 
+            </p>
+            <p>
+              We eliminate the friction of online shopping by offering <strong>100% verified pairs</strong>, complimentary expedited delivery exclusively within the <strong>Nairobi CBD</strong>, and a trusted <strong>pay on delivery</strong> service for immediate environs. Secure your next pair today and experience unparalleled comfort and style directly to your doorstep.
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* Advanced Filter Drawer */}
       <AnimatePresence>

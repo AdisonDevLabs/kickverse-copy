@@ -22,6 +22,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   // Helper to format URL slugs (e.g., 'official-shoes' -> 'Official Shoes')
   const formatString = (str?: string) => {
     if (!str) return '';
+    if (str === 'opens-and-sandals') return 'Opens & Sandals'; // Custom override
     return str
       .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -32,18 +33,18 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const typeName = formatString(typeRaw);
 
   // 3. Construct intelligent fallbacks based on available parameters
-  let dynamicTitle = 'Shop Footwear Collection';
-  let dynamicDescription = `Browse authentic footwear at ${brand.name}. Swift delivery across Nairobi and Country Wide.`;
+  let dynamicTitle = `Premium Sneakers, Soccer Cleats & Official Shoes | ${brand.name} Nairobi`;
+  let dynamicDescription = `Browse authentic footwear at ${brand.name}. Enjoy complimentary expedited delivery across the Nairobi CBD and trusted pay-on-delivery service countrywide.`;
   
   if (categoryName && typeName) {
-    dynamicTitle = `Shop ${categoryName} | ${typeName}`;
-    dynamicDescription = `Explore our collection of ${categoryName} under ${typeName}. Fast delivery across Kenya.`;
+    dynamicTitle = `Buy ${categoryName} ${typeName} Online in Nairobi | ${brand.name}`;
+    dynamicDescription = `Shop our curated collection of ${categoryName} ${typeName}. 100% verified pairs with fast delivery in Nairobi and across Kenya.`;
   } else if (categoryName) {
-    dynamicTitle = `Shop ${categoryName}`;
-    dynamicDescription = `Buy authentic ${categoryName} online at ${brand.name}. Quality guaranteed across Kenya.`;
+    dynamicTitle = `Buy Authentic ${categoryName} Online Nairobi, Kenya | ${brand.name}`;
+    dynamicDescription = `Explore affordable and authentic ${categoryName} online. Secure your pair today with complimentary CBD delivery in Nairobi.`;
   } else if (typeName) {
-    dynamicTitle = `Shop ${typeName}`;
-    dynamicDescription = `Browse our complete catalog of ${typeName}. Find the perfect fit with fast, reliable delivery in Kenya.`;
+    dynamicTitle = `Shop ${typeName} in Nairobi, Kenya | Pay on Delivery - ${brand.name}`;
+    dynamicDescription = `Browse our complete catalog of professional ${typeName}. Find the perfect fit with fast, reliable pay-on-delivery logistics in Kenya.`;
   }
 
   // Build clean, accurate self-referencing canonical URL
@@ -56,13 +57,15 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
   // 4. Inject highly specific, localized search keywords dynamically
   const dynamicKeywords = [
-    categoryName ? `${categoryName} Kenya` : '',
-    categoryName ? `${categoryName} Nairobi` : '',
-    typeName ? `${typeName} Nairobi` : '',
-    categoryName ? `Buy ${categoryName} online` : '',
-    'Kickverse',
-    'Shoes delivery Kenya'
-  ].filter(Boolean); // Removes any empty strings
+    categoryName ? `${categoryName} delivery Nairobi` : '',
+    categoryName ? `Buy ${categoryName} online Kenya` : '',
+    typeName ? `${typeName} Nairobi CBD` : '',
+    'Buy sneakers online Nairobi',
+    'Soccer cleats FG AG Turf Kenya',
+    'Official pure leather shoes Nairobi',
+    'Pay on delivery shoes Kenya',
+    'Kickverse KE',
+  ].filter(Boolean);
 
   return {
     title: dynamicTitle,
@@ -72,7 +75,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
       canonical: canonicalUrl,
     },
     openGraph: {
-      title: `${dynamicTitle} | ${brand.shortName}`,
+      title: dynamicTitle,
       description: dynamicDescription,
       url: canonicalUrl,
       siteName: brand.name,

@@ -11,9 +11,18 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           '/admin/',
           '/admin/*',
+          '/api/admin/',
+          '/api/admin/*',
+          '/_next/',
+          '/draft/',
         ],
       },
+      {
+        userAgent: 'Googlebot',
+        allow: '/',
+        disallow: ['/admin/', '/api/admin/'],
+      },
     ],
-    sitemap: `${brand.url}/sitemap.xml`,
+    sitemap: `${baseUrl}/sitemap.xml`,
   };
 }

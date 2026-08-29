@@ -5,12 +5,8 @@ import { brand } from '@/lib/data/brand';
 import ProductDetailsClient from './ProductDetailsClient';
 import { getDb } from '@/lib/db';
 import { products, testimonials, sizeGuides, colorMap } from '@/lib/db/schema';
-<<<<<<< HEAD
-import { eq, and, not, sql, desc } from 'drizzle-orm'; // Added desc
-=======
 import { eq, and, not, sql, desc } from 'drizzle-orm';
 import { unstable_cache } from 'next/cache';
->>>>>>> c89ed85 (fix:image and cloudflare database reads)
 
 export const revalidate = 60;
 
@@ -18,8 +14,6 @@ type Props = {
   params: Promise<{ id: string }>;
 }
 
-<<<<<<< HEAD
-=======
 function detectBrand(productName: string): string {
   const knownBrands = ['Nike', 'Adidas', 'Jordan', 'Puma', 'New Balance', 'On Running', 'Asics', 'Vans', 'Converse', 'Timberland', 'Clarks'];
   const matched = knownBrands.find((b) => new RegExp(`\\b${b}\\b`, 'i').test(productName));
@@ -66,7 +60,6 @@ const getCachedProductAssets = unstable_cache(
   { revalidate: 3600, tags: ['products', 'reviews', 'settings'] }
 );
 
->>>>>>> c89ed85 (fix:image and cloudflare database reads)
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   
@@ -74,9 +67,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = await getCachedProduct(id);
   
   if (!product) {
-    notFound(); // <-- 2. Trigger true 404 here
+    notFound(); 
   }
 
+  const detectedBrand = detectBrand(product.name);
   const previewImage = product.images && product.images.length > 0 
     ? product.images[0] 
     : product.image;
@@ -85,29 +79,61 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? previewImage 
     : `${brand.url.replace(/\/$/, '')}${previewImage.startsWith('/') ? '' : '/'}${previewImage}`;
 
-  // 1. Generate highly specific, intent-driven keywords dynamically
   const baseKeywords = [
     product.name,
-    `${product.name} Kenya`,
-    `Buy ${product.name} online`,
-    `${product.category} Nairobi`,
-    `${product.productType} delivery Kenya`,
-    'Kickverse'
+    `Buy ${product.name} Nairobi`,
+    `Buy ${product.name} online Kenya`,
+    `${product.name} price in Kenya`,
+    `Original ${product.name} delivery Nairobi`,
+    `${detectedBrand} shoes Nairobi`,
+    `${product.category} Nairobi CBD`,
+    'Pay on delivery shoes Nairobi',
+    'Kickverse KE',
   ];
 
-<<<<<<< HEAD
   // 2. Inject niche keywords based on the exact product type
-=======
->>>>>>> c89ed85 (fix:image and cloudflare database reads)
   if (product.productType === 'Soccer Cleats') {
-    baseKeywords.push('Football boots Kenya', 'Soccer cleats Nairobi', 'Firm ground boots');
+    baseKeywords.push(
+      'Football boots Kenya',
+      'Soccer cleats Nairobi CBD',
+      'Original soccer boots Nairobi',
+      'Firm Ground FG football boots Kenya',
+      'Artificial Grass AG turf shoes Nairobi',
+      'Buy soccer cleats online Nairobi'
+    );
+  } else if (product.category === 'Official Shoes') {
+    baseKeywords.push(
+      'Pure leather official shoes Nairobi',
+      'Men formal shoes Nairobi CBD',
+      'Office loafers Nairobi',
+      'Genuine leather shoes Kenya'
+    );
+  } else if (product.category === 'Opens & Sandals' || (product.category && product.category.toLowerCase().includes('sandal'))) {
+    baseKeywords.push(
+      'Casual slides Nairobi',
+      'Men leather sandals Kenya',
+      'Suede clogs Nairobi',
+      'Comfort sandals delivery Nairobi'
+    );
   } else {
-    baseKeywords.push('Sneakers Kenya', 'Streetwear shoes Nairobi', 'Original sneakers');
+    baseKeywords.push(
+      'Sneakers Nairobi',
+      'Original streetwear shoes Kenya',
+      'Affordable sneakers Nairobi CBD',
+      'Trending sneakers Kenya'
+    );
   }
 
-  // 3. Craft a localized, conversion-focused meta description
-  const cleanDescription = product.description.replace(/(<([^>]+)>)/gi, "").substring(0, 90);
-  const localDescription = `Buy the ${product.name} at ${brand.name}. Premium ${product.category.toLowerCase()} available for fast delivery in Nairobi and across Kenya. ${cleanDescription}...`;
+  const formattedPrice = `KSh ${Number(product.price).toLocaleString()}`;
+  const metaTitle = `Buy ${product.name} in Nairobi, Kenya | ${brand.name}`;
+
+  const cleanDescription = (product.description || '')
+    .replace(/(<([^>]+)>)/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .substring(0, 120);
+
+  const localDescription = `Buy original ${product.name} for ${formattedPrice} at ${brand.name}. Free expedited delivery within Nairobi CBD, pay on delivery available across Nairobi & nationwide Kenya. ${cleanDescription}...`;
 
   return {
     title: product.name, 
@@ -116,8 +142,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: {
       canonical: `${brand.url}/product/${id}`,
     },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
     openGraph: {
-      title: `${product.name} | ${brand.shortName}`,
+      title: `${product.name} - ${formattedPrice} | ${brand.name} Nairobi`,
       description: localDescription,
       url: `${brand.url}/product/${id}`,
       siteName: brand.name,
@@ -126,7 +163,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           url: absoluteImageUrl,
           width: 800,
           height: 800,
-          alt: `Buy ${product.name} in kenya`,
+          alt: `Buy ${product.name} online in Nairobi Kenya at Kickverse`,
         },
       ],
       locale: 'en_KE',
@@ -134,7 +171,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: product.name,
+      title: `${product.name} | ${brand.name} Nairobi`,
       description: localDescription,
       images: [absoluteImageUrl],
     },
@@ -144,54 +181,69 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProductPage({ params }: Props) {
   const { id } = await params;
   
-<<<<<<< HEAD
-  // 1. Fetch the main product
-  const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
-  const product = result[0];
-=======
   // 4. Instantly fetches from cache (no DB query since metadata already cached it)
   const product = await getCachedProduct(id);
->>>>>>> c89ed85 (fix:image and cloudflare database reads)
 
   if (!product) {
-    notFound(); // <-- 3. Trigger true 404 here too
+    notFound(); 
   }
 
   // 5. Instantly fetches related assets from cache
   const { allSizeGuides, allColorMaps, relatedPool, productReviews, recentlyViewedPool } = await getCachedProductAssets(product.id, product.productType);
 
-
   const relatedProducts = relatedPool.sort(() => 0.5 - Math.random()).slice(0, 4);
   const recentlyViewed = recentlyViewedPool.sort(() => 0.5 - Math.random()).slice(0, 8);
 
-  const previewImage = product.images && product.images.length > 0 
-    ? product.images[0] 
-    : product.image;
+  const imagesList = product.images && product.images.length > 0 ? product.images : [product.image];
+  const absoluteImages = imagesList.map((img: string) =>
+    img.startsWith('http') ? img : `${brand.url.replace(/\/$/, '')}${img.startsWith('/') ? '' : '/'}${img}`
+  );
 
-  const absoluteImageUrl = previewImage.startsWith('http') 
-    ? previewImage 
-    : `${brand.url.replace(/\/$/, '')}${previewImage.startsWith('/') ? '' : '/'}${previewImage}`;
+  const detectedBrand = detectBrand(product.name);
+  const reviewCount = productReviews.length;
+  const averageRating = reviewCount > 0
+    ? (productReviews.reduce((acc, curr) => acc + Number(curr.rating || 5), 0) / reviewCount).toFixed(1)
+    : Number(product.rating || 5.0).toFixed(1);
 
-  const jsonLd = {
+  const productSchema: Record<string, any> = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
-    image: [absoluteImageUrl],
-    description: product.description,
+    image: absoluteImages,
+    description: product.description?.replace(/(<([^>]+)>)/gi, '') || product.name,
+    sku: `KV-${product.id}`,
+    mpn: `KV-${product.id}`,
     category: product.category,
+    brand: {
+      '@type': 'Brand',
+      name: detectedBrand,
+    },
     offers: {
       '@type': 'Offer',
+      url: `${brand.url}/product/${product.id}`,
       priceCurrency: 'KES',
       price: product.price,
-      url: `${brand.url}/product/${product.id}`,
+      priceValidUntil: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+        .toISOString()
+        .split('T')[0],
+      itemCondition: 'https://schema.org/NewCondition',
       availability: 'https://schema.org/InStock',
       seller: {
         '@type': 'Organization',
         name: brand.name,
+        url: brand.url,
+      },
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: { '@type': 'MonetaryAmount', value: '0', currency: 'KES' },
+        shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'KE', addressRegion: 'Nairobi County' },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
+          transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
+        },
       },
     },
-<<<<<<< HEAD
-=======
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: averageRating,
@@ -242,15 +294,14 @@ export default async function ProductPage({ params }: Props) {
         acceptedAnswer: { '@type': 'Answer', text: `Yes, our pairs run true to standard sizing. If you have wider feet, we recommend selecting half a size up. Consult our interactive Size Guide for exact measurements.` },
       },
     ],
->>>>>>> c89ed85 (fix:image and cloudflare database reads)
   };
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      
       <ProductDetailsClient 
         product={product} 
         reviews={productReviews}
