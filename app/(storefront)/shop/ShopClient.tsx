@@ -12,6 +12,12 @@ import { discoveryChips, filterCategories, searchSuggestions, priceRanges, filte
 import { motion, AnimatePresence } from 'motion/react';
 import { staggerContainer, staggerItem, fadeIn, fadeUp } from '@/lib/animations';
 
+// SEO Slug Generator Helper
+const createSlug = (name: string, id: string) => {
+  const cleanName = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+  return `${cleanName}-${id}`;
+};
+
 export default function ShopClient({ initialProducts }: { initialProducts: any[] }) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -595,7 +601,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                     className="group flex flex-col hover:-translate-y-1 transition-transform duration-300"
                   >
                         <div className="relative aspect-[3/4] w-full bg-brand-card overflow-hidden mb-4 group-hover:shadow-lg group-hover:shadow-brand-primary/20 transition-shadow duration-300 border border-transparent rounded-md group-hover:border-white/10">
-                          <Link href={`/product/${product.id}`} className="absolute inset-0 z-10" aria-label={`View ${product.name}`}></Link>
+                          <Link href={`/product/${createSlug(product.name, product.id)}`} className="absolute inset-0 z-10" aria-label={`View ${product.name}`}></Link>
                           
                           {/* Badge */}
                           <div className="absolute top-3 left-3 z-20 shadow-xl">
@@ -621,7 +627,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                         </div>
                         
                         <div className="w-full text-left flex flex-col flex-1 px-1">
-                          <Link href={`/product/${product.id}`} className="w-full block">
+                          <Link href={`/product/${createSlug(product.name, product.id)}`} className="w-full block">
                             <h3 className="font-sans font-medium text-white line-clamp-2 mb-1 group-hover:text-brand-primary transition-colors text-xs sm:text-sm md:text-base leading-tight">
                               {product.name}
                             </h3>
@@ -645,7 +651,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                           {/* CTAs */}
                           <div className="mt-auto pt-2 w-full">
                              <Link 
-                              href={`/product/${product.id}`}
+                              href={`/product/${createSlug(product.name, product.id)}`}
                               className="w-full bg-brand-primary border border-white/10 text-black font-bold h-10 rounded-md group-hover:bg-white group-hover:text-black group-hover:border-white transition-all flex justify-center items-center uppercase tracking-widest text-[10px] sm:text-xs z-20 relative"
                              >
                                View Details

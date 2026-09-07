@@ -3,6 +3,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Minus, Plus, ShoppingBag, MessageCircle, CheckCircle, ShieldCheck, Truck, ArrowRight } from 'lucide-react';
 import { useCart } from '@/lib/CartContext';
@@ -13,6 +14,13 @@ import Image from 'next/image';
 // Apply the same luxury curve used in your animations.ts
 const premiumEasing: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
+// SEO Slug Generator Helper
+const createSlug = (name: string, id: string) => {
+  if (!name) return id;
+  const cleanName = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+  return `${cleanName}-${id}`;
+};
+
 export function CartDrawer() {
   const { items, isCartOpen, setIsCartOpen, updateQuantity, removeFromCart, cartTotal, cartCount } = useCart();
 
@@ -22,13 +30,17 @@ export function CartDrawer() {
     const productUrl = window.location.href;
 
     let message = `Hello ${brand.name}\n\nI would like to order:\n\n`;
+
+    
     
     items.forEach(item => {
-      message += `• ${item.product.name} × ${item.quantity}\n  Size: ${item.size}${item.color ? ` | Color: ${item.color}` : ''}\n\n`;
+      const itemUrl = `${brand.url}/product/${createSlug(item.product.name, item.product.id)}`;
+
+      message += `• ${item.product.name} × ${item.quantity}\n  Size: ${item.size}${item.color ? ` | Color: ${item.color}` : ''}\n Link: ${itemUrl}\n\n`;
     });
 
     message += `Delivery Location: (Please type here)\n`;
-    message += `Subtotal: ${formatPrice(cartTotal)}\n\nPlease confirm availability, total payable and payment method\n\nThank you.\n\n${productUrl}`;
+    message += `Subtotal: ${formatPrice(cartTotal)}\n\nPlease confirm availability, total payable and payment method\n\nThank you.`;
     
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/${brand.whatsappNumber}?text=${encodedMessage}`, '_blank');
@@ -87,32 +99,43 @@ export function CartDrawer() {
                   >
                     CONTINUE SHOPPING
                   </button>
-                  <a href="/shop?category=best-sellers" onClick={() => setIsCartOpen(false)} className="text-xs text-gray-400 hover:text-white uppercase tracking-widest font-bold mt-2 underline underline-offset-4">
+                  <Link href="/shop?category=best-sellers" onClick={() => setIsCartOpen(false)} className="text-xs text-gray-400 hover:text-white uppercase tracking-widest font-bold mt-2 underline underline-offset-4">
                     BROWSE BEST SELLERS
-                  </a>
+                  </Link>
                 </div>
               ) : (
                 <div className="space-y-6">
                   {items.map((item) => (
                     <div key={`${item.product.id}-${item.size}-${item.color}`} className="flex space-x-4 bg-transparent border-b border-white/5 pb-6">
-                      <div className="relative h-28 w-24 flex-shrink-0 bg-brand-dark rounded-md overflow-hidden">
+                      <Link 
+                        href={`/product/${createSlug(item.product.name, item.product.id)}`} 
+                        onClick={() => setIsCartOpen(false)}
+                        className="relative h-28 w-24 flex-shrink-0 bg-brand-dark rounded-md overflow-hidden block"
+                      >
                         <Image
                           src={item.product.image}
                           alt={item.product.name}
                           fill
                           referrerPolicy="no-referrer"
                           sizes= "96px"
-                          className="object-cover opacity-90"
+                          className="object-cover opacity-90 hover:opacity-100 transition-opacity hover:scale-105 duration-500"
                         />
-                      </div>
+                      </Link>
                       <div className="flex-1 flex flex-col">
                         <div className="flex justify-between items-start">
-                          <h3 className="font-sans font-medium text-sm text-white line-clamp-2 pr-2 leading-tight">
-                            {item.product.name}
-                          </h3>
+                          {/* Clickable Title with SEO Slug */}
+                          <Link 
+                            href={`/product/${createSlug(item.product.name, item.product.id)}`}
+                            onClick={() => setIsCartOpen(false)}
+                          >
+                            <h3 className="font-sans font-medium text-sm text-white line-clamp-2 pr-2 leading-tight hover:text-brand-primary transition-colors">
+                              {item.product.name}
+                            </h3>
+                          </Link>
+                          
                           <button
                             onClick={() => removeFromCart(item.product.id, item.size, item.color)}
-                            className="text-gray-500 hover:text-white transition-colors p-1 -mt-1 rounded-md"
+                            className="text-gray-500 hover:text-white transition-colors p-1 -mt-1 rounded-md shrink-0"
                             aria-label="Remove item"
                           >
                             <X className="h-4 w-4" />

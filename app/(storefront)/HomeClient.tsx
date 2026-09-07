@@ -17,6 +17,14 @@ import { brand } from '@/lib/data/brand';
 
 const PublicReviewModal = dynamic(() => import('@/components/PublicReviewModal').then(mod => mod.PublicReviewModal), { ssr: false });
 const AnimatedCounter = dynamic(() => import('@/components/AnimatedCounter'), { ssr: false });
+
+// Add SEO Slug Generator Helper just above the component
+const createSlug = (name: string, id: string) => {
+  if (!name) return id;
+  const cleanName = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+  return `${cleanName}-${id}`;
+};
+
 // Define the props we expect from the server
 export default function HomeClient({ initialProducts, initialCategories, initialTestimonials, storeSettings }: any) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -563,7 +571,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   key={product.id} 
                   className="relative min-w-[80vw] sm:min-w-[45vw] md:min-w-0 snap-center group flex flex-col bg-brand-card border border-white/10 hover:border-brand-accent transition-colors overflow-hidden rounded-md"
                  >
-                  <Link href={`/product/${product.id}`} className="block relative aspect-[4/3] bg-black overflow-hidden group-hover:opacity-90 transition-opacity rounded-t-md">
+                  <Link href={`/product/${createSlug(product.name, product.id)}`} className="block relative aspect-[4/3] bg-black overflow-hidden group-hover:opacity-90 transition-opacity rounded-t-md">
                     {/* Discount Badge */}
                     {product.originalPrice && (
                       <div className="absolute top-2 left-2 z-20 rounded-md bg-brand-accent text-white text-[9px] sm:text-sm font-display uppercase tracking-widest px-2 py-0.5 sm:px-3 sm:py-1 shadow-lg shadow-brand-accent/40">
@@ -597,7 +605,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   </div>
 
                   <div className="px-3 sm:px-5 pt-3 sm:pt-4 pb-0 flex flex-col">
-                    <Link href={`/product/${product.id}`}>
+                    <Link href={`/product/${createSlug(product.name, product.id)}`}>
                       <h3 className="font-poppins font-semibold text-sm sm:text-base text-white group-hover:text-brand-accent transition-colors">
                         {product.name}
                       </h3>
@@ -615,14 +623,14 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                        <a 
                         href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(
                           `👋 Hello ${brand.name},\n\nI would like to grab this flash deal:\n\n📦 *Item:* ${product.name}\n💰 *Price:* Ksh ${product.price}\n\nPlease let me know the next steps for delivery`
-                        )}\n\n${brand.url}/product/${product.id}`}
+                        )}\n\n${brand.url}/product/${createSlug(product.name, product.id)}`}
                         target="_blank" rel="noreferrer"
                         className="w-full bg-brand-primary text-black rounded-md font-bold py-1.5 sm:py-2.5 hover:bg-brand-hover transition-colors flex justify-center items-center uppercase tracking-widest text-[8px] sm:text-xs"
                        >
                          <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" /> Order On WhatsApp
                        </a>
                       <Link 
-                        href={`/product/${product.id}`}
+                        href={`/product/${createSlug(product.name, product.id)}`}
                         className="w-full bg-transparent border rounded-md border-white/20 text-white font-bold py-1.5 sm:py-2.5 hover:bg-white hover:text-black transition-colors flex justify-center items-center uppercase tracking-widest text-[8px] sm:text-xs"
                        >
                          View Details
@@ -729,7 +737,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 className="group flex flex-col bg-transparent lg:hover:-translate-y-2 transition-transform duration-500"
               >
                 <div className="relative aspect-[3/4] bg-neutral-900 border border-white/10 overflow-hidden mb-3 sm:mb-5 block rounded-md">
-                  <Link href={`/product/${product.id}`} className="block w-full h-full absolute inset-0 z-10">
+                  <Link href={`/product/${createSlug(product.name, product.id)}`} className="block w-full h-full absolute inset-0 z-10">
                     <Image
                       src={product.image}
                       alt={`Buy ${product.name} Online Nairobi - Authentic Footwear Delivery`}
@@ -745,7 +753,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   <p className="text-[7px] sm:text-[10px] text-brand-primary font-bold uppercase tracking-widest mb-1 sm:mb-1.5 flex justify-center items-center">
                     <Flame className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" /> {brand.sections?.newArrivals?.trendingBadgePrefix || "Trending in"} {brand.location}
                   </p>
-                  <Link href={`/product/${product.id}`}>
+                  <Link href={`/product/${createSlug(product.name, product.id)}`}>
                     <h3 className="font-poppins font-semibold text-white text-sm sm:text-base md:text-lg line-clamp-1 mb-1 sm:mb-2 group-hover:text-brand-primary transition-colors">
                       {product.name}
                     </h3>
@@ -759,14 +767,14 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                      <a 
                       href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(
                         `👋 Hello ${brand.name} team,\n\nI just saw your new arrival and I would love to get my hands on it!\n\n✨ *Item:* ${product.name}\n💰 *Price:* Ksh ${product.price}\n\nIs this currently in stock, and what are the delivery options?`
-                      )}\n\n${brand.url}/product/${product.id}`}
+                      )}\n\n${brand.url}/product/${createSlug(product.name, product.id)}`}
                       target="_blank" rel="noreferrer"
                       className="w-full bg-brand-primary text-black font-bold py-1.5 sm:py-2 rounded-md transition-colors flex justify-center items-center uppercase tracking-widest text-[7px] sm:text-[9px] md:text-xs hover:bg-brand-hover"
                      >
                        <MessageCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-4 md:w-4 mr-1 sm:mr-2" /> Order on WhatsApp
                      </a>
                      <Link 
-                      href={`/product/${product.id}`}
+                      href={`/product/${createSlug(product.name, product.id)}`}
                       className="w-full bg-transparent border border-white/20 text-white font-bold py-1.5 sm:py-2 rounded-md transition-colors flex justify-center items-center uppercase tracking-widest text-[8px] sm:text-[10px] md:text-xs hover:bg-white hover:text-black"
                      >
                        View Details
@@ -810,7 +818,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 className="group flex flex-col bg-transparent"
               >
                 <div className="relative aspect-[4/5] bg-neutral-900 border border-white/10 overflow-hidden mb-3 sm:mb-5 block group-hover:border-brand-accent transition-colors rounded-md">                  
-                  <Link href={`/product/${product.id}`} className="block w-full h-full absolute inset-0 z-10">
+                  <Link href={`/product/${createSlug(product.name, product.id)}`} className="block w-full h-full absolute inset-0 z-10">
                     <Image
                       src={product.image}
                       alt={`${product.name} - Best Selling Footwear in Nairobi Kenya`}
@@ -831,7 +839,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     </div>
                     <span className="text-gray-400 text-[8px] sm:text-xs font-bold ml-1">(120+ Reviews)</span>
                   </div>
-                  <Link href={`/product/${product.id}`}>
+                  <Link href={`/product/${createSlug(product.name, product.id)}`}>
                     <h3 className="font-poppins font-semibold text-white text-sm sm:text-base md:text-lg line-clamp-1 mb-1 group-hover:text-brand-accent transition-colors">
                       {product.name}
                     </h3>
@@ -852,14 +860,14 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                      <a 
                       href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(
                         `👋 Hello ${brand.name}!\n\nI saw this is one of your best sellers and I'd love to order one before it sells out:\n\n🌟 *Item:* ${product.name}\n💰 *Price:* Ksh ${product.price}\n\nPlease let me know if you still have stock and the next steps for delivery`
-                      )}\n\n${brand.url}/product/${product.id}`}
+                      )}\n\n${brand.url}/product/${createSlug(product.name, product.id)}`}
                       target="_blank" rel="noreferrer"
                       className="w-full bg-brand-primary text-black font-bold py-1.5 sm:py-2 rounded-md transition-colors flex justify-center items-center uppercase tracking-widest text-[7px] sm:text-[9px] md:text-xs hover:bg-brand-hover"
                      >
                        <MessageCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-4 md:w-4 mr-1 sm:mr-2" /> Order on WhatsApp
                      </a>
                      <Link 
-                      href={`/product/${product.id}`}
+                      href={`/product/${createSlug(product.name, product.id)}`}
                       className="w-full bg-transparent border border-white/20 text-white font-bold py-1.5 sm:py-2 rounded-md transition-colors flex justify-center items-center uppercase tracking-widest text-[8px] sm:text-[10px] md:text-xs hover:bg-white hover:text-black"
                      >
                        View Details

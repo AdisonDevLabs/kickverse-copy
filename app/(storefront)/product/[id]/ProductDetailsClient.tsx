@@ -35,6 +35,11 @@ const getAvatarColor = (name: string) => {
   return colors[Math.abs(hash) % colors.length];
 };
 
+const createSlug = (name: string, id: string) => {
+  const cleanName = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+  return `${cleanName}-${id}`;
+};
+
 export default function ProductDetailsClient({ product, reviews, relatedProducts, recentlyViewed, sizeGuides, colorMap }: any) {
   const router = useRouter();
   const { addToCart, setIsCartOpen } = useCart();
@@ -160,7 +165,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
               { "@type": "ListItem", "position": 1, "name": "Home", "item": `${brand.url}/` },
               { "@type": "ListItem", "position": 2, "name": "Shop", "item": `${brand.url}/shop` },
               { "@type": "ListItem", "position": 3, "name": product.category, "item": `${brand.url}/shop?category=${product.category.toLowerCase().replace(/\s+/g, '-')}` },
-              { "@type": "ListItem", "position": 4, "name": product.name, "item": `${brand.url}/product/${product.id}` }
+              { "@type": "ListItem", "position": 4, "name": product.name, "item": `${brand.url}/product/${createSlug(product.name, product.id)}` }
             ]
           })
         }}
@@ -306,7 +311,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
               className="md:w-1/2 p-6 md:p-0 flex flex-col z-0"
             >
               <motion.div variants={staggerItem} className="mb-8 mt-2 md:mt-0">
-                <h1 className="font-display uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white leading-[1.1] mb-4">
+                <h1 className="font-poppins font-bold uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white leading-[1.1] mb-4">
                   {product.name}
                 </h1>
                 
@@ -329,7 +334,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                 
                 <div className="flex flex-col gap-1 items-start">
                   <div className="flex items-end gap-4">
-                    <span className="text-3xl sm:text-4xl font-sans font-medium text-white">{formatPrice(product.price)}</span>
+                    <span className="font-poppins font-semibold text-2.5xl sm:text-3.5xl font-sans font-medium text-white">{formatPrice(product.price)}</span>
                     {product.originalPrice && (
                       <span className="text-lg sm:text-xl text-gray-500 line-through mb-1.5">{formatPrice(product.originalPrice)}</span>
                     )}
@@ -693,7 +698,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 {relatedProducts.map((prod: any) => (
                   <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} key={prod.id}>
-                    <Link href={`/product/${prod.id}`} className="group flex flex-col hover:-translate-y-1 transition-transform duration-300">
+                    <Link href={`/product/${createSlug(prod.name, prod.id)}`} className="group flex flex-col hover:-translate-y-1 transition-transform duration-300">
                       <div className="relative aspect-[3/4] w-full bg-brand-dark overflow-hidden rounded-md mb-4 border border-transparent group-hover:border-white/10">
                         <Image src={prod.image} alt={`Buy ${prod.name} online in Nairobi`} fill referrerPolicy="no-referrer" className="object-cover group-hover:scale-[1.03] opacity-90 group-hover:opacity-100 transition-transform duration-700" />
                       </div>
@@ -716,7 +721,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4">
                 {recentlyViewed.map((prod: any) => (
                   <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} key={prod.id}>
-                    <Link href={`/product/${prod.id}`} className="group">
+                    <Link href={`/product/${createSlug(prod.name, prod.id)}`} className="group">
                       <div className="relative aspect-square w-full bg-brand-card rounded-md overflow-hidden border border-white/5 group-hover:border-white/20 transition-colors">
                         <Image src={prod.image} alt={`${prod.name} Kenya catalog`} fill className="object-cover" referrerPolicy="no-referrer" />
                       </div>

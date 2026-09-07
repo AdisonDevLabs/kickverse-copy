@@ -13,3 +13,8 @@ coverage/
 .wrangler
 .dev.vars*
 !.dev.vars.example
+
+cleanup-r2.mjs
+compress-r2.mjs
+list-r2.mjs
+r2-inventory.json

@@ -13,6 +13,12 @@ type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
+// SEO Slug Generator Helper
+function createSlug(name: string, id: string) {
+  const cleanName = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+  return `${cleanName}-${id}`;
+}
+
 // 2. Replace static metadata with dynamic generateMetadata
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const resolvedParams = await searchParams;
@@ -176,7 +182,7 @@ export default async function ShopPage({ searchParams }: Props) {
         'itemListElement': allProducts.slice(0, 50).map((product, index) => ({
           '@type': 'ListItem',
           'position': index + 1,
-          'url': `${baseUrl}/product/${product.id}`,
+          'url': `${baseUrl}/product/${createSlug(product.name, product.id)}`,
           'name': product.name
         }))
       },

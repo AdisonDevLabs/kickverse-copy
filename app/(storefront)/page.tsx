@@ -8,6 +8,13 @@ import HomeClient from './HomeClient';
 // 1. Tell Next.js to use Cloudflare's Edge network
 export const revalidate = 60;
 
+// Add SEO Slug Generator Helper
+function createSlug(name: string, id: string) {
+  if (!name) return id;
+  const cleanName = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+  return `${cleanName}-${id}`;
+}
+
 export default async function HomePage() {
   // 2. Await the database initialization
   const db = await getDb();
@@ -150,7 +157,7 @@ export default async function HomePage() {
     itemListElement: allProducts.slice(0, 10).map((product: any, index: number) => ({
       '@type': 'ListItem',
       position: index + 1,
-      url: `${brand.url}/product/${product.id}`,
+      url: `${brand.url}/product/${createSlug(product.name, product.id)}`,
       name: product.name
     }))
   };

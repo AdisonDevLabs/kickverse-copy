@@ -1,5 +1,5 @@
 // app/(storefront)/product/[id]/page.tsx
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import { brand } from '@/lib/data/brand';
 import ProductDetailsClient from './ProductDetailsClient';
@@ -12,6 +12,12 @@ export const revalidate = 60;
 
 type Props = {
   params: Promise<{ id: string }>;
+}
+
+// SEO Slug Generator Helper
+function createSlug(name: string, id: string) {
+  const cleanName = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+  return `${cleanName}-${id}`;
 }
 
 function detectBrand(productName: string): string {
@@ -61,14 +67,20 @@ const getCachedProductAssets = unstable_cache(
 );
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
+  const { id: slug } = await params;
   
+  // Extract ID from the end of the slug
+  const idMatch = slug.match(/(?:-|^)(p-\d+)$/);
+  const productId = idMatch ? idMatch[1] : slug;
+
   // 3. Use the cached function instead of raw DB call
-  const product = await getCachedProduct(id);
+  const product = await getCachedProduct(productId);
   
   if (!product) {
     notFound(); 
   }
+
+  const expectedSlug = createSlug(product.name, product.id);
 
   const detectedBrand = detectBrand(product.name);
   const previewImage = product.images && product.images.length > 0 
@@ -140,7 +152,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: localDescription,
     keywords: baseKeywords,
     alternates: {
-      canonical: `${brand.url}/product/${id}`,
+      canonical: `${brand.url}/product/${expectedSlug}`,
     },
     robots: {
       index: true,
@@ -156,7 +168,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: `${product.name} - ${formattedPrice} | ${brand.name} Nairobi`,
       description: localDescription,
-      url: `${brand.url}/product/${id}`,
+      url: `${brand.url}/product/${expectedSlug}`,
       siteName: brand.name,
       images: [
         {
@@ -179,13 +191,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProductPage({ params }: Props) {
-  const { id } = await params;
+  const { id: slug } = await params;
   
+  const idMatch = slug.match(/(?:-|^)(p-\d+)$/);
+  const productId = idMatch ? idMatch[1] : slug;
+
   // 4. Instantly fetches from cache (no DB query since metadata already cached it)
-  const product = await getCachedProduct(id);
+  const product = await getCachedProduct(productId);
 
   if (!product) {
     notFound(); 
+  }
+
+  // 301 Redirect for legacy links or malformed URLs
+  const expectedSlug = createSlug(product.name, product.id);
+  if (slug !== expectedSlug) {
+    redirect(`/product/${expectedSlug}`);
   }
 
   // 5. Instantly fetches related assets from cache
@@ -220,7 +241,7 @@ export default async function ProductPage({ params }: Props) {
     },
     offers: {
       '@type': 'Offer',
-      url: `${brand.url}/product/${product.id}`,
+      url: `${brand.url}/product/${expectedSlug}`,
       priceCurrency: 'KES',
       price: product.price,
       priceValidUntil: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
@@ -270,7 +291,7 @@ export default async function ProductPage({ params }: Props) {
       { '@type': 'ListItem', position: 1, name: 'Home', item: `${brand.url}/` },
       { '@type': 'ListItem', position: 2, name: 'Shop', item: `${brand.url}/shop` },
       { '@type': 'ListItem', position: 3, name: product.category, item: `${brand.url}/shop?category=${encodeURIComponent(product.category.toLowerCase().replace(/\s+/g, '-'))}` },
-      { '@type': 'ListItem', position: 4, name: product.name, item: `${brand.url}/product/${product.id}` },
+      { '@type': 'ListItem', position: 4, name: product.name, item: `${brand.url}/product/${expectedSlug}` },
     ],
   };
 
