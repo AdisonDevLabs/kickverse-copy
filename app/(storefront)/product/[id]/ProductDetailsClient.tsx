@@ -276,7 +276,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   >
                     <Image
                       src={images[activeImage]}
-                      alt={`Buy ${product.name} in Nairobi - View ${activeImage + 1}`}
+                      alt={`${product.name} ${selectedColor ? `in ${selectedColor}` : ''} - Price in Kenya & Authentic Delivery`}
                       fill
                       priority
                       referrerPolicy="no-referrer"
@@ -299,7 +299,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                     onClick={() => handleImageSelect(idx)}
                     className={`relative w-24 aspect-square flex-shrink-0 bg-brand-card border rounded-md overflow-hidden transition-all ${activeImage === idx ? 'border-brand-primary opacity-100' : 'border-white/10 opacity-50 hover:opacity-100'}`}
                   >
-                    <Image src={img} alt={`${product.name} detail shot ${idx + 1} Nairobi`} fill referrerPolicy="no-referrer" className="object-cover" />
+                    <Image src={img} alt={`${product.name} ${product.colors?.[idx] || 'original'} - Detail View Kenya`} fill referrerPolicy="no-referrer" className="object-cover" />
                   </button>
                 ))}
               </div>
@@ -313,6 +313,11 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
               <motion.div variants={staggerItem} className="mb-8 mt-2 md:mt-0">
                 <h1 className="font-poppins font-bold uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white leading-[1.1] mb-4">
                   {product.name}
+                  {selectedColor && (
+                    <span className="block text-2xl sm:text-3xl text-gray-400 mt-2 font-medium capitalize">
+                      {selectedColor}
+                    </span>
+                  )}
                 </h1>
                 
                 <div className="flex flex-wrap items-center gap-4 mb-6">
@@ -506,6 +511,14 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   <p className="text-gray-400 leading-relaxed font-light text-sm">
                     {product.description}
                   </p>
+                  <div className="pt-4 border-t border-white/5 text-[11px] text-gray-500/80 leading-relaxed uppercase tracking-wider">
+                    <p>
+                      Shop the authentic {product.name}{selectedColor ? ` in ${selectedColor}` : ''}. 
+                      Currently available in sizes {product.sizes?.join(', ') || 'standard fit'}. 
+                      Find the best {product.name} price in Kenya (KSh) with fast, secure delivery via Kickverse. 
+                      All footwear is guaranteed 100% original.
+                    </p>
+                  </div>
                 </div>
 
                 <div>
@@ -700,7 +713,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} key={prod.id}>
                     <Link href={`/product/${createSlug(prod.name, prod.id)}`} className="group flex flex-col hover:-translate-y-1 transition-transform duration-300">
                       <div className="relative aspect-[3/4] w-full bg-brand-dark overflow-hidden rounded-md mb-4 border border-transparent group-hover:border-white/10">
-                        <Image src={prod.image} alt={`Buy ${prod.name} online in Nairobi`} fill referrerPolicy="no-referrer" className="object-cover group-hover:scale-[1.03] opacity-90 group-hover:opacity-100 transition-transform duration-700" />
+                        <Image src={prod.image} alt={`${prod.name} - Current Price in Kenya`} fill referrerPolicy="no-referrer" className="object-cover group-hover:scale-[1.03] opacity-90 group-hover:opacity-100 transition-transform duration-700" />
                       </div>
                       <div className="text-left w-full mt-auto">
                         <h3 className="font-sans font-medium text-white line-clamp-2 mb-1 group-hover:text-brand-primary transition-colors text-sm sm:text-base leading-tight">{prod.name}</h3>
@@ -723,7 +736,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} key={prod.id}>
                     <Link href={`/product/${createSlug(prod.name, prod.id)}`} className="group">
                       <div className="relative aspect-square w-full bg-brand-card rounded-md overflow-hidden border border-white/5 group-hover:border-white/20 transition-colors">
-                        <Image src={prod.image} alt={`${prod.name} Kenya catalog`} fill className="object-cover" referrerPolicy="no-referrer" />
+                        <Image src={prod.image} alt={`${prod.name} - Original KSh Price Nairobi`} fill className="object-cover" referrerPolicy="no-referrer" />
                       </div>
                     </Link>
                   </motion.div>

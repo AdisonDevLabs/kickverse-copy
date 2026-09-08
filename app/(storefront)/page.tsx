@@ -77,157 +77,147 @@ export default async function HomePage() {
     ? Number((globalTestimonials.reduce((acc: number, curr: any) => acc + curr.rating, 0) / totalReviews).toFixed(1))
     : Number(storeConfig.fallbackRating || 4.8);
 
-  // 1. WebSite Schema with SearchAction
-  const websiteSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    '@id': `${brand.url}/#website`,
-    name: brand.name,
-    alternateName: ['Kickverse', 'Kickverse Kenya', 'Kickverse KE', 'kickverse.co.ke'],
-    url: brand.url,
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: `${brand.url}/shop?q={search_term_string}`,
-      'query-input': 'required name=search_term_string',
-    },
-  };
+  const baseUrl = brand.url.replace(/\/$/, '');
 
-  // 2. OnlineStore & ShoeStore LocalBusiness Schema
-  const storeSchema = {
+  const jsonLdGraph = {
     '@context': 'https://schema.org',
-    '@type': ['OnlineStore', 'ShoeStore'],
-    '@id': `${brand.url}/#store`,
-    name: brand.name,
-    alternateName: 'Kickverse KE',
-    url: brand.url,
-    logo: `${brand.url}${brand.logo}`,
-    image: `${brand.url}${brand.logo1}`,
-    description: brand.description,
-    telephone: `+${brand.whatsappNumber}`,
-    priceRange: 'KSh 1,999 - KSh 6,500',
-    currenciesAccepted: 'KES',
-    paymentAccepted: 'Cash on Delivery, M-Pesa, Mobile Money',
-    areaServed: [
-      { '@type': 'City', name: 'Nairobi' },
-      { '@type': 'AdministrativeArea', name: 'Nairobi County' },
-      { '@type': 'Country', name: 'Kenya' }
-    ],
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: 'Nairobi CBD',
-      addressRegion: 'Nairobi County',
-      addressCountry: 'KE'
-    },
-    sameAs: [
-      brand.socialLinks.instagram,
-      brand.socialLinks.tiktok,
-      brand.socialLinks.tiktokBootRoom,
-      brand.socialLinks.whatsappCommunity
-    ],
-    contactPoint: [
+    '@graph': [
       {
-        '@type': 'ContactPoint',
-        telephone: `+254${brand.contacts.sneakers.phone.substring(1)}`,
-        contactType: 'sales & customer service',
-        areaServed: 'KE',
-        availableLanguage: ['English', 'Swahili']
+        '@type': 'WebSite',
+        '@id': `${baseUrl}/#website`,
+        name: brand.name,
+        // Captures search typos: kick verse (pos 9.5), kicksverse (pos 63.3)
+        alternateName: ['Kickverse', 'Kick verse', 'Kicksverse', 'Kickverse Kenya', 'Kickverse KE', 'kickverse.co.ke'],
+        url: baseUrl,
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: `${baseUrl}/shop?q={search_term_string}`,
+          'query-input': 'required name=search_term_string',
+        },
       },
       {
-        '@type': 'ContactPoint',
-        telephone: `+254${brand.contacts.bootRoom.phone.substring(1)}`,
-        contactType: 'technical sports footwear',
-        areaServed: 'KE',
-        availableLanguage: ['English', 'Swahili']
-      }
-    ],
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: averageRating.toString(),
-      reviewCount: (totalReviews > 0 ? totalReviews : 120).toString(),
-      bestRating: '5',
-      worstRating: '1'
-    }
-  };
-
-  // 3. ItemList Schema for Featured Products
-  const itemListSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: 'Top Footwear in Nairobi - Kickverse KE',
-    itemListElement: allProducts.slice(0, 10).map((product: any, index: number) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      url: `${brand.url}/product/${createSlug(product.name, product.id)}`,
-      name: product.name
-    }))
-  };
-
-  // 4. FAQPage Schema for Local Intent Queries
-  const faqSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: 'Do you offer free shoe delivery in Nairobi CBD?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Yes! Kickverse KE provides complimentary, expedited delivery exclusively within the Nairobi Central Business District (CBD).'
+        '@type': ['OnlineStore', 'ShoeStore'],
+        '@id': `${baseUrl}/#store`,
+        name: brand.name,
+        alternateName: 'Kickverse KE',
+        url: baseUrl,
+        logo: `${baseUrl}${brand.logo}`,
+        image: `${baseUrl}${brand.logo1}`,
+        description: brand.description,
+        telephone: `+${brand.whatsappNumber}`,
+        priceRange: 'KSh 2,500 - KSh 15,000',
+        currenciesAccepted: 'KES',
+        paymentAccepted: 'Cash on Delivery, M-Pesa, Mobile Money',
+        areaServed: [
+          { '@type': 'City', name: 'Nairobi' },
+          { '@type': 'AdministrativeArea', name: 'Nairobi County' },
+          { '@type': 'Country', name: 'Kenya' }
+        ],
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'Nairobi CBD',
+          addressRegion: 'Nairobi County',
+          addressCountry: 'KE'
+        },
+        sameAs: [
+          brand.socialLinks.instagram,
+          brand.socialLinks.tiktok,
+          brand.socialLinks.tiktokBootRoom,
+          brand.socialLinks.whatsappCommunity
+        ],
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue: averageRating.toString(),
+          reviewCount: (totalReviews > 0 ? totalReviews : 120).toString(),
+          bestRating: '5',
+          worstRating: '1'
         }
       },
       {
-        '@type': 'Question',
-        name: 'Can I pay on delivery for shoes in Nairobi?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Yes, we offer Pay On Delivery for orders delivered within Nairobi County and surrounding environs. You can inspect your footwear upon arrival before making payment via M-Pesa or cash.'
-        }
+        '@type': 'BreadcrumbList',
+        '@id': `${baseUrl}/#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${baseUrl}/` }
+        ]
       },
       {
-        '@type': 'Question',
-        name: 'What types of soccer cleats are available at Kickverse KE?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'We stock Artificial Grass (AG), Turf (TF), and Firm Ground (FG) football boots including the Nike Mercurial, Phantom, Adidas Predator, F50, and Puma Future series suited for Nairobi playing surfaces.'
-        }
+        '@type': 'ItemList',
+        '@id': `${baseUrl}/#itemlist`,
+        name: 'Top Footwear & Sneakers in Nairobi - Kickverse KE',
+        // Injects full product entities so Google displays price tags in search results
+        itemListElement: allProducts.slice(0, 15).map((product: any, index: number) => {
+          const productUrl = `${baseUrl}/product/${createSlug(product.name, product.id)}`;
+          const imageUrl = product.image.startsWith('http') ? product.image : `${baseUrl}${product.image.startsWith('/') ? '' : '/'}${product.image}`;
+          return {
+            '@type': 'ListItem',
+            position: index + 1,
+            url: productUrl,
+            name: product.name,
+            item: {
+              '@type': 'Product',
+              name: product.name,
+              url: productUrl,
+              image: imageUrl,
+              offers: {
+                '@type': 'Offer',
+                priceCurrency: 'KES',
+                price: product.price,
+                availability: 'https://schema.org/InStock',
+                itemCondition: 'https://schema.org/NewCondition',
+                seller: { '@type': 'Organization', name: brand.name }
+              }
+            }
+          };
+        })
+      },
+      {
+        '@type': 'FAQPage',
+        '@id': `${baseUrl}/#faq`,
+        mainEntity: [
+          {
+            '@type': 'Question',
+            name: 'How much do shoes and sneakers cost in Kenyan shillings?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Prices at Kickverse range from KSh 2,500 to KSh 15,000 depending on the model. All prices on our website are clearly listed in Kenyan Shillings (KSh).'
+            }
+          },
+          {
+            '@type': 'Question',
+            name: 'How do I know the sneakers and shoes are authentic and original?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'We guarantee that 100% of the footwear we sell is authentic and original. We inspect every pair thoroughly, and you can inspect them yourself upon delivery before paying.'
+            }
+          },
+          {
+            '@type': 'Question',
+            name: 'Do you sell hiking boots and walking boots in Kenya?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Yes! We carry a wide selection of durable outdoor hiking boots, walking boots, and trail shoes designed for tough terrain.'
+            }
+          },
+          {
+            '@type': 'Question',
+            name: 'Can I pay on delivery for shoes in Nairobi?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Yes, we offer Pay On Delivery for orders delivered within Nairobi County and surrounding environs. Inspect your shoes upon arrival before making payment.'
+            }
+          }
+        ]
       }
     ]
   };
 
-  // 3. Construct JSON-LD Schema.org Data for the Storefront Homepage
-  const storeJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: brand.name,
-    url: brand.url,
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: `${brand.url}/shop?q={search_term_string}`,
-      'query-input': 'required name=search_term_string',
-    },
-  };
-
+  const safeJsonLd = JSON.stringify(jsonLdGraph).replace(/</g, '\\u003c');
+  
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(storeSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd }}
       />
       <HomeClient 
         initialProducts={allProducts} 

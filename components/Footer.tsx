@@ -24,7 +24,7 @@ export function Footer() {
             
             {/* Brand Section */}
             <motion.div variants={staggerItem} className="md:col-span-12 lg:col-span-4 flex flex-col items-start text-left">
-              <Link href="/" aria-label="Go to Kickverse Homepage" className="font-display font-black text-3xl tracking-widest text-white uppercase mb-4 block">
+              <Link href="/" aria-label="Kickverse Kenya - Buy Authentic Sneakers & Cleats" className="font-display font-black text-3xl tracking-widest text-white uppercase mb-4 block">
                  {brand.name.split(' ')[0]}
                  <span className="text-brand-primary">
                    {brand.name.split(' ').length > 1 ? ' ' + brand.name.split(' ')[1] : ''}
@@ -192,7 +192,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()} {brand.name}. All rights reserved.
           </p>
           <p className="text-gray-600 text-[10px] sm:text-xs font-mono uppercase tracking-widest text-center md:text-right">
-            Designed for mobile-first shopping experience in {brand.location}
+            Your trusted destination for original sneakers, cleats, and walking boots at the best prices in Kenya.
           </p>
         </motion.div>
       </div>

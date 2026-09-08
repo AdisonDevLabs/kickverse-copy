@@ -179,10 +179,17 @@ export function NavBar() {
                           <div className="w-6 h-0.5 bg-brand-primary mt-2 rounded-full"></div>
                         </div>
                         <div className="flex flex-col">
-                          {['Jordan', 'Air Force', 'Air Max', 'SB Dunk', 'New Balance', 'Adidas', 'Doc Martens'].map(brandItem => (
-                              <Link key={brandItem} href={`/shop?type=sneakers&brand=${brandItem.toLowerCase().replace(' ', '-')}`} className="px-5 py-2 text-xs text-gray-300 hover:text-brand-primary hover:bg-white/5 transition-colors group/item flex items-center">
+                          {[
+                            { label: 'Adidas Samba', href: '/shop?type=sneakers&q=samba' },
+                            { label: 'Nike Dunks', href: '/shop?type=sneakers&q=dunk' },
+                            { label: 'New Balance 9060', href: '/shop?type=sneakers&q=9060' },
+                            { label: 'Air Max 97', href: '/shop?type=sneakers&q=air+max+97' },
+                            { label: 'Asics Running', href: '/shop?type=sneakers&q=asics' },
+                            { label: 'Walking Boots', href: '/shop?category=boots' },
+                          ].map(item => (
+                              <Link key={item.label} href={item.href} title={`${item.label} Price in Kenya`} className="px-5 py-2 text-xs text-gray-300 hover:text-brand-primary hover:bg-white/5 transition-colors group/item flex items-center">
                                 <span className="w-1.5 h-1.5 rounded-full bg-transparent group-hover/item:bg-brand-primary transition-colors mr-2"></span>
-                                {brandItem}
+                                {item.label}
                               </Link>
                           ))}
                         </div>
@@ -222,10 +229,16 @@ export function NavBar() {
                           <div className="w-6 h-0.5 bg-brand-primary mt-2 rounded-full"></div>
                         </div>
                         <div className="flex flex-col">
-                          {['Mercurial', 'Phantom', 'Tiempo', 'Predator', 'F50', 'Future', 'Ultra'].map(model => (
-                              <Link key={model} href={`/shop?type=soccer-cleats&model=${model.toLowerCase()}`} className="px-5 py-2 text-xs text-gray-300 hover:text-brand-primary hover:bg-white/5 transition-colors group/item flex items-center">
+                          {[
+                            { label: 'Adidas Predator', href: '/shop?type=soccer-cleats&q=predator' },
+                            { label: 'Nike Mercurial', href: '/shop?type=soccer-cleats&q=mercurial' },
+                            { label: 'F50 Heartbreakers', href: '/shop?type=soccer-cleats&q=f50' },
+                            { label: 'Firm Ground (FG)', href: '/shop?type=soccer-cleats&q=fg' },
+                            { label: 'Turf Trainers (TF)', href: '/shop?type=soccer-cleats&q=turf' },
+                          ].map(item => (
+                              <Link key={item.label} href={item.href} title={`${item.label} in Nairobi`} className="px-5 py-2 text-xs text-gray-300 hover:text-brand-primary hover:bg-white/5 transition-colors group/item flex items-center">
                                 <span className="w-1.5 h-1.5 rounded-full bg-transparent group-hover/item:bg-brand-primary transition-colors mr-2"></span>
-                                {model}
+                                {item.label}
                               </Link>
                           ))}
                         </div>
@@ -365,7 +378,10 @@ export function NavBar() {
                           <p className="text-[10px] uppercase text-brand-primary mb-3 font-bold tracking-widest">Categories</p>
                           <div className="flex flex-col gap-2">
                             <Link href="/shop?type=sneakers" onClick={() => setIsDesktopSearchOpen(false)} className="text-sm text-gray-300 hover:text-white flex items-center group">
-                               <span className="w-1.5 h-1.5 bg-white/20 group-hover:bg-brand-primary transition-colors rounded-full mr-2"></span> Sneakers
+                               <span className="w-1.5 h-1.5 bg-white/20 group-hover:bg-brand-primary transition-colors rounded-full mr-2"></span> Latest Sneakers
+                            </Link>
+                            <Link href="/shop?category=boots" onClick={() => setIsDesktopSearchOpen(false)} className="text-sm text-gray-300 hover:text-white flex items-center group">
+                               <span className="w-1.5 h-1.5 bg-white/20 group-hover:bg-brand-primary transition-colors rounded-full mr-2"></span> Walking & Hiking Boots
                             </Link>
                             <Link href="/shop?type=soccer-cleats" onClick={() => setIsDesktopSearchOpen(false)} className="text-sm text-gray-300 hover:text-white flex items-center group">
                                <span className="w-1.5 h-1.5 bg-white/20 group-hover:bg-brand-primary transition-colors rounded-full mr-2"></span> Soccer Cleats

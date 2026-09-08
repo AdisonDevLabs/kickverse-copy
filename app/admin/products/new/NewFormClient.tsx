@@ -16,7 +16,11 @@ type ProductImage = {
 };
 
 // ULTRA-FAST, LOW-MEMORY SINGLE-PASS WEBP CONVERTER
-async function convertToWebpMemorySafe(file: File, maxDim = 1920, quality = 0.82): Promise<File> {
+async function convertToWebpMemorySafe(
+  file: File, 
+  maxDim = 1920, 
+  targetSizeKb = 300
+): Promise<File> {
   const originalNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
   const webpName = `${originalNameWithoutExt}.webp`;
   const isHeic = file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
@@ -70,7 +74,46 @@ async function convertToWebpMemorySafe(file: File, maxDim = 1920, quality = 0.82
     (imageSource as any).close();
   }
 
-  const webpBlob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/webp', quality));
+  const targetBytes = targetSizeKb * 1024;
+  let webpBlob: Blob | null = null;
+
+  const getCanvasBlob = (q: number) => 
+    new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/webp', q));
+
+  // STEP 1: Iterative Quality Adjustments (Binary Search)
+  let minQ = 0.1;
+  let maxQ = 1.0;
+  let quality = 0.95; 
+  let attempts = 0;
+  const maxAttempts = 5;
+
+  webpBlob = await getCanvasBlob(quality);
+
+  while (webpBlob && webpBlob.size > targetBytes && attempts < maxAttempts) {
+    maxQ = quality;
+    quality = (minQ + maxQ) / 2;
+    webpBlob = await getCanvasBlob(quality);
+    attempts++;
+  }
+
+  // STEP 2: Dimensional Scaling Fallback 
+  let currentWidth = width;
+  let currentHeight = height;
+  
+  while (webpBlob && webpBlob.size > targetBytes && currentWidth > 600) {
+    currentWidth = Math.round(currentWidth * 0.85);
+    currentHeight = Math.round(currentHeight * 0.85);
+
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = currentWidth;
+    tempCanvas.height = currentHeight;
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    if (tempCtx) {
+      tempCtx.drawImage(canvas, 0, 0, currentWidth, currentHeight);
+      webpBlob = await new Promise<Blob | null>((resolve) => tempCanvas.toBlob(resolve, 'image/webp', quality));
+    }
+  }
 
   canvas.width = 0;
   canvas.height = 0;

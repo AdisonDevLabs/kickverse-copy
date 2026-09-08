@@ -7,13 +7,13 @@ export const brand = {
   shortName: "KICKVERSE",
   logo: "/kickverse.png",
   logo1: "/android-chrome-512x512.png",
-  tagline: "PREMIUM SNEAKERS, SOCCER CLEATS & OFFICIAL SHOES IN NAIROBI",
+  tagline: "AUTHENTIC SNEAKERS, CLEATS & WALKING BOOTS IN NAIROBI",
   description:
-    "Shop with us for premium sneakers, cleats, and official leather shoes. Enjoy free Nairobi CBD delivery and secure pay-on-delivery.",
+    "Shop with us for 100% authentic sneakers, walking boots, and soccer cleats. Enjoy free Nairobi CBD delivery, secure pay-on-delivery, and transparent prices in KSh.",
   location: "Nairobi, Kenya",
   seo: {
-    title: "Kickverse KE | Premium Sneakers, Soccer Cleats & Official Shoes in Nairobi, Kenya",
-    description: "Buy original sneakers, artificial turf soccer cleats (TF/AG/FG), pure leather official shoes, and casual sandals in Nairobi, Kenya. Enjoy free Nairobi CBD delivery, countrywide shipping, and secure pay on delivery.",
+    title: "Kickverse KE | Authentic Sneakers, Soccer Cleats & Official Shoes in Nairobi, Kenya",
+    description: "Buy original sneakers, hiking boots, artificial turf soccer cleats (TF/AG/FG), pure leather official shoes, and casual sandals in Nairobi, Kenya. Enjoy free Nairobi CBD delivery, countrywide shipping, and secure pay on delivery.",
     ogImage: "/kickverse.png",
     favicon: "/favicon.ico",
     appleIcon: "/apple-touch-icon.png",
@@ -36,24 +36,24 @@ export const brand = {
   sections: {
     featured: {
       title: "Featured Footwear Collection",
-      subtitle: "Browse our curated selection of original sneakers, pure leather official shoes and casual opens & sandals in Nairobi."
+      subtitle: "Browse our curated selection of 100% original sneakers, pure leather official shoes, and casual opens & sandals in Nairobi."
     },
     flashDeals: {
       badge: "Limited Time Offers",
       title: "Flash Deals on Trending Footwear",
-      subtitle: "Grab your favorite sneaker and cleat styles before they are gone — best prices in Kenya.",
+      subtitle: "Grab your favorite authentic styles before they are gone — best shoe prices in Kenya (KSh).",
       cta: "View All Deals"
     },
     newArrivals: {
       badge: "Updated Weekly",
-      title: "Latest Men's & Women's Footwear in Nairobi",
-      subtitle: "Fresh sneaker drops, artificial turf football boots, and official shoes added weekly in Kenya.",
+      title: "Latest Sneakers & Footwear Arrivals in Kenya",
+      subtitle: "Fresh sneaker drops, hiking boots, artificial turf football boots, and official shoes added weekly.",
       cta: "View All Arrivals",
       trendingBadgePrefix: "Trending in"
     },
     bestSellers: {
       badge: "Customer Favorites",
-      title: "Best Sellers",
+      title: "Best Selling Sneakers & Shoes in Nairobi",
       subtitle: "Top-rated original sneakers and soccer cleats tested, trusted, and approved by happy customers across Kenya.",
       cta: "View All Favorites"
     },
@@ -71,7 +71,7 @@ export const brand = {
       badge: "We Are Online",
       titleTop: "START YOUR",
       titleBottom: "ORDER NOW",
-      subtitle: "Chat directly with our Nairobi sales team on WhatsApp to confirm size, stock, and instant CBD dispatch."
+      subtitle: "Chat directly with our Nairobi sales team on WhatsApp to confirm size, exact KSh price, and instant CBD dispatch."
     }
   },
 
@@ -111,7 +111,7 @@ export const brand = {
   features: [
     {
       title: "100% Genuine Quality",
-      description: "Curated collection of original streetwear sneakers, turf soccer boots, and pure leather official shoes."
+      description: "Curated collection of authentic streetwear sneakers, walking boots, turf soccer cleats, and pure leather official shoes."
     },
     {
       title: "Countrywide Kenya Delivery",
@@ -122,7 +122,7 @@ export const brand = {
       description: "Enjoy complimentary, expedited delivery exclusively within the Nairobi CBD boundaries."
     },
     {
-      title: "Pay After Delivery",
+      title: "Pay on Delivery",
       description: "Order with confidence and pay upon delivery in Nairobi and surrounding metropolitan areas."
     }
   ],
@@ -177,8 +177,9 @@ export const cartTrustFeatures = [
 export const footerQuickShopLinks = [
   { label: "Sneakers", href: "/shop?type=sneakers" },
   { label: "Soccer Cleats", href: "/shop?type=soccer-cleats" },
+  { label: "Walking & Hiking Boots", href: "/shop?category=boots" },
   { label: "Official Shoes", href: "/shop?type=official-shoes" },
-  { label: "Opens & Sandals", href: "/shop?type=opens-sandals" },
+  { label: "Opens & Sandals", href: "/shop?type=opens-and-sandals" },
 ];
 
 export const footerSupportLinks = [

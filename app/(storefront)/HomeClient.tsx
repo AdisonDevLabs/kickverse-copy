@@ -268,7 +268,8 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 variants={heroReveal}
                 className="font-display uppercase tracking-wider text-[2.8rem] sm:text-[3.5rem] md:text-[5rem] lg:text-[7rem] leading-[0.9] text-white drop-shadow-2xl"
               >
-                <span className="sr-only">Premium Sneakers, Soccer Cleats & Official Shoes at Kickverse Nairobi, Kenya - </span>
+                <span className="sr-only">
+                  Buy Authentic Sneakers, Walking Boots, Soccer Cleats & Official Shoes in Kenya | Best Footwear Prices in Nairobi CBD -</span>
                 {brand.hero?.headlineTop || "HOME OF THE BEST"} <br/> 
                 <span className="text-brand-primary inline-block mt-5 sm:mt-6">{brand.hero?.headlineHighlight || "SNEAKERS & CLEATS"}</span>
               </motion.h1>
@@ -407,7 +408,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
 
                 {/* 4. Opens & Sandals Card */}
                 <Link 
-                  href="/shop?type=opens-sandals"
+                  href="/shop?type=opens-and-sandals"
                   className="relative h-24 sm:h-32 md:h-40 rounded-lg overflow-hidden group block border border-white/10 hover:border-brand-primary transition-all shadow-lg bg-black"
                 >
                   
@@ -586,7 +587,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
 
                     <Image
                       src={product.image}
-                      alt={`${product.name} - Buy online in Nairobi Kenya with Pay on Delivery`}
+                      alt={`${product.name} Price in Kenya | 100% Authentic with Pay on Delivery`}
                       fill
                       referrerPolicy="no-referrer"
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -657,13 +658,13 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
                 className="font-display uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-2 sm:mb-4"
               >
-                Soccer Cleats & Turf Boots in Nairobi
+                Soccer Cleats & Football Boots in Nairobi, Kenya
               </motion.h2>
               <motion.p 
                 initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} 
                 className="text-gray-300 max-w-2xl mx-auto font-medium text-xs sm:text-sm md:text-lg"
               >
-                Engineered for artificial turf (TF), firm ground (FG), and artificial grass (AG). Find the perfect boot for Nairobi pitches.
+                Engineered for artificial turf (TF), firm ground (FG), and artificial grass (AG). Explore original boots with transparent prices in KSh.
               </motion.p>
             </div>
 
@@ -740,7 +741,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   <Link href={`/product/${createSlug(product.name, product.id)}`} className="block w-full h-full absolute inset-0 z-10">
                     <Image
                       src={product.image}
-                      alt={`Buy ${product.name} Online Nairobi - Authentic Footwear Delivery`}
+                      alt={`${product.name} - Latest Sneaker Arrival Price in Kenya`}
                       fill
                       referrerPolicy="no-referrer"
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -821,7 +822,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   <Link href={`/product/${createSlug(product.name, product.id)}`} className="block w-full h-full absolute inset-0 z-10">
                     <Image
                       src={product.image}
-                      alt={`${product.name} - Best Selling Footwear in Nairobi Kenya`}
+                      alt={`${product.name} - Best Selling Original Shoe in Kenya`}
                       fill
                       referrerPolicy="no-referrer"
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -1281,7 +1282,87 @@ export default function HomeClient({ initialProducts, initialCategories, initial
           </div>
         </div>
       </section>
-{/* Universal Review Modal */}
+      {/* Semantic SEO Authority & Internal Link Directory */}
+      <section className="py-16 sm:py-20 bg-black border-t border-white/10 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* SEO Content Block */}
+          <div className="max-w-4xl mb-12">
+            <h2 className="font-display uppercase tracking-wide text-2xl sm:text-3xl text-white mb-4">
+              Authentic Footwear, Sneakers & Cleats at the Best Prices in Kenya
+            </h2>
+            <div className="space-y-4 text-xs sm:text-sm text-gray-400 leading-relaxed font-sans">
+              <p>
+                Welcome to <strong>{brand.name}</strong>, Kenya’s premier online store for 100% verified original sneakers, professional soccer cleats, rugged outdoor walking boots, and handcrafted leather official shoes. We eliminate the uncertainty of buying footwear online by offering clear prices in <strong>Kenyan Shillings (KSh)</strong>, comprehensive size guides, and genuine product pictures.
+              </p>
+              <p>
+                Whether you are searching for popular lifestyle silhouettes like the <em>Adidas Samba, Nike Dunks, Air Max 97, Asics</em>, and <em>New Balance 9060</em>, or high-performance football boots engineered for Firm Ground (FG) and Artificial Grass (AG) pitches across Nairobi, we ensure you receive pristine, authentic pairs in their original packaging.
+              </p>
+              <p>
+                Take advantage of our <strong>free expedited delivery within Nairobi CBD</strong> and convenient <strong>Pay on Delivery</strong> service across Nairobi County and surrounding environs. Test your fit and inspect the craftsmanship before completing payment via M-Pesa or cash.
+              </p>
+            </div>
+          </div>
+
+          {/* Keyword Link Directory Silos */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8 border-t border-white/10 text-xs">
+            <div>
+              <h3 className="font-bold uppercase tracking-widest text-white mb-3 text-[11px] text-brand-primary">
+                Popular Sneakers Kenya
+              </h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><Link href="/shop?q=adidas+samba" className="hover:text-white transition-colors">Adidas Samba Nairobi</Link></li>
+                <li><Link href="/shop?q=dunk" className="hover:text-white transition-colors">Nike Dunk Low & High Kenya</Link></li>
+                <li><Link href="/shop?q=air+max+97" className="hover:text-white transition-colors">Nike Air Max 97 Price</Link></li>
+                <li><Link href="/shop?q=9060" className="hover:text-white transition-colors">New Balance 9060 Burgundy</Link></li>
+                <li><Link href="/shop?q=asics" className="hover:text-white transition-colors">Asics Running Shoes Nairobi</Link></li>
+                <li><Link href="/shop?q=shox" className="hover:text-white transition-colors">Nike Shox R4 Kenya</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-bold uppercase tracking-widest text-white mb-3 text-[11px] text-brand-primary">
+                Soccer Cleats & Boots
+              </h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><Link href="/shop?type=soccer-cleats" className="hover:text-white transition-colors">Soccer Cleats Nairobi</Link></li>
+                <li><Link href="/shop?type=soccer-cleats&q=predator" className="hover:text-white transition-colors">Adidas Predator Boots Kenya</Link></li>
+                <li><Link href="/shop?type=soccer-cleats&q=mercurial" className="hover:text-white transition-colors">Nike Mercurial Cleats</Link></li>
+                <li><Link href="/shop?type=soccer-cleats&q=fg" className="hover:text-white transition-colors">Firm Ground (FG) Football Boots</Link></li>
+                <li><Link href="/shop?type=soccer-cleats&q=turf" className="hover:text-white transition-colors">Artificial Grass & Turf Shoes</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-bold uppercase tracking-widest text-white mb-3 text-[11px] text-brand-primary">
+                Boots & Formal Shoes
+              </h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><Link href="/shop?category=boots" className="hover:text-white transition-colors">Walking Boots Kenya</Link></li>
+                <li><Link href="/shop?category=boots" className="hover:text-white transition-colors">Outdoor Hiking Boots Nairobi</Link></li>
+                <li><Link href="/shop?type=official-shoes" className="hover:text-white transition-colors">Men Pure Leather Loafers</Link></li>
+                <li><Link href="/shop?type=official-shoes" className="hover:text-white transition-colors">Official Office Shoes Nairobi</Link></li>
+                <li><Link href="/shop?type=opens-and-sandals" className="hover:text-white transition-colors">Suede Clogs & Casual Slides</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-bold uppercase tracking-widest text-white mb-3 text-[11px] text-brand-primary">
+                Quick Shopping Hubs
+              </h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><Link href="/shop?category=deals" className="hover:text-white transition-colors">Flash Deals & Discounted Shoes</Link></li>
+                <li><Link href="/shop?category=new-arrivals" className="hover:text-white transition-colors">New Footwear Arrivals Kenya</Link></li>
+                <li><Link href="/shop?category=best-sellers" className="hover:text-white transition-colors">Best Selling Shoes Nairobi</Link></li>
+                <li><Link href="/shop" className="hover:text-white transition-colors">Pay on Delivery Footwear</Link></li>
+                <li><Link href="/shop" className="hover:text-white transition-colors">Shoes Price in Kenyan Shillings</Link></li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </section>
+      {/* Universal Review Modal */}
       <PublicReviewModal 
         isOpen={isReviewModalOpen} 
         onClose={() => setIsReviewModalOpen(false)} 

@@ -19,6 +19,24 @@ function createSlug(name: string, id: string) {
   return `${cleanName}-${id}`;
 }
 
+// Normalizes query parameters into clean display text
+function formatParam(str?: string): string {
+  if (!str) return '';
+  const specialCases: Record<string, string> = {
+    'opens-and-sandals': 'Opens & Sandals',
+    'soccer-cleats': 'Soccer Cleats',
+    'official-shoes': 'Official Shoes',
+    'hiking-boots': 'Hiking Boots',
+    'boots': 'Walking & Hiking Boots',
+    'sneakers': 'Sneakers',
+  };
+  if (specialCases[str.toLowerCase()]) return specialCases[str.toLowerCase()];
+  return str
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
 // 2. Replace static metadata with dynamic generateMetadata
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const resolvedParams = await searchParams;
@@ -35,22 +53,32 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
       .join(' ');
   };
 
-  const categoryName = formatString(categoryRaw);
-  const typeName = formatString(typeRaw);
+  const categoryName = formatParam(categoryRaw);
+  const typeName = formatParam(typeRaw);
+  const activeTaxonomy = categoryName || typeName;
 
   // 3. Construct intelligent fallbacks based on available parameters
-  let dynamicTitle = `Premium Sneakers, Soccer Cleats & Official Shoes | ${brand.name} Nairobi`;
-  let dynamicDescription = `Browse authentic footwear at ${brand.name}. Enjoy complimentary expedited delivery across the Nairobi CBD and trusted pay-on-delivery service countrywide.`;
+  let dynamicTitle = `Buy Sneakers, Boots & Cleats in Kenya | Best Prices in Nairobi - ${brand.name}`;
+  let dynamicDescription = `Shop 100% authentic footwear at ${brand.name} Kenya. Explore sneakers, soccer cleats, hiking boots & formal shoes at competitive prices in KSh. Pay on delivery available across Nairobi & nationwide.`;
   
   if (categoryName && typeName) {
-    dynamicTitle = `Buy ${categoryName} ${typeName} Online in Nairobi | ${brand.name}`;
-    dynamicDescription = `Shop our curated collection of ${categoryName} ${typeName}. 100% verified pairs with fast delivery in Nairobi and across Kenya.`;
-  } else if (categoryName) {
-    dynamicTitle = `Buy Authentic ${categoryName} Online Nairobi, Kenya | ${brand.name}`;
-    dynamicDescription = `Explore affordable and authentic ${categoryName} online. Secure your pair today with complimentary CBD delivery in Nairobi.`;
-  } else if (typeName) {
-    dynamicTitle = `Shop ${typeName} in Nairobi, Kenya | Pay on Delivery - ${brand.name}`;
-    dynamicDescription = `Browse our complete catalog of professional ${typeName}. Find the perfect fit with fast, reliable pay-on-delivery logistics in Kenya.`;
+    dynamicTitle = `${categoryName} ${typeName} Price in Kenya | Buy Online at ${brand.name}`;
+    dynamicDescription = `Order authentic ${categoryName} ${typeName} online in Kenya. Check current prices in KSh, compare sizes, and get same-day dispatch within Nairobi CBD from ${brand.name}.`;
+  } else if (categoryRaw?.toLowerCase().includes('boot') || typeRaw?.toLowerCase().includes('boot')) {
+    dynamicTitle = `Hiking & Walking Boots Price in Kenya | Outdoor Shoes Nairobi - ${brand.name}`;
+    dynamicDescription = `Explore rugged walking boots, outdoor hiking boots, and trail shoes in Kenya. Durable traction, waterproof protection, and fast delivery in Nairobi.`;
+  } else if (typeName === 'Soccer Cleats' || categoryName === 'Soccer Cleats') {
+    dynamicTitle = `Soccer Cleats & Football Boots Kenya | FG AG Turf Prices in Nairobi - ${brand.name}`;
+    dynamicDescription = `Shop original soccer cleats, turf shoes, and Firm Ground football boots in Nairobi, Kenya. Best prices in KSh with instant WhatsApp order & CBD delivery.`;
+  } else if (typeName === 'Official Shoes' || categoryName === 'Official Shoes') {
+    dynamicTitle = `Men's Official & Leather Shoes Price in Kenya | Nairobi CBD - ${brand.name}`;
+    dynamicDescription = `Buy genuine leather official shoes, loafers, and formal office footwear in Nairobi. Best prices in KSh with pay-on-delivery across Kenya.`;
+  } else if (typeName === 'Sneakers' || categoryName === 'Sneakers') {
+    dynamicTitle = `Latest Sneakers in Nairobi, Kenya | Original Shoes Price in KSh - ${brand.name}`;
+    dynamicDescription = `Shop trending Nike, Adidas Samba, New Balance 9060, Asics, and Dunks in Kenya. 100% verified original pairs with free Nairobi CBD dispatch.`;
+  } else if (activeTaxonomy) {
+    dynamicTitle = `${activeTaxonomy} in Nairobi, Kenya | Buy Authentic at ${brand.name}`;
+    dynamicDescription = `Browse authentic ${activeTaxonomy} at ${brand.name}. Best prices in Kenyan Shillings with same-day Nairobi delivery and nationwide shipping.`;
   }
 
   // Build clean, accurate self-referencing canonical URL
@@ -60,18 +88,30 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   
   const queryString = canonicalParams.toString();
   const canonicalUrl = `${brand.url.replace(/\/$/, '')}/shop${queryString ? `?${queryString}` : ''}`;
+  const ogImage = `${brand.url.replace(/\/$/, '')}/banner.jpg`;
 
   // 4. Inject highly specific, localized search keywords dynamically
   const dynamicKeywords = [
-    categoryName ? `${categoryName} delivery Nairobi` : '',
-    categoryName ? `Buy ${categoryName} online Kenya` : '',
-    typeName ? `${typeName} Nairobi CBD` : '',
-    'Buy sneakers online Nairobi',
-    'Soccer cleats FG AG Turf Kenya',
-    'Official pure leather shoes Nairobi',
-    'Pay on delivery shoes Kenya',
+    activeTaxonomy ? `${activeTaxonomy} price in Kenya` : 'shoes price in Kenya',
+    activeTaxonomy ? `buy ${activeTaxonomy} Nairobi` : 'buy sneakers Nairobi',
+    activeTaxonomy ? `${activeTaxonomy} Nairobi CBD` : 'sneakers Kenya',
+    'shoes price in ksh',
+    'how much in kenyan shillings',
+    'pay on delivery shoes Nairobi',
+    'original sneakers Kenya',
+    'authentic footwear Kenya',
+    'hiking boots Nairobi',
+    'walking boots Kenya',
+    'soccer cleats Nairobi',
+    'football boots Kenya',
+    'official leather shoes Nairobi',
+    'adidas samba Kenya',
+    'asics Nairobi',
+    'nike dunks Kenya',
+    'new balance 9060 price in Kenya',
+    brand.name,
     'Kickverse KE',
-  ].filter(Boolean);
+  ];
 
   return {
     title: dynamicTitle,
@@ -80,6 +120,17 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     alternates: {
       canonical: canonicalUrl,
     },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
     openGraph: {
       title: dynamicTitle,
       description: dynamicDescription,
@@ -87,11 +138,20 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
       siteName: brand.name,
       locale: 'en_KE',
       type: 'website',
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: `${brand.name} Footwear Catalog Nairobi Kenya`,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: dynamicTitle,
       description: dynamicDescription,
+      images: [ogImage],
     },
   };
 }
@@ -122,9 +182,9 @@ const getCachedProducts = unstable_cache(
     .orderBy(
       desc(products.isPinned),
       desc(products.id)
-    ).limit(500);
+    ).limit(1000);
   },
-  ['shop-products-500'], // Cache key
+  ['shop-products-all'], // Cache key
   { 
     revalidate: 3600, // Revalidate every hour
     tags: ['products'] // Allows you to call revalidateTag('products') on upload
@@ -135,7 +195,11 @@ const getCachedProducts = unstable_cache(
 export default async function ShopPage({ searchParams }: Props) {
   
   
-  const allProducts = await getCachedProducts();{/*await db.select({
+  const [resolvedParams, allProducts] = await Promise.all([
+    searchParams,
+    getCachedProducts(),
+  ]);
+  {/*await db.select({
     id: products.id,
     name: products.name,
     price: products.price,
@@ -159,37 +223,135 @@ export default async function ShopPage({ searchParams }: Props) {
     desc(products.id)
   ).limit(500);*/}
 
+  const categoryRaw = typeof resolvedParams.category === 'string' ? resolvedParams.category : undefined;
+  const typeRaw = typeof resolvedParams.type === 'string' ? resolvedParams.type : undefined;
+  const categoryName = formatParam(categoryRaw);
+  const typeName = formatParam(typeRaw);
+  const activeTaxonomy = categoryName || typeName;
+
   const baseUrl = brand.url.replace(/\/$/, '');
+  const canonicalParams = new URLSearchParams();
+  if (typeRaw) canonicalParams.set('type', typeRaw);
+  if (categoryRaw) canonicalParams.set('category', categoryRaw);
+  const queryString = canonicalParams.toString();
+  const currentUrl = `${baseUrl}/shop${queryString ? `?${queryString}` : ''}`;
+
+  // Construct context-aware Breadcrumbs
+  const breadcrumbElements: Array<{ '@type': string; position: number; name: string; item: string }> = [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${baseUrl}/` },
+    { '@type': 'ListItem', position: 2, name: 'Shop', item: `${baseUrl}/shop` },
+  ];
+
+  if (activeTaxonomy) {
+    breadcrumbElements.push({
+      '@type': 'ListItem',
+      position: 3,
+      name: activeTaxonomy,
+      item: currentUrl,
+    });
+  }
 
   const jsonLdGraph = {
     '@context': 'https://schema.org',
     '@graph': [
       {
+        '@type': 'CollectionPage',
+        '@id': `${currentUrl}/#webpage`,
+        url: currentUrl,
+        name: activeTaxonomy ? `${activeTaxonomy} in Kenya | ${brand.name}` : `Footwear Collection Nairobi | ${brand.name}`,
+        description: `Explore authentic sneakers, boots, and soccer cleats with live prices in KSh and pay on delivery across Kenya.`,
+        isPartOf: {
+          '@type': 'WebSite',
+          '@id': `${baseUrl}/#website`,
+          name: brand.name,
+          url: baseUrl,
+        },
+        breadcrumb: {
+          '@id': `${currentUrl}/#breadcrumb`,
+        },
+        mainEntity: {
+          '@id': `${currentUrl}/#itemlist`,
+        },
+      },
+      {
         '@type': 'BreadcrumbList',
-        '@id': `${baseUrl}/shop/#breadcrumb`,
-        'itemListElement': [
-          { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': baseUrl },
-          { '@type': 'ListItem', 'position': 2, 'name': 'Shop', 'item': `${baseUrl}/shop` }
-        ]
+        '@id': `${currentUrl}/#breadcrumb`,
+        'itemListElement': breadcrumbElements,
       },
       {
         '@type': 'ItemList',
-        '@id': `${baseUrl}/shop/#itemlist`,
-        'name': 'Kickverse Footwear Collection Nairobi',
-        'description': 'Comprehensive catalog of sneakers, soccer cleats, and official shoes available for delivery in Nairobi, Kenya.',
-        'url': `${baseUrl}/shop`,
+        '@id': `${currentUrl}/#itemlist`,
+        name: activeTaxonomy ? `${activeTaxonomy} - Kickverse Kenya` : 'All Footwear - Kickverse Kenya',
+        description: `Complete catalog of verified sneakers, football boots, hiking boots, and official shoes available in Nairobi, Kenya.`,
+        'url': currentUrl,
         'numberOfItems': allProducts.length,
-        'itemListElement': allProducts.slice(0, 50).map((product, index) => ({
-          '@type': 'ListItem',
-          'position': index + 1,
-          'url': `${baseUrl}/product/${createSlug(product.name, product.id)}`,
-          'name': product.name
-        }))
+        'itemListElement': allProducts.slice(0, 60).map((product, index) => {
+          const productUrl = `${baseUrl}/product/${createSlug(product.name, product.id)}`;
+          const imageUrl = product.image.startsWith('http')
+            ? product.image
+            : `${baseUrl}${product.image.startsWith('/') ? '' : '/'}${product.image}`;
+
+          return {
+            '@type': 'ListItem',
+            position: index + 1,
+            url: productUrl,
+            name: product.name,
+            item: {
+              '@type': 'Product',
+              name: product.name,
+              url: productUrl,
+              image: imageUrl,
+              offers: {
+                '@type': 'Offer',
+                priceCurrency: 'KES',
+                price: product.price,
+                availability: 'https://schema.org/InStock',
+                itemCondition: 'https://schema.org/NewCondition',
+                seller: {
+                  '@type': 'Organization',
+                  name: brand.name,
+                },
+              },
+            },
+          };
+        }),
       },
       {
         '@type': 'FAQPage',
-        '@id': `${baseUrl}/shop/#faq`,
+        '@id': `${currentUrl}/shop/#faq`,
         'mainEntity': [
+          {
+            '@type': 'Question',
+            name: 'How much do sneakers and shoes cost in Kenya?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: `Footwear prices at Kickverse range from KSh 3,500 to KSh 14,500 depending on the model, brand, and type (sneakers, soccer cleats, hiking boots, or official shoes). All prices are displayed in Kenyan Shillings (KSh).`,
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'Are all shoes at Kickverse authentic and original?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Yes. Every pair in our catalog is guaranteed 100% authentic and original. We inspect each pair prior to packaging and provide pay-on-delivery in Nairobi so you can verify the item before payment.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'Where can I buy original sneakers, boots, and cleats in Nairobi?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'You can order directly online at Kickverse KE or via WhatsApp. We provide complimentary expedited dispatch within Nairobi CBD and reliable courier delivery nationwide across Kenya.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'Can I pay on delivery for shoes in Kenya?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Yes. We provide Pay on Delivery across Nairobi and surrounding environs. You inspect your shoes first to ensure the right fit and quality before making payment.',
+            },
+          },
           {
             '@type': 'Question',
             'name': 'Do you offer delivery in Nairobi CBD?',

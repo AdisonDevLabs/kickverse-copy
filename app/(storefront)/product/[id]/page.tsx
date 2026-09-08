@@ -93,15 +93,32 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const baseKeywords = [
     product.name,
-    `Buy ${product.name} Nairobi`,
-    `Buy ${product.name} online Kenya`,
     `${product.name} price in Kenya`,
-    `Original ${product.name} delivery Nairobi`,
+    `${product.name} price in ksh`,
+    `Buy ${product.name} Nairobi`,
+    `${product.name} authentic`,
+    `is ${product.name} original`,
+    `where to buy ${product.name} in Kenya`,
     `${detectedBrand} shoes Nairobi`,
-    `${product.category} Nairobi CBD`,
-    'Pay on delivery shoes Nairobi',
     'Kickverse KE',
   ];
+
+  if (product.colors && product.colors.length > 0) {
+    const colorString = product.colors.join(' ');
+    baseKeywords.push(`${product.name} ${colorString}`);
+    baseKeywords.push(`${product.name} ${product.colors[0]} price in kenya`);
+  }
+
+  const productNameLower = product.name.toLowerCase();
+  if (productNameLower.includes('boot') || productNameLower.includes('trail') || productNameLower.includes('gore-tex')) {
+    baseKeywords.push(
+      'Hiking boots Kenya',
+      'Trekking shoes Nairobi',
+      'Mountain boots',
+      'Outdoor trail boots men',
+      'Walking boots in Kenya'
+    );
+  }
 
   // 2. Inject niche keywords based on the exact product type
   if (product.productType === 'Soccer Cleats') {
@@ -137,7 +154,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const formattedPrice = `KSh ${Number(product.price).toLocaleString()}`;
-  const metaTitle = `Buy ${product.name} in Nairobi, Kenya | ${brand.name}`;
+  const metaTitle = `${product.name} Price in Kenya | Buy Authentic at ${brand.name}`;
 
   const cleanDescription = (product.description || '')
     .replace(/(<([^>]+)>)/gi, '')
@@ -148,7 +165,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const localDescription = `Buy original ${product.name} for ${formattedPrice} at ${brand.name}. Free expedited delivery within Nairobi CBD, pay on delivery available across Nairobi & nationwide Kenya. ${cleanDescription}...`;
 
   return {
-    title: product.name, 
+    title: metaTitle, 
     description: localDescription,
     keywords: baseKeywords,
     alternates: {
@@ -166,7 +183,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     },
     openGraph: {
-      title: `${product.name} - ${formattedPrice} | ${brand.name} Nairobi`,
+      title: metaTitle,
       description: localDescription,
       url: `${brand.url}/product/${expectedSlug}`,
       siteName: brand.name,
@@ -175,7 +192,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           url: absoluteImageUrl,
           width: 800,
           height: 800,
-          alt: `Buy ${product.name} online in Nairobi Kenya at Kickverse`,
+          alt: `${product.name} Price in Kenya | Authentic ${detectedBrand}`,
         },
       ],
       locale: 'en_KE',
@@ -183,7 +200,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${product.name} | ${brand.name} Nairobi`,
+      title: metaTitle,
       description: localDescription,
       images: [absoluteImageUrl],
     },
@@ -220,6 +237,9 @@ export default async function ProductPage({ params }: Props) {
     img.startsWith('http') ? img : `${brand.url.replace(/\/$/, '')}${img.startsWith('/') ? '' : '/'}${img}`
   );
 
+  const formattedPrice = `KSh ${Number(product.price).toLocaleString()}`;
+
+
   const detectedBrand = detectBrand(product.name);
   const reviewCount = productReviews.length;
   const averageRating = reviewCount > 0
@@ -231,10 +251,12 @@ export default async function ProductPage({ params }: Props) {
     '@type': 'Product',
     name: product.name,
     image: absoluteImages,
-    description: product.description?.replace(/(<([^>]+)>)/gi, '') || product.name,
+    description: `Buy original ${product.name} in Kenya for ${formattedPrice}. Authentic ${detectedBrand} shoes with fast delivery in Nairobi.`,
     sku: `KV-${product.id}`,
     mpn: `KV-${product.id}`,
     category: product.category,
+    color: product.colors && product.colors.length > 0 ? product.colors.join(', ') : undefined,
+    size: product.sizes && product.sizes.length > 0 ? product.sizes.join(', ') : undefined,
     brand: {
       '@type': 'Brand',
       name: detectedBrand,
@@ -299,6 +321,21 @@ export default async function ProductPage({ params }: Props) {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
+      {
+        '@type': 'Question',
+        name: `How much does the ${product.name} cost in Kenya?`,
+        acceptedAnswer: { '@type': 'Answer', text: `The current price for the ${product.name} is ${formattedPrice} (KSh). We offer Pay on Delivery across Nairobi and surrounding environs.` },
+      },
+      {
+        '@type': 'Question',
+        name: `Are the ${product.name} shoes authentic and original?`,
+        acceptedAnswer: { '@type': 'Answer', text: `Yes, we guarantee that the ${product.name} and all our sneakers, boots, and cleats are 100% authentic and original.` },
+      },
+      {
+        '@type': 'Question',
+        name: `Where can I buy the ${product.name} online in Nairobi?`,
+        acceptedAnswer: { '@type': 'Answer', text: `You can order the ${product.name} easily online at Kickverse KE or directly via WhatsApp. We provide prompt dispatch within Nairobi CBD and nationwide shipping.` },
+      },
       {
         '@type': 'Question',
         name: `How do I order the ${product.name} in Nairobi?`,
