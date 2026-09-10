@@ -556,49 +556,113 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                 </div>
               </motion.div>
 
-              <motion.div variants={staggerItem} className="space-y-10">
+              <motion.div variants={staggerItem} className="space-y-10 mt-6">
+                
+                {/* 1. GOOD FOR / BEST FOR */}
                 <div>
-                  <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-white/10 pb-2">Overview</h3>
-                  <p className="text-gray-400 leading-relaxed font-light text-sm">
-                    {product.description}
-                  </p>
-                  <div className="pt-4 border-t border-white/5 text-[11px] text-gray-500/80 leading-relaxed uppercase tracking-wider">
-                    <p>
-                      Shop the authentic {product.name}{selectedColor ? ` in ${selectedColor}` : ''}. 
-                      Currently available in sizes {product.sizes?.join(', ') || 'standard fit'}. 
-                      Find the best {product.name} price in Kenya (KSh) with fast, secure delivery via Kickverse. 
-                      All footwear is guaranteed 100% original.
-                    </p>
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-white/10 pb-2">
+                    {product.productType === 'Soccer Cleats' ? 'Best For' : 'Good For'}
+                  </h3>
+                  
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {product.productType === 'Soccer Cleats' ? (
+                      <>
+                        <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-widest text-gray-300">Training</span>
+                        <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-widest text-gray-300">Matchday</span>
+                        <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-widest text-gray-300">Firm Ground</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-widest text-gray-300">Everyday wear</span>
+                        <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-widest text-gray-300">Casual outings</span>
+                        <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-widest text-gray-300">Daily use</span>
+                      </>
+                    )}
                   </div>
                 </div>
 
+                {/* 2. DESCRIPTION */}
                 <div>
                   <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-white/10 pb-2">
-                    {product.productType === 'Soccer Cleats' ? 'Performance Specs' : 'Design & Craft'}
+                    Description
+                  </h3>
+                  <p className="text-gray-400 leading-relaxed font-light text-sm mb-4">
+                    {product.description}
+                  </p>
+                </div>
+
+                {/* 3. DETAILS */}
+                <div>
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-white/10 pb-2">
+                    Details
                   </h3>
                   <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-2 text-sm text-gray-400 font-light">
                     {product.productType === 'Soccer Cleats' ? (
                       <>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Multi-Directional Traction</li>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Precision Touch Upper</li>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Anatomical Lockdown Fit</li>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Lightweight Construction</li>
-                        {product.name.includes('FG') && <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-accent" /> Firm Ground (FG) Optimized</li>}
-                        {product.name.includes('AG') && <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-accent" /> Artificial Grass (AG) Ready</li>}
-                        {product.name.includes('SG') && <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-accent" /> Soft Ground (SG) Optimized</li>}
-                        {product.name.includes('TF') && <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-accent" /> Turf (TF) Ready</li>}
+                        <li className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-brand-primary/50 mr-3"></span> Upper: Synthetic</li>
+                        <li className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-brand-primary/50 mr-3"></span> Sole: FG</li>
+                        <li className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-brand-primary/50 mr-3"></span> Fit: Snug</li>
+                        <li className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-brand-primary/50 mr-3"></span> Closure: Lace-up</li>
                       </>
                     ) : (
                       <>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Iconic Silhouette</li>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Premium Material Blend</li>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> All-Day Comfort Midsole</li>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Durable Street Traction</li>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Versatile Styling</li>
+                        <li className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-brand-primary/50 mr-3"></span> Material: Genuine leather</li>
+                        <li className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-brand-primary/50 mr-3"></span> Colour: {selectedColor || 'Standard'}</li>
+                        <li className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-brand-primary/50 mr-3"></span> Style: Low-top</li>
+                        <li className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-brand-primary/50 mr-3"></span> Closure: Lace-up</li>
                       </>
                     )}
                   </ul>
                 </div>
+
+                {/* 4. WHY BUY THIS PAIR? */}
+                <div>
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-white/10 pb-2">
+                    Why Buy This Pair?
+                  </h3>
+                  <ul className="space-y-4 text-sm text-gray-400 font-light">
+                    {product.productType === 'Soccer Cleats' ? (
+                      <>
+                        <li className="flex items-start">
+                          <span className="text-brand-primary font-bold mr-3 mt-0.5">✓</span> 
+                          <span>Suitable for firm-ground pitches</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-brand-primary font-bold mr-3 mt-0.5">✓</span> 
+                          <span>Available in the sizes shown</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-brand-primary font-bold mr-3 mt-0.5">✓</span> 
+                          <span>Delivery available</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-brand-primary font-bold mr-3 mt-0.5">✓</span> 
+                          <span>Easy ordering through WhatsApp</span>
+                        </li>
+                      </>
+                    ) : (
+                      <>
+                        <li className="flex items-start">
+                          <span className="text-brand-primary font-bold mr-3 mt-0.5">✓</span> 
+                          <span>Genuine product</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-brand-primary font-bold mr-3 mt-0.5">✓</span> 
+                          <span>Available in the sizes shown</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-brand-primary font-bold mr-3 mt-0.5">✓</span> 
+                          <span>Delivery available</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-brand-primary font-bold mr-3 mt-0.5">✓</span> 
+                          <span>Easy ordering through WhatsApp</span>
+                        </li>
+                      </>
+                    )}
+                  </ul>
+                </div>
+                
               </motion.div>
               
             </motion.div>
