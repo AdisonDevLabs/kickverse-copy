@@ -456,15 +456,19 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                       {/* Targeted WhatsApp CTA for Sizing Hesitation */}
                       <div className="bg-brand-dark rounded p-3 flex items-start gap-3 border border-white/5">
                         <HelpCircle className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-[10px] text-white font-bold uppercase tracking-widest mb-1">Not sure about your size?</p>
-                          <button 
-                            onClick={handleWhatsAppClick}
-                            className="text-[10px] text-brand-primary hover:text-white underline underline-offset-4 transition-colors text-left"
+                        <p className="text-[11px] text-gray-400 leading-relaxed">
+                          Not sure about your size?{' '}
+                          <a
+                            href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(
+                              `Hi Kickverse, I need help choosing my size for the ${product.name}.`
+                            )}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-brand-primary hover:text-white underline underline-offset-2 font-bold transition-colors"
                           >
-                            Ask us on WhatsApp before ordering
-                          </button>
-                        </div>
+                            Ask us on WhatsApp
+                          </a>
+                        </p>
                       </div>
                     </div>
                   </div>
