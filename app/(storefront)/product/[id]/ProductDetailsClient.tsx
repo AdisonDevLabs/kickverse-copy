@@ -56,6 +56,10 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
   const [showSizeGuide, setShowSizeGuide] = useState(false);
   const [activeGuideTab, setActiveGuideTab] = useState(sizeGuides?.[0]?.id || '');
 
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
+  const [buyerName, setBuyerName] = useState('');
+  const [buyerLocation, setBuyerLocation] = useState('');
+
   const colorMapObj = Object.fromEntries(
     colorMap?.map((c: any) => [c.colorName, c.hexCode]) || []
   );
@@ -140,15 +144,22 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
     }, 4000);
   };
   
-  const handleWhatsAppCheckout = () => {
+  const handleWhatsAppClick = () => {
     if (!selectedSize && product.sizes && product.sizes.length > 0) return triggerSizeError();
+    setIsWhatsAppModalOpen(true);
+  };
 
+  const proceedToWhatsApp = () => {
     const productUrl = window.location.href;
+    const greeting = buyerName.trim() ? `Hello Kickverse team, I'm ${buyerName.trim()}.` : `Hello Kickverse team,`;
+    const locationText = buyerLocation.trim() ? `\n• Delivery To: ${buyerLocation.trim()}` : '';
+    const totalCost = (product.price * quantity).toLocaleString();
 
-    const message = `Hello ${brand.name},\n\nI'd like to order:\n\n• Product: ${product.name}\n${selectedSize ? `• Size/Option: ${selectedSize}\n` : ''}${selectedColor ? `• Color: ${selectedColor}\n` : ''}• Quantity: ${quantity}\n\nPlease confirm availability and delivery details.\n\nThank you.\n\n${productUrl}`;
+    const message = `${greeting}\n\nI have confirmed my selection and I'm ready to complete my order for:\n\n• Product: ${product.name}\n${selectedSize ? `• Size: ${selectedSize}\n` : ''}${selectedColor ? `• Color: ${selectedColor}\n` : ''}• Quantity: ${quantity}${locationText}\n\n*Total:* KSh ${totalCost}\n\nPlease let me know how we proceed with payment and delivery\n\n${productUrl}`;
     
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/${brand.whatsappNumber}?text=${encodedMessage}`, '_blank');
+    setIsWhatsAppModalOpen(false);
   };
 
   return (
@@ -468,21 +479,13 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                     <span className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
                     Ready to Order?
                   </h4>
-                  <p className="text-[11px] text-gray-400 mb-3 uppercase tracking-wide">Tap below and we'll confirm:</p>
-                  <ul className="text-[11px] text-gray-300 space-y-2 mb-5 font-medium">
-                    <li className="flex items-center"><CheckCircle className="w-3.5 h-3.5 mr-2 text-brand-primary" /> Your shoe size & stock availability</li>
-                    <li className="flex items-center"><CheckCircle className="w-3.5 h-3.5 mr-2 text-brand-primary" /> Delivery location & cost</li>
-                    <li className="flex items-center"><CheckCircle className="w-3.5 h-3.5 mr-2 text-brand-primary" /> Preferred payment method</li>
-                  </ul>
+                  <p className="text-[11px] text-gray-400 mb-3 uppercase tracking-wide">Tap below to confirm your Order</p>
                   <button 
-                    onClick={handleWhatsAppCheckout}
+                    onClick={handleWhatsAppClick}
                     className="w-full h-14 bg-transparent border border-brand-primary text-brand-primary font-bold uppercase tracking-widest text-xs flex items-center justify-center hover:bg-brand-primary hover:text-black transition-colors rounded-md"
                   >
                     <MessageCircle className="h-5 w-5 mr-2" /> ORDER ON WHATSAPP
                   </button>
-                  <p className="text-[9px] text-center text-gray-500 uppercase tracking-widest mt-3">
-                    No payment required to confirm order
-                  </p>
                 </div>
               </motion.div>
 
@@ -811,6 +814,93 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
         productId={product.id} 
         productName={product.name} 
       />
+
+      {/* NEW: Humanized WhatsApp Confirmation Modal */}
+      <AnimatePresence>
+        {isWhatsAppModalOpen && (
+          <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
+              onClick={() => setIsWhatsAppModalOpen(false)} 
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm" 
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }} 
+              animate={{ opacity: 1, scale: 1, y: 0 }} 
+              exit={{ opacity: 0, scale: 0.95, y: 20 }} 
+              className="relative w-full max-w-md bg-brand-card border border-brand-primary/30 shadow-2xl overflow-hidden rounded-xl z-10 flex flex-col"
+            >
+              <div className="bg-brand-dark p-5 border-b border-white/10 flex justify-between items-center">
+                <h3 className="font-bold text-white uppercase tracking-widest flex items-center text-sm">
+                  <span className="w-2 h-2 rounded-full bg-green-500 mr-3 animate-pulse"></span>
+                  Confirm Your Order
+                </h3>
+                <button onClick={() => setIsWhatsAppModalOpen(false)} className="text-gray-400 hover:text-white transition-colors">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              
+              <div className="p-6">
+                <p className="text-sm text-gray-300 mb-5 leading-relaxed">
+                  Great choice. We have your <span className="font-bold text-white">{product.name}</span> ready. Let's get a few quick details to make your checkout lightning fast.
+                </p>
+                
+                {/* Order Summary Box */}
+                <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
+                  <div className="flex justify-between items-center text-sm mb-2">
+                    <span className="text-gray-400">Size / Option:</span>
+                    <span className="font-bold text-white">{selectedSize || 'Standard'}</span>
+                  </div>
+                  {selectedColor && (
+                    <div className="flex justify-between items-center text-sm mb-2">
+                      <span className="text-gray-400">Color:</span>
+                      <span className="font-bold text-white">{selectedColor}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center text-sm pt-2 border-t border-white/10 mt-2">
+                    <span className="text-gray-400">Total (Qty: {quantity}):</span>
+                    <span className="font-bold text-brand-primary">KSh {(product.price * quantity).toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {/* Humanized Inputs */}
+                <div className="space-y-4 mb-8">
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Your Name (Optional but helpful)</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. John" 
+                      value={buyerName}
+                      onChange={(e) => setBuyerName(e.target.value)}
+                      className="w-full bg-black/50 border border-white/20 rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-primary transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Where are we delivering to?</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. Nairobi CBD or Rongai" 
+                      value={buyerLocation}
+                      onChange={(e) => setBuyerLocation(e.target.value)}
+                      className="w-full bg-black/50 border border-white/20 rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-primary transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <button 
+                  onClick={proceedToWhatsApp}
+                  className="w-full h-14 bg-green-500 hover:bg-green-400 text-black font-bold uppercase tracking-widest text-xs flex items-center justify-center transition-colors rounded-md"
+                >
+                  <MessageCircle className="h-5 w-5 mr-2" /> SEND TO WHATSAPP
+                </button>
+                <p className="text-[10px] text-center text-gray-500 mt-3">
+                  You can review everything in WhatsApp before sending.
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
