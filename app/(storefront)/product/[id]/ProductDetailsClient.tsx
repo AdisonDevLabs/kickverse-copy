@@ -404,7 +404,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   >
                     <div className="flex justify-between items-center mb-4">
                       <span className="font-bold text-white uppercase tracking-widest text-xs flex items-center">
-                        Size
+                        Choose Your Size
                         {sizeError && <span className="text-red-500 ml-3 animate-pulse">Required *</span>}
                       </span>
                       <button 
@@ -435,12 +435,38 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                       ))}
                     </div>
                     
-                    {product.productType === 'Soccer Cleats' && (
-                      <p className="mt-3 text-[10px] text-brand-primary/80 uppercase tracking-widest flex items-center">
-                         <HelpCircle className="w-3 h-3 mr-1" />
-                         Performance boots run snug. Consider half a size up for wide feet.
-                      </p>
-                    )}
+                    {/* Dynamic Size & Fit Advice (Adapts to Category) */}
+                    <div className="mt-5 bg-white/5 border border-white/10 rounded-md p-4">
+                      <h4 className="text-[10px] font-bold text-white uppercase tracking-widest mb-2 border-b border-white/10 pb-2">Size & Fit Advice</h4>
+                      <ul className="text-[11px] text-gray-300 space-y-1.5 mb-4">
+                        <li className="flex items-start">
+                          <span className="text-brand-primary mr-2 mt-0.5">•</span>
+                          {product.productType === 'Soccer Cleats' 
+                            ? 'Performance boots run snug. Consider half a size up for wide feet.'
+                            : product.category?.includes('Official') 
+                            ? 'Official leather shoes run true to standard formal sizing.'
+                            : product.category?.includes('Boot') || product.name.toLowerCase().includes('boot')
+                            ? 'Boots generally run true to size. If planning to wear thick socks, consider sizing up.'
+                            : product.category?.includes('Sandal') || product.category?.includes('Open')
+                            ? 'Sandals run true to size. If between sizes, choose the smaller size for a secure strap fit.'
+                            : 'Fit: True to size. If you are between sizes or have wide feet, choose the larger size.'}
+                        </li>
+                      </ul>
+                      
+                      {/* Targeted WhatsApp CTA for Sizing Hesitation */}
+                      <div className="bg-brand-dark rounded p-3 flex items-start gap-3 border border-white/5">
+                        <HelpCircle className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-[10px] text-white font-bold uppercase tracking-widest mb-1">Not sure about your size?</p>
+                          <button 
+                            onClick={handleWhatsAppClick}
+                            className="text-[10px] text-brand-primary hover:text-white underline underline-offset-4 transition-colors text-left"
+                          >
+                            Ask us on WhatsApp before ordering
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
               </motion.div>
@@ -473,7 +499,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                     <span className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
                     Ready to Order?
                   </h4>
-                  <p className="text-[11px] text-gray-400 mb-3 uppercase tracking-wide">Tap below to confirm your Order</p>
+                  <p className="text-[11px] text-gray-400 mb-3 uppercase tracking-wide">Tap below to place your order.</p>
                   <button 
                     onClick={handleWhatsAppClick}
                     className="w-full h-16 sm:h-20 bg-brand-primary text-black font-bold uppercase tracking-widest text-sm sm:text-base flex items-center justify-center hover:bg-brand-hover transition-colors shadow-[0_0_20px_-5px_rgba(0,0,0,0.3)] rounded-md"
