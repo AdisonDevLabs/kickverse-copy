@@ -404,7 +404,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   >
                     <div className="flex justify-between items-center mb-4">
                       <span className="font-bold text-white uppercase tracking-widest text-xs flex items-center">
-                        Size / Option 
+                        Size
                         {sizeError && <span className="text-red-500 ml-3 animate-pulse">Required *</span>}
                       </span>
                       <button 
@@ -840,13 +840,13 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                 </button>
               </div>
               
-              <div className="p-6">
+              <div className="bg-brand-dark p-6">
                 <p className="text-sm text-gray-300 mb-5 leading-relaxed">
-                  Your <span className="font-bold text-white">{product.name}</span> s ready to order.
+                  Your <span className="font-bold text-white">{product.name}</span> is ready to order.
                 </p>
                 
                 {/* Order Summary Box */}
-                <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
+                <div className="bg-brand-primary/5 border border-white/10 rounded-lg p-4 mb-6">
                   <div className="flex justify-between items-center text-sm mb-2">
                     <span className="text-gray-400">Size</span>
                     <span className="font-bold text-white">{selectedSize || 'Standard'}</span>
@@ -893,7 +893,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
 
                 <button 
                   onClick={proceedToWhatsApp}
-                  className="w-full h-14 bg-green-500 hover:bg-green-400 text-black font-bold uppercase tracking-widest text-xs flex items-center justify-center transition-colors rounded-md"
+                  className="w-full h-14 bg-brand-primary hover:bg-white text-black font-bold uppercase tracking-widest text-xs flex items-center justify-center transition-colors rounded-md"
                 >
                   <MessageCircle className="h-5 w-5 mr-2" /> SEND TO WHATSAPP
                 </button>
