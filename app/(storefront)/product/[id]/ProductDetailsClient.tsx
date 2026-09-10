@@ -465,13 +465,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   </div>
                 </div>
 
-                <button 
-                  onClick={handleAddToCart}
-                  className="w-full h-16 sm:h-20 bg-brand-primary text-black font-bold uppercase tracking-widest text-sm sm:text-base flex items-center justify-center hover:bg-brand-hover transition-colors shadow-[0_0_20px_-5px_rgba(0,0,0,0.3)] rounded-md"
-                >
-                  <ShoppingBag className="h-5 w-5 mr-3" />
-                  ADD TO CART
-                </button>
+                
                 
                 {/* 🟢 READY TO ORDER / WHATSAPP CHECKOUT */}
                 <div className="mt-4 bg-brand-primary/5 border border-brand-primary/20 rounded-md p-5">
@@ -482,11 +476,19 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   <p className="text-[11px] text-gray-400 mb-3 uppercase tracking-wide">Tap below to confirm your Order</p>
                   <button 
                     onClick={handleWhatsAppClick}
-                    className="w-full h-14 bg-transparent border border-brand-primary text-brand-primary font-bold uppercase tracking-widest text-xs flex items-center justify-center hover:bg-brand-primary hover:text-black transition-colors rounded-md"
+                    className="w-full h-16 sm:h-20 bg-brand-primary text-black font-bold uppercase tracking-widest text-sm sm:text-base flex items-center justify-center hover:bg-brand-hover transition-colors shadow-[0_0_20px_-5px_rgba(0,0,0,0.3)] rounded-md"
                   >
                     <MessageCircle className="h-5 w-5 mr-2" /> ORDER ON WHATSAPP
                   </button>
                 </div>
+
+                <button 
+                  onClick={handleAddToCart}
+                  className="w-full h-14 bg-transparent border border-brand-primary text-brand-primary font-bold uppercase tracking-widest text-xs flex items-center justify-center hover:bg-brand-primary transition-colors hover:text-black rounded-md"
+                >
+                  <ShoppingBag className="h-5 w-5 mr-3" />
+                  ADD TO CART
+                </button>
               </motion.div>
 
               <motion.div variants={staggerItem} className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-brand-card p-6 border border-white/5 mb-12 rounded-md">
@@ -897,7 +899,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                 >
                   <MessageCircle className="h-5 w-5 mr-2" /> SEND TO WHATSAPP
                 </button>
-                <p className="text-[10px] text-center text-gray-500 mt-3">
+                <p className="text-[10px] text-center text-gray-200 mt-3">
                   You can review your order on WhatsApp before sending.
                 </p>
               </div>
