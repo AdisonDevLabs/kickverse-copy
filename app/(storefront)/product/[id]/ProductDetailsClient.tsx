@@ -842,13 +842,13 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
               
               <div className="p-6">
                 <p className="text-sm text-gray-300 mb-5 leading-relaxed">
-                  Great choice. We have your <span className="font-bold text-white">{product.name}</span> ready. Let's get a few quick details to make your checkout lightning fast.
+                  Your <span className="font-bold text-white">{product.name}</span> s ready to order.
                 </p>
                 
                 {/* Order Summary Box */}
                 <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
                   <div className="flex justify-between items-center text-sm mb-2">
-                    <span className="text-gray-400">Size / Option:</span>
+                    <span className="text-gray-400">Size</span>
                     <span className="font-bold text-white">{selectedSize || 'Standard'}</span>
                   </div>
                   {selectedColor && (
@@ -857,8 +857,12 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                       <span className="font-bold text-white">{selectedColor}</span>
                     </div>
                   )}
+                  <div className="flex justify-between items-center text-sm mb-2">
+                    <span className="text-gray-400">Pair(s):</span>
+                    <span className="font-bold text-white">{quantity}</span>
+                  </div>
                   <div className="flex justify-between items-center text-sm pt-2 border-t border-white/10 mt-2">
-                    <span className="text-gray-400">Total (Qty: {quantity}):</span>
+                    <span className="text-gray-400">Total:</span>
                     <span className="font-bold text-brand-primary">KSh {(product.price * quantity).toLocaleString()}</span>
                   </div>
                 </div>
@@ -866,7 +870,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                 {/* Humanized Inputs */}
                 <div className="space-y-4 mb-8">
                   <div>
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Your Name (Optional but helpful)</label>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Your Name (Optional)</label>
                     <input 
                       type="text" 
                       placeholder="e.g. John" 
@@ -876,10 +880,10 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Where are we delivering to?</label>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Where should we deliver your order?</label>
                     <input 
                       type="text" 
-                      placeholder="e.g. Nairobi CBD or Rongai" 
+                      placeholder="e.g. Nairobi CBD" 
                       value={buyerLocation}
                       onChange={(e) => setBuyerLocation(e.target.value)}
                       className="w-full bg-black/50 border border-white/20 rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-primary transition-colors"
@@ -894,7 +898,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   <MessageCircle className="h-5 w-5 mr-2" /> SEND TO WHATSAPP
                 </button>
                 <p className="text-[10px] text-center text-gray-500 mt-3">
-                  You can review everything in WhatsApp before sending.
+                  You can review your order on WhatsApp before sending.
                 </p>
               </div>
             </motion.div>
