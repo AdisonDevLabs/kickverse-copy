@@ -462,12 +462,28 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   ADD TO CART
                 </button>
                 
-                <button 
-                  onClick={handleWhatsAppCheckout}
-                  className="w-full h-14 bg-transparent border border-brand-primary text-brand-primary font-bold uppercase tracking-widest text-xs flex items-center justify-center hover:bg-brand-primary hover:text-black transition-colors rounded-md"
-                >
-                  <MessageCircle className="h-4 w-4 mr-2" /> ORDER ON WHATSAPP
-                </button>
+                {/* 🟢 READY TO ORDER / WHATSAPP CHECKOUT */}
+                <div className="mt-4 bg-brand-primary/5 border border-brand-primary/20 rounded-md p-5">
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-brand-primary mb-3 flex items-center">
+                    <span className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
+                    Ready to Order?
+                  </h4>
+                  <p className="text-[11px] text-gray-400 mb-3 uppercase tracking-wide">Tap below and we'll confirm:</p>
+                  <ul className="text-[11px] text-gray-300 space-y-2 mb-5 font-medium">
+                    <li className="flex items-center"><CheckCircle className="w-3.5 h-3.5 mr-2 text-brand-primary" /> Your shoe size & stock availability</li>
+                    <li className="flex items-center"><CheckCircle className="w-3.5 h-3.5 mr-2 text-brand-primary" /> Delivery location & cost</li>
+                    <li className="flex items-center"><CheckCircle className="w-3.5 h-3.5 mr-2 text-brand-primary" /> Preferred payment method</li>
+                  </ul>
+                  <button 
+                    onClick={handleWhatsAppCheckout}
+                    className="w-full h-14 bg-transparent border border-brand-primary text-brand-primary font-bold uppercase tracking-widest text-xs flex items-center justify-center hover:bg-brand-primary hover:text-black transition-colors rounded-md"
+                  >
+                    <MessageCircle className="h-5 w-5 mr-2" /> ORDER ON WHATSAPP
+                  </button>
+                  <p className="text-[9px] text-center text-gray-500 uppercase tracking-widest mt-3">
+                    No payment required to confirm order
+                  </p>
+                </div>
               </motion.div>
 
               <motion.div variants={staggerItem} className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-brand-card p-6 border border-white/5 mb-12 rounded-md">
