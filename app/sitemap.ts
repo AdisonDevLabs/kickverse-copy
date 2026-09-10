@@ -5,12 +5,18 @@ import { brand } from '@/lib/data/brand';
 
 export const revalidate = 86400;
 
+const createSlug = (name: string, id: string) => {
+  if (!name) return id;
+  const cleanName = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+  return `${cleanName}-${id}`;
+};
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = brand.url.replace(/\/$/, '');
   const db = await getDb();
   
   // Fetch all products from D1 Database
-  const allProducts = await db.select({ id: products.id }).from(products);
+  const allProducts = await db.select({ id: products.id, name: products.name }).from(products);
 
   // Static routes
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -33,6 +39,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.9,
+    },
+    {
+      url: `${baseUrl}shop?type=sneakers&category=hiking-boots`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.85,
     },
     {
       url: `${baseUrl}/shop?type=soccer-cleats`,
@@ -72,7 +84,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Dynamic product routes
   const productRoutes: MetadataRoute.Sitemap = allProducts.map((product) => ({
-    url: `${baseUrl}/product/${product.id}`,
+    url: `${baseUrl}/product/${createSlug(product.name, product.id)}`,
     lastModified: new Date(),
     changeFrequency: 'weekly',
     priority: 0.8,

@@ -203,11 +203,16 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
       result = result.filter(p => {
         const prodCategory = normalizeSlug(p.category || '');
         const prodType = normalizeSlug(p.productType || ''); 
+        const prodName = (p.name || '').toLowerCase();
         
+        const isBootMatch = targetCategory.includes('boot') && 
+          (prodName.includes('boot') || prodName.includes('trail') || prodName.includes('hiking'));
+
         return prodCategory.includes(targetCategory) || 
-               targetCategory.includes(prodCategory) ||
-               prodType.includes(targetCategory) || 
-               targetCategory.includes(prodType);   
+              targetCategory.includes(prodCategory) ||
+              prodType.includes(targetCategory) || 
+              targetCategory.includes(prodType) ||
+              isBootMatch;
       });
     } else if (!searchQuery && filterProductType === 'Sneakers' && (!filterCategory || filterCategory.toLowerCase() === 'all')) {
       // EXCLUSION RULE: When viewing "All" Sneakers, hide Official Shoes and Opens & Sandals
@@ -317,12 +322,14 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
             variants={staggerItem}
             className="font-display font-black uppercase tracking-wide text-3xl sm:text-4xl md:text-5xl text-white leading-none"
           >
-            {discoveryMode === 'deals' && filterCategory === 'All' ? 'Flash Deals in Nairobi' : 
-             discoveryMode === 'just-dropped' && filterCategory === 'All' ? 'New Footwear Arrivals' :
-             discoveryMode === 'best-sellers' && filterCategory === 'All' ? 'Best Sellers in Kenya' :
-             filterCategory && filterCategory !== 'All' ? `${filterCategory} in Nairobi` :
-             filterProductType !== 'All' ? `Premium ${filterProductType}` :
-             'Shop Collection'}
+            {searchQuery ? `Search Results for "${searchQuery}" in Kenya` :
+              discoveryMode === 'deals' && filterCategory === 'All' ? 'Flash Deals & Footwear Offers in Nairobi' :
+              discoveryMode === 'just-dropped' && filterCategory === 'All' ? 'Latest Sneakers & New Footwear Arrivals Kenya' :
+              discoveryMode === 'best-sellers' && filterCategory === 'All' ? 'Best Selling Shoes & Sneakers in Kenya' :
+              filterCategory && filterCategory.toLowerCase().includes('boot') ? 'Walking & Hiking Boots in Kenya' :
+              filterCategory && filterCategory !== 'All' ? `${filterCategory} Shoes in Nairobi, Kenya` :
+              filterProductType === 'Soccer Cleats' ? 'Original Soccer Cleats & Football Boots in Kenya' :
+              'Latest Sneakers in Nairobi, Kenya'}
           </motion.h1>
         </motion.div>
       </div>
@@ -385,22 +392,20 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
             </div>
           </div>
 
-          {/* Row 2: Scrollable Pill Navigation for Types & Collections */}
+          {/* Row 2: Crawlable Pill Navigation for Types & Collections */}
           <nav aria-label="Category Navigation" className="flex items-center overflow-x-auto hide-scrollbar gap-3 pb-2 -mx-6 px-6 lg:mx-0 lg:px-0">
-
             <div className="flex items-center gap-2 flex-nowrap pl-1 pr-3">
-              {/* 1. Main Product Type Pill (Acts as the "All" reset button) */}
-              <button
-                onClick={() => {
+              {/* 1. Main Product Type Pill */}
+              <Link
+                href={`/shop?type=${filterProductType === 'Soccer Cleats' ? 'soccer-cleats' : 'sneakers'}`}
+                onClick={(e) => {
+                  e.preventDefault();
                   setFilterCategory('All');
                   setDiscoveryMode('all');
-                  
-                  // NEW: Push to URL
                   const params = new URLSearchParams(searchParams.toString());
                   params.set('type', filterProductType === 'Soccer Cleats' ? 'soccer-cleats' : 'sneakers');
                   params.delete('category');
-                  const newUrl = `${pathname}?${params.toString()}`;
-                  window.history.replaceState(null, '', newUrl);
+                  window.history.replaceState(null, '', `${pathname}?${params.toString()}`);
                 }}
                 className={`whitespace-nowrap px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
                   filterCategory === 'All' && discoveryMode === 'all'
@@ -409,39 +414,44 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                 }`}
               >
                 {filterProductType}
-              </button>
+              </Link>
 
-              {/* 2. Ordered Categories (Priority first, then alphabetical) */}
+              {/* 2. Ordered Categories */}
               {displayCategories.map((cat) => {
-                const isActive = filterCategory === cat;
+                const isActive = filterCategory.toLowerCase() === cat.toLowerCase();
+                
+                // Calculate target URL for crawler and client navigation
+                let targetHref = `/shop?type=${filterProductType === 'Soccer Cleats' ? 'soccer-cleats' : 'sneakers'}`;
+                if (cat === 'Official Shoes') targetHref = '/shop?type=official-shoes';
+                else if (cat === 'Opens & Sandals') targetHref = '/shop?type=opens-and-sandals';
+                else if (cat.toLowerCase().includes('boot')) targetHref = '/shop?category=boots';
+                else if (cat !== 'All') targetHref += `&category=${cat.toLowerCase().replace(/\s+/g, '-')}`;
+
                 return (
-                  <button
+                  <Link
                     key={cat}
-                    onClick={() => {
+                    href={targetHref}
+                    onClick={(e) => {
+                      e.preventDefault();
                       const newCategory = isActive ? 'All' : cat;
                       setFilterCategory(newCategory);
                       setDiscoveryMode('all');
                       
-                      // NEW: Push to URL dynamically based on the specific category clicked
                       const params = new URLSearchParams(searchParams.toString());
-                      
                       if (newCategory === 'All') {
-                         params.set('type', filterProductType === 'Soccer Cleats' ? 'soccer-cleats' : 'sneakers');
-                         params.delete('category');
+                        params.set('type', filterProductType === 'Soccer Cleats' ? 'soccer-cleats' : 'sneakers');
+                        params.delete('category');
                       } else if (newCategory === 'Official Shoes') {
-                         params.set('type', 'official-shoes');
-                         params.delete('category');
+                        params.set('type', 'official-shoes');
+                        params.delete('category');
                       } else if (newCategory === 'Opens & Sandals') {
-                         params.set('type', 'opens-and-sandals');
-                         params.delete('category');
+                        params.set('type', 'opens-and-sandals');
+                        params.delete('category');
                       } else {
-                         // Standard dynamic category (e.g., Nike, Adidas)
-                         params.set('type', filterProductType === 'Soccer Cleats' ? 'soccer-cleats' : 'sneakers');
-                         params.set('category', newCategory.toLowerCase().replace(/\s+/g, '-'));
+                        params.set('type', filterProductType === 'Soccer Cleats' ? 'soccer-cleats' : 'sneakers');
+                        params.set('category', newCategory.toLowerCase().replace(/\s+/g, '-'));
                       }
-                      
-                      const newUrl = `${pathname}?${params.toString()}`;
-                      window.history.replaceState(null, '', newUrl);
+                      window.history.replaceState(null, '', `${pathname}?${params.toString()}`);
                     }}
                     className={`whitespace-nowrap px-4 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-widest transition-all ${
                       isActive
@@ -450,7 +460,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                     }`}
                   >
                     {cat}
-                  </button>
+                  </Link>
                 );
               })}
             </div>
@@ -616,7 +626,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                           
                           <Image
                             src={product.image}
-                            alt={`${product.name} - Buy online in Nairobi, Kenya`}
+                            alt={`${product.name} Price in Kenya | 100% Authentic ${product.category || 'Footwear'}`}
                             fill
                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                             priority={index < 6}
@@ -627,10 +637,14 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                         </div>
                         
                         <div className="w-full text-left flex flex-col flex-1 px-1">
-                          <Link href={`/product/${createSlug(product.name, product.id)}`} className="w-full block">
-                            <h3 className="font-sans font-medium text-white line-clamp-2 mb-1 group-hover:text-brand-primary transition-colors text-xs sm:text-sm md:text-base leading-tight">
+                          <Link 
+                            href={`/product/${createSlug(product.name, product.id)}`}
+                            className="w-full block"
+                            title={`${product.name} price in Kenya`}
+                          >
+                            <h2 className="font-sans font-medium text-white line-clamp-2 mb-1 group-hover:text-brand-primary transition-colors text-xs sm:text-sm md:text-base leading-tight">
                               {product.name}
-                            </h3>
+                            </h2>
                             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                               <span className="font-sans font-medium text-brand-primary text-xs sm:text-sm md:text-base">{formatPrice(product.price)}</span>
                               {product.originalPrice && (
@@ -653,6 +667,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                              <Link 
                               href={`/product/${createSlug(product.name, product.id)}`}
                               className="w-full bg-brand-primary border border-white/10 text-black font-bold h-10 rounded-md group-hover:bg-white group-hover:text-black group-hover:border-white transition-all flex justify-center items-center uppercase tracking-widest text-[10px] sm:text-xs z-20 relative"
+                              title={`Check ${product.name} price and available sizes`}
                              >
                                View Details
                              </Link>
@@ -699,14 +714,20 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
       <section className="max-w-7xl mx-auto px-6 py-12 md:py-16 border-t border-white/10 mt-12 bg-brand-dark">
         <div className="max-w-3xl">
           <h2 className="text-white font-display uppercase tracking-widest text-lg sm:text-xl mb-4">
-            Professional Sneakers, Soccer Cleats & Official Shoes in Nairobi
+            {filterCategory && filterCategory.toLowerCase().includes('boot') 
+              ? 'Durable Walking & Hiking Boots in Nairobi, Kenya'
+              : filterProductType === 'Soccer Cleats'
+              ? 'Professional Football Boots & Soccer Cleats in Kenya'
+              : filterCategory && filterCategory !== 'All'
+              ? `Original ${filterCategory} Shoes & Sneakers in Nairobi CBD`
+              : 'Authentic Sneakers, Cleats & Footwear Prices in Kenya'}
           </h2>
           <div className="space-y-4 text-xs sm:text-sm text-gray-400 leading-relaxed font-sans">
             <p>
-              Discover the ultimate destination for authentic and trending footwear in Kenya. Whether you are searching for affordable premium sneakers, professional Firm Ground (FG) and Artificial Grass (AG) turf soccer cleats, or pure leather official shoes for the corporate environment, {brand.name} curates the highest quality selection. 
+              Looking for the best footwear prices in Kenya? {brand.name} provides 100% verified, original pairs with real-time stock availability in Kenyan Shillings (KSh). Whether you need trending lifestyle sneakers, Firm Ground (FG) or Artificial Grass (AG) football cleats, sturdy hiking and walking boots, or corporate leather shoes, all items are inspected prior to dispatch.
             </p>
             <p>
-              We eliminate the friction of online shopping by offering <strong>100% verified pairs</strong>, complimentary expedited delivery exclusively within the <strong>Nairobi CBD</strong>, and a trusted <strong>pay on delivery</strong> service for immediate environs. Secure your next pair today and experience unparalleled comfort and style directly to your doorstep.
+              Enjoy <strong>free expedited delivery within Nairobi CBD</strong> and <strong>Pay on Delivery</strong> across Nairobi and surrounding environs. Try on your shoes to confirm your size and comfort before making payment.
             </p>
           </div>
         </div>

@@ -16,11 +16,11 @@ type FileStatus = {
 const MAX_AUTO_RETRIES = 2;
 const UPLOAD_BATCH_SIZE = 5; // Network batch size for Cloudflare Free Tier
 
-// ULTRA-FAST, LOW-MEMORY SINGLE-PASS WEBP CONVERTER
+// ULTRA-FAST ITERATIVE WEBP CONVERTER (TARGET: < 300KB)
 async function convertToWebpMemorySafe(
   file: File, 
   maxDim = 1920, 
-  quality = 0.82
+  targetSizeKb = 300
 ): Promise<File> {
   const originalNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
   const webpName = `${originalNameWithoutExt}.webp`;
@@ -30,11 +30,9 @@ async function convertToWebpMemorySafe(
 
   try {
     if (isHeic) {
-      // 1. Try Native Browser HEIC Decoding (Ultra-fast on Safari / iOS)
       try {
         imageSource = await createImageBitmap(file);
       } catch {
-        // 2. Fallback to heic2any for Chrome/Firefox/Android
         const heic2any = (await import('heic2any')).default;
         const convertedBlob = await heic2any({ blob: file, toType: 'image/png' });
         const singleBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
@@ -44,11 +42,10 @@ async function convertToWebpMemorySafe(
       imageSource = await createImageBitmap(file);
     }
   } catch (err) {
-    // If bitmap creation fails, return original file as ultimate safety fallback
     return file;
   }
 
-  // Calculate scaled dimensions to fit within maxDim
+  // Initial dimensional scale-down to maxDim
   let width = imageSource.width;
   let height = imageSource.height;
   if (width > maxDim || height > maxDim) {
@@ -61,7 +58,6 @@ async function convertToWebpMemorySafe(
     }
   }
 
-  // Draw directly onto Canvas
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
@@ -76,15 +72,56 @@ async function convertToWebpMemorySafe(
 
   ctx.drawImage(imageSource, 0, 0, width, height);
 
-  // IMMEDIATELY RELEASE BITMAP RAM MEMORY
+  // Free RAM instantly
   if ('close' in imageSource && typeof (imageSource as any).close === 'function') {
     (imageSource as any).close();
   }
 
-  // Export single-pass WebP Blob
-  const webpBlob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/webp', quality));
+  const targetBytes = targetSizeKb * 1024;
+  let webpBlob: Blob | null = null;
 
-  // Clear canvas reference to trigger instant Garbage Collection
+  // Helper function to generate Blob
+  const getCanvasBlob = (q: number) => 
+    new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/webp', q));
+
+  // STEP 1: Iterative Quality Adjustments (Binary Search)
+  let minQ = 0.1;
+  let maxQ = 1.0;
+  let quality = 0.95; // Start near lossless
+  let attempts = 0;
+  const maxAttempts = 5;
+
+  webpBlob = await getCanvasBlob(quality);
+
+  while (webpBlob && webpBlob.size > targetBytes && attempts < maxAttempts) {
+    maxQ = quality;
+    quality = (minQ + maxQ) / 2; // Split the difference
+    webpBlob = await getCanvasBlob(quality);
+    attempts++;
+  }
+
+  // STEP 2: Dimensional Scaling Fallback 
+  // If the file is still too large (e.g., highly complex images), shrink the dimensions by 15% iteratively
+  let currentWidth = width;
+  let currentHeight = height;
+  
+  while (webpBlob && webpBlob.size > targetBytes && currentWidth > 600) {
+    currentWidth = Math.round(currentWidth * 0.85);
+    currentHeight = Math.round(currentHeight * 0.85);
+
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = currentWidth;
+    tempCanvas.height = currentHeight;
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    if (tempCtx) {
+      // Draw from the original sized canvas to avoid compounding compression artifacts
+      tempCtx.drawImage(canvas, 0, 0, currentWidth, currentHeight);
+      webpBlob = await new Promise<Blob | null>((resolve) => tempCanvas.toBlob(resolve, 'image/webp', quality));
+    }
+  }
+
+  // Trigger GC on original canvas
   canvas.width = 0;
   canvas.height = 0;
 

@@ -28,7 +28,6 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   metadataBase: new URL(brand.url),
   alternates: {
-    canonical: '/',
   },
   title: {
     default: brand.seo.title, // Fallback for the homepage
@@ -37,15 +36,15 @@ export const metadata: Metadata = {
   description: brand.seo.description,
 
   keywords: [
+    'Kickverse',
+    'Kick verse',
+    'Nike Mind 001 price in Kenya',
     'Sneakers Nairobi',
+    'Holy water shoes',
+    'Hiking boots Kenya',
+    'Asics Nairobi',
     'Buy soccer cleats Kenya',
-    'Turf football boots Nairobi',
-    'Official leather shoes Nairobi CBD',
-    'Affordable sneakers Kenya',
-    'Nike Airmax Nairobi',
-    'Jordan 4 Kenya',
     'Pay on delivery shoes Nairobi',
-    'Kickverse KE',
   ],
 
   authors: [{ name: brand.name }],
@@ -102,7 +101,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
     '@context': 'https://schema.org',
     '@type': ['ShoeStore', 'OnlineStore'],
     'name': brand.name,
-    alternateName: ['Kickverse', 'Kickverse KE', 'Kickverse Kenya', 'KickVerse', 'KickVerse Store'],
+    alternateName: ['Kickverse', 'Kickverse KE', 'Kickverse Kenya', 'KickVerse', 'KickVerse Store', 'kick verse'],
     'url': brand.url,
     'logo': `${brand.url}${brand.logo}`,
     'description': brand.description,
@@ -131,6 +130,30 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
       { '@type': 'AdministrativeArea', 'name': 'Langata' },
       { '@type': 'Country', 'name': 'Kenya' },
     ],
+    'hasMerchantReturnPolicy': {
+      '@type': 'MerchantReturnPolicy',
+      'applicableCountry': 'KE',
+      'returnPolicyCategory': 'https://schema.org/MerchantReturnFiniteReturnWindow',
+      'merchantReturnDays': 2,
+      'returnMethod': 'https://schema.org/ReturnInStore',
+    },
+    'shippingDetails': {
+      '@type': 'OfferShippingDetails',
+      'shippingRate': {
+        '@type': 'MonetaryAmount',
+        'value': 0,
+        'currency': 'KES'
+      },
+      'shippingDestination': {
+        '@type': 'DefinedRegion',
+        'addressCountry': 'KE'
+      },
+      'deliveryTime': {
+        '@type': 'ShippingDeliveryTime',
+        'handlingTime': { '@type': 'QuantitativeValue', 'minValue': 0, 'maxValue': 1, 'unitCode': 'd' },
+        'transitTime': { '@type': 'QuantitativeValue', 'minValue': 0, 'maxValue': 2, 'unitCode': 'd' }
+      }
+    },
     'openingHoursSpecification': [
       {
         '@type': 'OpeningHoursSpecification',

@@ -21,8 +21,26 @@ export default function manifest(): MetadataRoute.Manifest {
       },
       {
         src: brand.logo1,
+        sizes: '192x192',
+        type: 'image/png',
+        purpose: 'maskable',
+      },
+      {
+        src: brand.logo1,
         sizes: '512x512',
         type: 'image/png',
+      },
+    ],
+    shortcuts: [
+      {
+        name: 'Sneakers',
+        short_name: 'Sneakers',
+        url: '/shop?type=sneakers',
+      },
+      {
+        name: 'Soccer Cleats',
+        short_name: 'Cleats',
+        url: '/shop?type=soccer-cleats',
       },
     ],
   };

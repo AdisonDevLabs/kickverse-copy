@@ -15,22 +15,25 @@ import {
 import { brand } from '@/lib/data/brand';
 
 export const metadata: Metadata = {
-  title: `Store Policies, Delivery & Pay on Delivery Support | ${brand.name} Nairobi`,
-  description: `Official store policies for ${brand.name}. Learn about Pay on Delivery in Nairobi, complimentary CBD dispatch, countrywide courier shipping across Kenya, 48-hour exchanges, and sneaker sizing.`,
+  title: `Store Policies, Authenticity & Pay on Delivery Shoes Nairobi | ${brand.name}`,
+  description: `Official store policies for ${brand.name}. Learn about our 100% authenticity guarantee, Pay on Delivery in Nairobi, shoe prices in KSh, and 48-hour exchanges.`,
   keywords: [
     "Kickverse store policies",
-    "sneakers pay on delivery Nairobi",
+    "pay on delivery shoes Nairobi",
+    "is Kickverse authentic",
     "buy shoes online Nairobi CBD",
+    "are Kickverse shoes original",
     "soccer cleats delivery Kenya",
-    "Kickverse returns and exchanges",
-    "shoe sizing guide Kenya"
+    "where to buy sneakers in Kenya",
+    "walking boots Kenya",
+    "shoe prices in KSh"
   ],
   alternates: {
     canonical: "/policies",
   },
   openGraph: {
-    title: `Store Policies & Support | ${brand.name} Kenya`,
-    description: `Complete guide on shopping, delivery logistics, returns, and shoe sizing with ${brand.name} in Nairobi and across Kenya.`,
+    title: `Store Policies, Authenticity & Support | ${brand.name} Kenya`,
+    description: `Complete guide on shopping, delivery logistics, authenticity guarantees, and shoe sizing with ${brand.name} in Nairobi and across Kenya.`,
     url: "/policies",
     type: "website",
   },
@@ -46,18 +49,8 @@ export default function PoliciesPage() {
       {
         "@type": "BreadcrumbList",
         "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": domain
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Policies & Support",
-            "item": `${domain}/policies`
-          }
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": domain },
+          { "@type": "ListItem", "position": 2, "name": "Policies & Support", "item": `${domain}/policies` }
         ]
       },
       {
@@ -65,10 +58,34 @@ export default function PoliciesPage() {
         "mainEntity": [
           {
             "@type": "Question",
+            "name": "Are the sneakers, boots, and cleats at Kickverse authentic?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. We guarantee that all footwear sold at Kickverse is 100% authentic and original. You can inspect your shoes upon delivery to verify their quality before paying."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Where can I buy original sneakers and cleats online in Kenya?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "You can buy original sneakers, walking boots, and cleats directly on our website, kickverse.co.ke. We offer free delivery within Nairobi CBD and Pay on Delivery for Nairobi County."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How much do shoes cost in Kenyan Shillings?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Prices range from KSh 2,500 to KSh 15,000 depending on the model. All prices on our website are transparently listed in KSh with no hidden fees."
+            }
+          },
+          {
+            "@type": "Question",
             "name": "How do I order sneakers and soccer cleats from Kickverse KE?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Browse our collection on kickverse.co.ke and click the 'Order on WhatsApp' button on any product page. Our customer support team will immediately confirm your exact size, verify stock availability, and coordinate delivery details directly with you."
+              "text": "Browse our collection on kickverse.co.ke and click the 'Order on WhatsApp' button. Our customer support team will immediately confirm your exact size, verify stock, and coordinate delivery."
             }
           },
           {
@@ -76,15 +93,7 @@ export default function PoliciesPage() {
             "name": "Does Kickverse KE offer Pay on Delivery in Nairobi?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Yes. We offer convenient Pay on Delivery (PoD) for all orders within Nairobi County and its immediate environs. Additionally, doorstep delivery within the Nairobi Central Business District (CBD) is completely complimentary."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "How does parcel delivery work outside Nairobi?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "For orders shipped outside Nairobi across Kenya, payment confirmation is required prior to dispatch. Once verified, packages are shipped through trusted countrywide courier and parcel services for prompt doorstep or station collection."
+              "text": "Yes. We offer convenient Pay on Delivery (PoD) for all orders within Nairobi County. Delivery within the Nairobi Central Business District (CBD) is completely complimentary."
             }
           },
           {
@@ -92,15 +101,7 @@ export default function PoliciesPage() {
             "name": "What is the return and exchange policy at Kickverse KE?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "We accept exchange requests within 48 hours of delivery for different sizes or styles. All returned items must be completely clean, unworn, and preserved in their original condition with all tags and packaging intact."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "How do I choose the correct shoe or cleat size?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "We recommend choosing your standard UK or EU footwear size. If you are ordering performance soccer cleats (FG, AG, or TF) or specific sneaker silhouettes, our team can advise you on exact fit and half-size adjustments directly over WhatsApp before dispatch."
+              "text": "We accept exchange requests within 48 hours of delivery for different sizes or styles. Returned items must be clean, unworn, and preserved in their original condition."
             }
           }
         ]
@@ -168,7 +169,30 @@ export default function PoliciesPage() {
               </div>
             </section>
 
-            {/* Section 2: Delivery & Logistics */}
+            {/* Section 2: Authenticity & Pricing (New SEO Section) */}
+            <section 
+              id="authenticity" 
+              aria-labelledby="authenticity-heading"
+              className="bg-brand-card p-6 md:p-8 rounded-lg border border-white/5 scroll-mt-32 shadow-sm"
+            >
+              <div className="flex items-center mb-6 text-brand-primary border-b border-white/5 pb-4">
+                <ShieldCheck className="w-6 h-6 mr-3 shrink-0" />
+                <h2 id="authenticity-heading" className="font-display text-xl md:text-2xl uppercase tracking-widest">
+                  Authenticity & Pricing Guarantees
+                </h2>
+              </div>
+              <div className="space-y-4 text-gray-300 text-sm md:text-base leading-relaxed">
+                <p>
+                  We are frequently asked, <em>&ldquo;Are these shoes real?&rdquo;</em> and <em>&ldquo;How do I know they are legit?&rdquo;</em> 
+                  <strong> We guarantee that 100% of the footwear sold at {brand.name} is authentic and original.</strong>
+                </p>
+                <p>
+                  Every pair—from lifestyle sneakers and walking boots to professional soccer cleats—undergoes strict physical quality verification prior to dispatch. Furthermore, all prices are transparently listed in <strong>Kenyan Shillings (KSh)</strong> with no hidden fees, ensuring you get the best shoe prices in Kenya.
+                </p>
+              </div>
+            </section>
+
+            {/* Section 3: Delivery & Logistics */}
             <section 
               id="delivery" 
               aria-labelledby="delivery-heading"
@@ -204,7 +228,7 @@ export default function PoliciesPage() {
               </div>
             </section>
 
-            {/* Section 3: Returns & Exchanges */}
+            {/* Section 4: Returns & Exchanges */}
             <section 
               id="returns" 
               aria-labelledby="returns-heading"
@@ -230,7 +254,7 @@ export default function PoliciesPage() {
               </div>
             </section>
 
-            {/* Section 4: Size & Surface Guide */}
+            {/* Section 5: Size & Surface Guide */}
             <section 
               id="size-guide" 
               aria-labelledby="size-guide-heading"
@@ -257,7 +281,7 @@ export default function PoliciesPage() {
               </div>
             </section>
 
-            {/* Section 5: Frequently Asked Questions */}
+            {/* Section 6: Frequently Asked Questions */}
             <section 
               id="faq" 
               aria-labelledby="faq-heading"
@@ -270,6 +294,14 @@ export default function PoliciesPage() {
                 </h2>
               </div>
               <div className="space-y-4">
+                <div className="border-b border-white/5 pb-4">
+                  <h3 className="text-white font-semibold text-base mb-1">Are the sneakers, boots, and shoes authentic?</h3>
+                  <p className="text-gray-300 text-sm">Yes. We guarantee that all footwear sold at Kickverse is 100% authentic and original. You can inspect your shoes upon delivery to verify their quality before paying.</p>
+                </div>
+                <div className="border-b border-white/5 pb-4">
+                  <h3 className="text-white font-semibold text-base mb-1">Where can I buy original sneakers online in Kenya?</h3>
+                  <p className="text-gray-300 text-sm">You can order directly here on kickverse.co.ke or via our WhatsApp desk. We offer free delivery within Nairobi CBD and Pay on Delivery across Nairobi County.</p>
+                </div>
                 <div className="border-b border-white/5 pb-4">
                   <h3 className="text-white font-semibold text-base mb-1">Are all pairs inspected before delivery?</h3>
                   <p className="text-gray-300 text-sm">Yes. Every sneaker, cleat, and official shoe undergoes strict physical quality verification prior to dispatch to ensure pristine condition.</p>
