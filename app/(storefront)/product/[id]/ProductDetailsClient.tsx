@@ -521,39 +521,81 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                 </button>
               </motion.div>
 
-              <motion.div variants={staggerItem} className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-brand-card p-6 border border-white/5 mb-12 rounded-md">
-                <div className="flex items-start">
-                  <Truck className="h-5 w-5 mr-3 text-gray-400 shrink-0" />
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-1">Nairobi Delivery</h4>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">
-                      {product.productType === 'Soccer Cleats' ? 'Fast dispatch within Nairobi CBD' : 'Expedited delivery across Kenya'}
+              <motion.div variants={staggerItem} className="bg-brand-card px-6 py-2 border border-white/5 mb-12 rounded-md divide-y divide-white/10">
+                
+                {/* 1. QUALITY CHECK */}
+                <div className="py-6">
+                  <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-3 flex items-center">
+                    <ShieldCheck className="h-5 w-5 mr-3 text-brand-primary" /> QUALITY CHECKED
+                  </h4>
+                  <div className="pl-8">
+                    <p className="text-sm text-gray-400 mb-3">Every pair is checked before it leaves our store to make sure you receive the pair you ordered.</p>
+                    <div className="bg-white/5 p-4 rounded-md border border-white/10 flex items-start gap-3">
+                      <MessageCircle className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm text-white font-medium mb-1">Want to see the actual pair before ordering?</p>
+                        <button 
+                          onClick={handleWhatsAppClick} 
+                          className="text-xs text-brand-primary hover:text-white underline underline-offset-4 font-bold uppercase tracking-widest transition-colors"
+                        >
+                          Ask us on WhatsApp
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. DELIVERY */}
+                <div className="py-6">
+                  <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-3 flex items-center">
+                    <Truck className="h-5 w-5 mr-3 text-brand-primary" /> DELIVERY
+                  </h4>
+                  <div className="pl-8">
+                    <ul className="text-sm text-gray-400 space-y-2 mb-3">
+                      <li><strong className="text-white">Nairobi CBD:</strong> Free delivery</li>
+                      <li><strong className="text-white">Other Nairobi areas:</strong> Delivery available</li>
+                      <li><strong className="text-white">Outside Nairobi:</strong> Countrywide delivery</li>
+                    </ul>
+                    <p className="text-sm text-gray-400 mb-2"> 
+                      Delivery usually takes <strong className="text-white">1–3 days</strong>, depending on your location.
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start">
-                  <ShieldCheck className="h-5 w-5 mr-3 text-gray-400 shrink-0" />
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-1">Quality Guaranteed</h4>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">
-                      {product.productType === 'Soccer Cleats' ? 'Authentic Performance Gear' : 'Pristine Packaging & Box'}
-                    </p>
+
+                {/* 3. PAYMENT */}
+                <div className="py-6">
+                  <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-3 flex items-center">
+                    <ShoppingBag className="h-5 w-5 mr-3 text-brand-primary" /> PAYMENT
+                  </h4>
+                  <div className="pl-8">
+                    <ul className="text-sm text-gray-400 space-y-2 mb-3">
+                      <li><strong className="text-white">Nairobi:</strong> Pay on delivery available.</li>
+                      <li><strong className="text-white">Outside Nairobi:</strong> We'll let you know the available payment option when you order.</li>
+                    </ul>
                   </div>
                 </div>
-                <div className="flex items-start">
-                  <CheckCircle className="h-5 w-5 mr-3 text-gray-400 shrink-0" />
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-1">Secure Packaging</h4>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Pay on delivery available locally</p>
+
+                {/* 4. RETURNS & EXCHANGES */}
+                <div className="py-6">
+                  <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-3 flex items-center">
+                    <CheckCircle className="h-5 w-5 mr-3 text-brand-primary" /> RETURNS & EXCHANGES
+                  </h4>
+                  <div className="space-y-4 pl-8">
+                    <div>
+                      <strong className="text-white block mb-1 text-sm">Wrong size?</strong>
+                      <p className="text-sm text-gray-400">Contact us within 24 hours and we'll help you with an exchange.</p>
+                    </div>
+                    <div>
+                      <strong className="text-white block mb-1 text-sm">Wrong pair?</strong>
+                      <p className="text-sm text-gray-400">Let us know and we'll arrange a replacement</p>
+                    </div>
+                    <div>
+                      <strong className="text-white block mb-1 text-sm">Any issue with your pair?</strong>
+                      <p className="text-sm text-gray-400">        Contact us when you receive it and we'll sort it out with you.</p>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-start">
-                  <MessageCircle className="h-5 w-5 mr-3 text-gray-400 shrink-0" />
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-1">WhatsApp Support</h4>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Direct help from our team</p>
-                  </div>
-                </div>
+
               </motion.div>
 
               <motion.div variants={staggerItem} className="space-y-10 mt-6">
@@ -589,7 +631,15 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   <p className="text-gray-400 leading-relaxed font-light text-sm mb-4">
                     {product.description}
                   </p>
-                </div>
+                </div>{/*
+                <div className="pt-4 border-t border-white/5 text-[11px] text-gray-500/80 leading-relaxed uppercase tracking-wider">
+                    <p>
+                      Shop the authentic {product.name}{selectedColor ? ` in ${selectedColor}` : ''}. 
+                      Currently available in sizes {product.sizes?.join(', ') || 'standard fit'}. 
+                      Find the best {product.name} price in Kenya (KSh) with fast, secure delivery via Kickverse. 
+                      All footwear is guaranteed 100% original.
+                    </p>
+                  </div>
 
                 {/* 3. DETAILS */}
                 <div>
