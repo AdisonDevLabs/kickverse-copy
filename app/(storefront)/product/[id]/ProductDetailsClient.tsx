@@ -252,7 +252,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
       {/* Context-Aware Breadcrumbs (Desktop) */}
       <motion.div 
         initial="hidden" animate="visible" variants={fadeUp}
-        className="bg-brand-card py-3 px-6 border-b border-white/10 hidden md:block"
+        className="py-3 px-6 hidden md:block"
       >
         <div className="max-w-7xl mx-auto flex items-center text-xs font-bold uppercase tracking-widest text-gray-500">
           <Link href="/" className="hover:text-white transition-colors">Home</Link>
@@ -279,7 +279,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
       {/* Mobile Back Button */}
       <motion.div 
         initial="hidden" animate="visible" variants={fadeUp}
-        className="md:hidden w-full bg-brand-card border-b border-white/10 px-4 py-2"
+        className="md:hidden w-full px-4 py-2"
       >
         <button onClick={() => router.back()} className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors">
           <ArrowLeft className="h-4 w-4 mr-2" /> Back To Shop
@@ -539,29 +539,30 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
 
                 
                 
-                {/* 🟢 READY TO ORDER / WHATSAPP CHECKOUT */}
-                <div ref={ctaRef} className="mt-4 bg-brand-primary/5 border border-brand-primary/20 rounded-md p-5">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-brand-primary mb-3 flex items-center">
-                    <span className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
+                {/* Main CTA Section (Tracked for Sticky Bar) */}
+                <div ref={ctaRef} className="mt-4">
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-brand-primary mb-2 flex items-center">
+                    <span className="w-2 h-2 rounded-full bg-brand-primary mr-2 animate-pulse"></span>
                     Ready to Order?
                   </h4>
-                  <p className="text-[11px] text-gray-400 mb-3 uppercase tracking-wide">Tap below to place your order.</p>
-                  <button 
-                    onClick={handleWhatsAppClick}
-                    className="w-full h-14 sm:h-16 bg-brand-primary text-black font-bold uppercase tracking-widest text-sm sm:text-base flex items-center justify-center hover:bg-brand-hover transition-colors shadow-[0_0_20px_-5px_rgba(0,0,0,0.3)] rounded-md"
-                  >
-                    <MessageCircle className="h-5 w-5 mr-2" /> ORDER ON WHATSAPP
-                  </button>
-                  <button 
-                  onClick={handleAddToCart}
-                  className="w-full h-12 bg-transparent border border-brand-primary text-brand-primary font-bold uppercase tracking-widest text-xs flex items-center justify-center hover:bg-brand-primary transition-colors hover:text-black rounded-md"
-                >
-                  <ShoppingBag className="h-4 w-4 mr-2" />
-                  ADD TO CART
-                </button>
-                </div>
+                  <p className="text-[11px] text-gray-400 mb-4 uppercase tracking-wide">Tap below to place your order.</p>
+                  
+                  <div className="flex flex-col gap-3">
+                    <button 
+                      onClick={handleWhatsAppClick}
+                      className="w-full h-14 sm:h-16 bg-brand-primary text-black font-bold uppercase tracking-widest text-sm flex items-center justify-center hover:bg-white transition-colors rounded-md"
+                    >
+                      <MessageCircle className="h-5 w-5 mr-2" /> ORDER ON WHATSAPP
+                    </button>
 
-                
+                    <button 
+                      onClick={handleAddToCart}
+                      className="w-full h-12 sm:h-14 bg-transparent border border-brand-primary text-brand-primary font-bold uppercase tracking-widest text-xs flex items-center justify-center hover:bg-brand-primary hover:text-black transition-colors rounded-md"
+                    >
+                      <ShoppingBag className="h-4 w-4 mr-2" /> ADD TO CART
+                    </button>
+                  </div>
+                </div>
               </motion.div>
 
               <motion.div variants={staggerItem} className="mb-12 rounded-md divide-y divide-white/10">
@@ -751,13 +752,13 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
         </div>
 
         {/* Customer Reviews Section (Restored PDP Layout + New 3-Tier Cards + Pagination) */}
-        <section id="reviews" className="border-t border-white/10 bg-brand-dark py-20 px-6">
+        <section id="reviews" className="border-t border-white/10 bg-brand-dark py-14 px-6">
           <div className="max-w-7xl mx-auto">
             
             {/* Header - PDP Style (Left Title, Right Button) */}
             <motion.div 
               initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
-              className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12"
+              className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6"
             >
               <div>
                 <h2 className="font-display uppercase tracking-wide text-3xl md:text-5xl text-white mb-4">
