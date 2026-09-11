@@ -44,7 +44,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
   const router = useRouter();
   const { addToCart, setIsCartOpen } = useCart();
   
-  const [selectedSize, setSelectedSize] = useState<string>(product?.sizes?.[0] || '');
+  const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>(product?.colors?.[0] || '');
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
@@ -71,7 +71,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
     window.scrollTo(0, 0);
     setActiveImage(0); 
     if (product) {
-       setSelectedSize(product.sizes?.[0] || '');
+       setSelectedSize('');
        setSelectedColor(product.colors?.[0] || '');
        
        if (product.productType === 'Soccer Cleats' && sizeGuides) {
@@ -80,6 +80,20 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
        }
     }
   }, [product?.id, product, sizeGuides]);
+
+  // NEW: Block body scroll when any modal is open
+  useEffect(() => {
+    if (showSizeGuide || isReviewModalOpen || isWhatsAppModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    
+    // Cleanup function to ensure scrolling is restored if the component unmounts
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showSizeGuide, isReviewModalOpen, isWhatsAppModalOpen]);
 
 
   const images = product.images && product.images.length > 0 ? product.images : [product.image];
@@ -409,7 +423,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                     <div className="flex justify-between items-center mb-4">
                       <span className="font-bold text-white uppercase tracking-widest text-xs flex items-center">
                         Choose Your Size
-                        {sizeError && <span className="text-red-500 ml-3 animate-pulse">Required *</span>}
+                        {sizeError && <span className="text-red-500 ml-3 animate-pulse">Please choose your size first *</span>}
                       </span>
                       <button 
                         onClick={() => setShowSizeGuide(true)}
@@ -945,6 +959,21 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
           )}
         </AnimatePresence>
 
+      </div>
+
+      {/* NEW: Mobile Sticky CTA Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[90] bg-brand-dark/95 backdrop-blur-md border-t border-white/10 p-3 flex items-center justify-between gap-4 shadow-[0_-20px_40px_rgba(0,0,0,0.5)]">
+        <div className="flex flex-col pl-1 shrink-0">
+          <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-0.5">Total</span>
+          <span className="text-sm font-bold text-white">{formatPrice(product.price * quantity)}</span>
+        </div>
+        <button 
+          onClick={handleWhatsAppClick}
+          className="flex-1 h-12 bg-brand-primary hover:bg-white text-black font-bold uppercase tracking-widest text-[11px] sm:text-xs flex items-center justify-center transition-colors rounded-md shadow-[0_0_15px_-5px_rgba(0,0,0,0.3)]"
+        >
+          <MessageCircle className="h-4 w-4 mr-2 shrink-0" /> 
+          <span className="truncate">ORDER ON WHATSAPP</span>
+        </button>
       </div>
 
       {/* Universal Public Review Modal */}
