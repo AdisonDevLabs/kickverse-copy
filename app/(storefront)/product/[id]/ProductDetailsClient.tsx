@@ -521,7 +521,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                 </button>
               </motion.div>
 
-              <motion.div variants={staggerItem} className="bg-brand-card px-6 py-2 border border-white/5 mb-12 rounded-md divide-y divide-white/10">
+              <motion.div variants={staggerItem} className="mb-12 rounded-md divide-y divide-white/10">
                 
                 {/* 1. QUALITY CHECK */}
                 <div className="py-6">
@@ -530,18 +530,6 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   </h4>
                   <div className="pl-8">
                     <p className="text-sm text-gray-400 mb-3">Every pair is checked before it leaves our store to make sure you receive the pair you ordered.</p>
-                    <div className="bg-white/5 p-4 rounded-md border border-white/10 flex items-start gap-3">
-                      <MessageCircle className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-sm text-white font-medium mb-1">Want to see the actual pair before ordering?</p>
-                        <button 
-                          onClick={handleWhatsAppClick} 
-                          className="text-xs text-brand-primary hover:text-white underline underline-offset-4 font-bold uppercase tracking-widest transition-colors"
-                        >
-                          Ask us on WhatsApp
-                        </button>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
