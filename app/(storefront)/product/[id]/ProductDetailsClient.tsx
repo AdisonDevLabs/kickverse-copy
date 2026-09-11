@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -44,7 +44,11 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
   const router = useRouter();
   const { addToCart, setIsCartOpen } = useCart();
   
-  const [selectedSize, setSelectedSize] = useState<string>(product?.sizes?.[0] || '');
+  const [selectedSize, setSelectedSize] = useState<string>('');
+
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const [isMainCTAVisible, setIsMainCTAVisible] = useState(true);
+
   const [selectedColor, setSelectedColor] = useState<string>(product?.colors?.[0] || '');
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
@@ -55,6 +59,10 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
   
   const [showSizeGuide, setShowSizeGuide] = useState(false);
   const [activeGuideTab, setActiveGuideTab] = useState(sizeGuides?.[0]?.id || '');
+
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
+  const [buyerName, setBuyerName] = useState('');
+  const [buyerLocation, setBuyerLocation] = useState('');
 
   const colorMapObj = Object.fromEntries(
     colorMap?.map((c: any) => [c.colorName, c.hexCode]) || []
@@ -67,7 +75,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
     window.scrollTo(0, 0);
     setActiveImage(0); 
     if (product) {
-       setSelectedSize(product.sizes?.[0] || '');
+       setSelectedSize('');
        setSelectedColor(product.colors?.[0] || '');
        
        if (product.productType === 'Soccer Cleats' && sizeGuides) {
@@ -76,6 +84,40 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
        }
     }
   }, [product?.id, product, sizeGuides]);
+
+  // NEW: Block body scroll when any modal is open
+  useEffect(() => {
+    if (showSizeGuide || isReviewModalOpen || isWhatsAppModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    
+    // Cleanup function to ensure scrolling is restored if the component unmounts
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showSizeGuide, isReviewModalOpen, isWhatsAppModalOpen]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // If it's not on screen AND it's above the viewport (top < 0), show sticky bar
+        if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
+          setIsMainCTAVisible(false);
+        } else {
+          setIsMainCTAVisible(true); // Hide sticky bar if CTA is on screen or below fold
+        }
+      },
+      { threshold: 0, rootMargin: "-80px 0px 0px 0px" } // Offset for mobile nav bar
+    );
+
+    if (ctaRef.current) observer.observe(ctaRef.current);
+    
+    return () => {
+      if (ctaRef.current) observer.unobserve(ctaRef.current);
+    };
+  }, []);
 
 
   const images = product.images && product.images.length > 0 ? product.images : [product.image];
@@ -140,15 +182,22 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
     }, 4000);
   };
   
-  const handleWhatsAppCheckout = () => {
+  const handleWhatsAppClick = () => {
     if (!selectedSize && product.sizes && product.sizes.length > 0) return triggerSizeError();
+    setIsWhatsAppModalOpen(true);
+  };
 
+  const proceedToWhatsApp = () => {
     const productUrl = window.location.href;
+    const greeting = buyerName.trim() ? `Hello Kickverse team, I'm ${buyerName.trim()}.` : `Hello Kickverse team,`;
+    const locationText = buyerLocation.trim() ? `\n• Delivery To: ${buyerLocation.trim()}` : '';
+    const totalCost = (product.price * quantity).toLocaleString();
 
-    const message = `Hello ${brand.name},\n\nI'd like to order:\n\n• Product: ${product.name}\n${selectedSize ? `• Size/Option: ${selectedSize}\n` : ''}${selectedColor ? `• Color: ${selectedColor}\n` : ''}• Quantity: ${quantity}\n\nPlease confirm availability and delivery details.\n\nThank you.\n\n${productUrl}`;
+    const message = `${greeting}\n\nI have confirmed my selection and I'm ready to complete my order for:\n\n• Product: ${product.name}\n${selectedSize ? `• Size: ${selectedSize}\n` : ''}${selectedColor ? `• Color: ${selectedColor}\n` : ''}• Quantity: ${quantity}${locationText}\n\n*Total:* KSh ${totalCost}\n\nPlease let me know how we proceed with payment and delivery\n\n${productUrl}`;
     
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/${brand.whatsappNumber}?text=${encodedMessage}`, '_blank');
+    setIsWhatsAppModalOpen(false);
   };
 
   return (
@@ -203,7 +252,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
       {/* Context-Aware Breadcrumbs (Desktop) */}
       <motion.div 
         initial="hidden" animate="visible" variants={fadeUp}
-        className="bg-brand-card py-4 px-6 border-b border-white/10 hidden md:block"
+        className="py-3 px-6 hidden md:block"
       >
         <div className="max-w-7xl mx-auto flex items-center text-xs font-bold uppercase tracking-widest text-gray-500">
           <Link href="/" className="hover:text-white transition-colors">Home</Link>
@@ -230,23 +279,23 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
       {/* Mobile Back Button */}
       <motion.div 
         initial="hidden" animate="visible" variants={fadeUp}
-        className="md:hidden w-full bg-brand-card border-b border-white/10 px-4 py-3"
+        className="md:hidden w-full px-4 py-2"
       >
         <button onClick={() => router.back()} className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors">
           <ArrowLeft className="h-4 w-4 mr-2" /> Back To Shop
         </button>
       </motion.div>
 
-      <div className="pt-6 md:pt-12">
+      <div className="pt-3 md:pt-6">
         <div className="max-w-7xl mx-auto px-0 md:px-6 md:pb-12">
           <div className="flex flex-col md:flex-row gap-0 md:gap-12 lg:gap-16">
             
             {/* Image Gallery with Mobile Drag Gestures */}
             <motion.div 
               initial="hidden" animate="visible" variants={fadeUp}
-              className="md:w-1/2 md:sticky md:top-24 h-fit z-10"
+              className="md:w-1/2 md:sticky md:top-24 h-fit z-10 px-4 md:px-0"
             >
-              <div className="relative aspect-[3/4] md:aspect-[4/5] w-full max-h-[calc(100vh-200px)] bg-brand-card overflow-hidden border-b md:border border-white/10 group md:rounded-md">
+              <div className="relative aspect-[3/4] md:aspect-[4/5] w-full max-h-[calc(100vh-200px)] bg-brand-card overflow-hidden border border-white/10 group rounded-md">
                 {product.isFlashDeal ? (
                   <div className="absolute top-4 left-4 z-20 bg-brand-accent text-white text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest shadow-xl rounded-md">Sale</div>
                 ) : product.isNewArrival ? (
@@ -327,10 +376,14 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                     ))}
                     <span className="ml-2 text-sm font-bold text-white tracking-widest">{product.rating ? Number(product.rating).toFixed(1) : '5.0'}</span>
                   </div>
-                  <div className="w-1 h-1 rounded-full bg-white/20"></div>
-                  <button onClick={() => document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs font-bold text-gray-400 uppercase tracking-widest hover:text-white underline underline-offset-4">
-                    {reviews?.length || product.reviews || 0} Reviews
-                  </button>
+                  {(reviews?.length > 0 || product.reviews > 0) && (
+                    <>
+                      <div className="w-1 h-1 rounded-full bg-white/20"></div>
+                      <button onClick={() => document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs font-bold text-gray-400 uppercase tracking-widest hover:text-white underline underline-offset-4">
+                        {reviews?.length || product.reviews} Reviews
+                      </button>
+                    </>
+                  )}
                   <div className="w-1 h-1 rounded-full bg-white/20"></div>
                   <span className="text-xs font-bold uppercase tracking-widest text-brand-primary flex items-center">
                     <CheckCircle className="w-3 h-3 mr-1" /> In Stock
@@ -339,9 +392,9 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                 
                 <div className="flex flex-col gap-1 items-start">
                   <div className="flex items-end gap-4">
-                    <span className="font-poppins font-semibold text-2.5xl sm:text-3.5xl font-sans font-medium text-white">{formatPrice(product.price)}</span>
+                    <span className="font-poppins font-semibold text-lg sm:text-xl font-sans font-medium text-white mb-1.5">{formatPrice(product.price)}</span>
                     {product.originalPrice && (
-                      <span className="text-lg sm:text-xl text-gray-500 line-through mb-1.5">{formatPrice(product.originalPrice)}</span>
+                      <span className="text-2.5xl sm:text-3.5xl text-gray-500 line-through mb-1.5">{formatPrice(product.originalPrice)}</span>
                     )}
                     {product.originalPrice && (
                       <span className="ml-2 bg-brand-accent/10 text-brand-accent rounded-md text-[10px] font-bold px-2 py-1 uppercase tracking-widest mb-2 border border-brand-accent/20 hidden sm:block">
@@ -393,8 +446,8 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   >
                     <div className="flex justify-between items-center mb-4">
                       <span className="font-bold text-white uppercase tracking-widest text-xs flex items-center">
-                        Size / Option 
-                        {sizeError && <span className="text-red-500 ml-3 animate-pulse">Required *</span>}
+                        Choose Your Size
+                        {sizeError && <span className="text-red-500 ml-3 animate-pulse">Please choose your size first *</span>}
                       </span>
                       <button 
                         onClick={() => setShowSizeGuide(true)}
@@ -424,12 +477,42 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                       ))}
                     </div>
                     
-                    {product.productType === 'Soccer Cleats' && (
-                      <p className="mt-3 text-[10px] text-brand-primary/80 uppercase tracking-widest flex items-center">
-                         <HelpCircle className="w-3 h-3 mr-1" />
-                         Performance boots run snug. Consider half a size up for wide feet.
-                      </p>
-                    )}
+                    {/* Dynamic Size & Fit Advice (Adapts to Category) */}
+                    <div className="mt-5 bg-white/5 border border-white/10 rounded-md p-4">
+                      <h4 className="text-[10px] font-bold text-white uppercase tracking-widest mb-2 border-b border-white/10 pb-2">Size & Fit Advice</h4>
+                      <ul className="text-[11px] text-gray-300 space-y-1.5 mb-4">
+                        <li className="flex items-start">
+                          <span className="text-brand-primary mr-2 mt-0.5">•</span>
+                          {product.productType === 'Soccer Cleats' 
+                            ? 'Performance boots run snug. Consider half a size up for wide feet.'
+                            : product.category?.includes('Official') 
+                            ? 'Official leather shoes run true to standard formal sizing.'
+                            : product.category?.includes('Boot') || product.name.toLowerCase().includes('boot')
+                            ? 'Boots generally run true to size. If planning to wear thick socks, consider sizing up.'
+                            : product.category?.includes('Sandal') || product.category?.includes('Open')
+                            ? 'Sandals run true to size. If between sizes, choose the smaller size for a secure strap fit.'
+                            : 'Fit: True to size. If you are between sizes or have wide feet, choose the larger size.'}
+                        </li>
+                      </ul>
+                      
+                      {/* Targeted WhatsApp CTA for Sizing Hesitation */}
+                      <div className="bg-brand-dark rounded p-3 flex items-start gap-3 border border-white/5">
+                        <HelpCircle className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
+                        <p className="text-[11px] text-gray-400 leading-relaxed">
+                          Not sure about your size?{' '}
+                          <a
+                            href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(
+                              `Hi Kickverse, I need help choosing my size for the ${product.name}.`
+                            )}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-brand-primary hover:text-white underline underline-offset-2 font-bold transition-colors"
+                          >
+                            Ask us on WhatsApp
+                          </a>
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 )}
               </motion.div>
@@ -454,64 +537,134 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   </div>
                 </div>
 
-                <button 
-                  onClick={handleAddToCart}
-                  className="w-full h-16 sm:h-20 bg-brand-primary text-black font-bold uppercase tracking-widest text-sm sm:text-base flex items-center justify-center hover:bg-brand-hover transition-colors shadow-[0_0_20px_-5px_rgba(0,0,0,0.3)] rounded-md"
-                >
-                  <ShoppingBag className="h-5 w-5 mr-3" />
-                  ADD TO CART
-                </button>
                 
-                <button 
-                  onClick={handleWhatsAppCheckout}
-                  className="w-full h-14 bg-transparent border border-brand-primary text-brand-primary font-bold uppercase tracking-widest text-xs flex items-center justify-center hover:bg-brand-primary hover:text-black transition-colors rounded-md"
-                >
-                  <MessageCircle className="h-4 w-4 mr-2" /> ORDER ON WHATSAPP
-                </button>
-              </motion.div>
+                
+                {/* Main CTA Section (Tracked for Sticky Bar) */}
+                <div ref={ctaRef} className="mt-4">
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-brand-primary mb-2 flex items-center">
+                    <span className="w-2 h-2 rounded-full bg-brand-primary mr-2 animate-pulse"></span>
+                    Ready to Order?
+                  </h4>
+                  <p className="text-[11px] text-gray-400 mb-4 uppercase tracking-wide">Tap below to place your order.</p>
+                  
+                  <div className="flex flex-col gap-3">
+                    <button 
+                      onClick={handleWhatsAppClick}
+                      className="w-full h-14 sm:h-16 bg-brand-primary text-black font-bold uppercase tracking-widest text-sm flex items-center justify-center hover:bg-white transition-colors rounded-md"
+                    >
+                      <MessageCircle className="h-5 w-5 mr-2" /> ORDER ON WHATSAPP
+                    </button>
 
-              <motion.div variants={staggerItem} className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-brand-card p-6 border border-white/5 mb-12 rounded-md">
-                <div className="flex items-start">
-                  <Truck className="h-5 w-5 mr-3 text-gray-400 shrink-0" />
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-1">Nairobi Delivery</h4>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">
-                      {product.productType === 'Soccer Cleats' ? 'Fast dispatch within Nairobi CBD' : 'Expedited delivery across Kenya'}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <ShieldCheck className="h-5 w-5 mr-3 text-gray-400 shrink-0" />
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-1">Quality Guaranteed</h4>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">
-                      {product.productType === 'Soccer Cleats' ? 'Authentic Performance Gear' : 'Pristine Packaging & Box'}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <CheckCircle className="h-5 w-5 mr-3 text-gray-400 shrink-0" />
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-1">Secure Packaging</h4>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Pay on delivery available locally</p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <MessageCircle className="h-5 w-5 mr-3 text-gray-400 shrink-0" />
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-1">WhatsApp Support</h4>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Direct help from our team</p>
+                    <button 
+                      onClick={handleAddToCart}
+                      className="w-full h-12 sm:h-14 bg-transparent border border-brand-primary text-brand-primary font-bold uppercase tracking-widest text-xs flex items-center justify-center hover:bg-brand-primary hover:text-black transition-colors rounded-md"
+                    >
+                      <ShoppingBag className="h-4 w-4 mr-2" /> ADD TO CART
+                    </button>
                   </div>
                 </div>
               </motion.div>
 
-              <motion.div variants={staggerItem} className="space-y-10">
+              <motion.div variants={staggerItem} className="mb-12 rounded-md divide-y divide-white/10">
+                
+                {/* 1. QUALITY CHECK */}
+                <div className="py-6">
+                  <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-3 flex items-center">
+                    <ShieldCheck className="h-5 w-5 mr-3 text-brand-primary" /> QUALITY CHECKED
+                  </h4>
+                  <div className="pl-8">
+                    <p className="text-sm text-gray-400 mb-3">Every pair is checked before it leaves our store to make sure you receive the pair you ordered.</p>
+                  </div>
+                </div>
+
+                {/* 2. DELIVERY */}
+                <div className="py-6">
+                  <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-3 flex items-center">
+                    <Truck className="h-5 w-5 mr-3 text-brand-primary" /> DELIVERY
+                  </h4>
+                  <div className="pl-8">
+                    <ul className="text-sm text-gray-400 space-y-2 mb-3">
+                      <li><strong className="text-white">Nairobi CBD:</strong> Free delivery</li>
+                      <li><strong className="text-white">Other Nairobi areas:</strong> Delivery available</li>
+                      <li><strong className="text-white">Outside Nairobi:</strong> Countrywide delivery</li>
+                    </ul>
+                    <p className="text-sm text-gray-400 mb-2"> 
+                      Delivery usually takes <strong className="text-white">1–3 days</strong>, depending on your location.
+                    </p>
+                  </div>
+                </div>
+
+                {/* 3. PAYMENT */}
+                <div className="py-6">
+                  <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-3 flex items-center">
+                    <ShoppingBag className="h-5 w-5 mr-3 text-brand-primary" /> PAYMENT
+                  </h4>
+                  <div className="pl-8">
+                    <ul className="text-sm text-gray-400 space-y-2 mb-3">
+                      <li><strong className="text-white">Nairobi:</strong> Pay on delivery available.</li>
+                      <li><strong className="text-white">Outside Nairobi:</strong> Payment options will be shared when you order.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* 4. RETURNS & EXCHANGES */}
+                <div className="py-6">
+                  <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-3 flex items-center">
+                    <CheckCircle className="h-5 w-5 mr-3 text-brand-primary" /> RETURNS & EXCHANGES
+                  </h4>
+                  <div className="space-y-4 pl-8">
+                    <div>
+                      <strong className="text-white block mb-1 text-sm">Wrong size?</strong>
+                      <p className="text-sm text-gray-400">Contact us within 24 hours and we'll help you with an exchange.</p>
+                    </div>
+                    <div>
+                      <strong className="text-white block mb-1 text-sm">Received a wrong pair?</strong>
+                      <p className="text-sm text-gray-400">Let us know and we'll arrange a replacement</p>
+                    </div>
+                    <div>
+                      <strong className="text-white block mb-1 text-sm">Any other issue?</strong>
+                      <p className="text-sm text-gray-400">Contact us when you receive your order and we'll sort it out with you.</p>
+                    </div>
+                  </div>
+                </div>
+
+              </motion.div>
+
+              <motion.div variants={staggerItem} className="space-y-10 mt-6">
+                
+                {/* 1. GOOD FOR / BEST FOR */}
                 <div>
-                  <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-white/10 pb-2">Overview</h3>
-                  <p className="text-gray-400 leading-relaxed font-light text-sm">
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-white/10 pb-2">
+                    {product.productType === 'Soccer Cleats' ? 'Best For' : 'Good For'}
+                  </h3>
+                  
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {product.productType === 'Soccer Cleats' ? (
+                      <>
+                        <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-widest text-gray-300">Training</span>
+                        <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-widest text-gray-300">Matchday</span>
+                        <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-widest text-gray-300">Firm Ground</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-widest text-gray-300">Everyday wear</span>
+                        <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-widest text-gray-300">Casual outings</span>
+                        <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-widest text-gray-300">Going out</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* 2. DESCRIPTION */}
+                <div>
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-white/10 pb-2">
+                    Description
+                  </h3>
+                  <p className="text-gray-400 leading-relaxed font-light text-sm mb-4">
                     {product.description}
                   </p>
-                  <div className="pt-4 border-t border-white/5 text-[11px] text-gray-500/80 leading-relaxed uppercase tracking-wider">
+                </div>{/*
+                <div className="pt-4 border-t border-white/5 text-[11px] text-gray-500/80 leading-relaxed uppercase tracking-wider">
                     <p>
                       Shop the authentic {product.name}{selectedColor ? ` in ${selectedColor}` : ''}. 
                       Currently available in sizes {product.sizes?.join(', ') || 'standard fit'}. 
@@ -519,35 +672,79 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                       All footwear is guaranteed 100% original.
                     </p>
                   </div>
-                </div>
 
+                {/* 3. DETAILS */}
                 <div>
                   <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-white/10 pb-2">
-                    {product.productType === 'Soccer Cleats' ? 'Performance Specs' : 'Design & Craft'}
+                    Details
                   </h3>
                   <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-2 text-sm text-gray-400 font-light">
                     {product.productType === 'Soccer Cleats' ? (
                       <>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Multi-Directional Traction</li>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Precision Touch Upper</li>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Anatomical Lockdown Fit</li>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Lightweight Construction</li>
-                        {product.name.includes('FG') && <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-accent" /> Firm Ground (FG) Optimized</li>}
-                        {product.name.includes('AG') && <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-accent" /> Artificial Grass (AG) Ready</li>}
-                        {product.name.includes('SG') && <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-accent" /> Soft Ground (SG) Optimized</li>}
-                        {product.name.includes('TF') && <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-accent" /> Turf (TF) Ready</li>}
+                        <li className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-brand-primary/50 mr-3"></span> Upper: Synthetic</li>
+                        <li className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-brand-primary/50 mr-3"></span> Sole: FG</li>
+                        <li className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-brand-primary/50 mr-3"></span> Fit: Snug</li>
+                        <li className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-brand-primary/50 mr-3"></span> Closure: Lace-up</li>
                       </>
                     ) : (
                       <>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Iconic Silhouette</li>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Premium Material Blend</li>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> All-Day Comfort Midsole</li>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Durable Street Traction</li>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-brand-primary" /> Versatile Styling</li>
+                        <li className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-brand-primary/50 mr-3"></span> Material: Genuine leather</li>
+                        <li className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-brand-primary/50 mr-3"></span> Colour: {selectedColor || 'Standard'}</li>
+                        <li className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-brand-primary/50 mr-3"></span> Style: Low-top</li>
+                        <li className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-brand-primary/50 mr-3"></span> Closure: Lace-up</li>
                       </>
                     )}
                   </ul>
                 </div>
+
+                {/* 4. WHY BUY THIS PAIR? 
+                <div>
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-white/10 pb-2">
+                    Why Buy This Pair?
+                  </h3>
+                  <ul className="space-y-4 text-sm text-gray-400 font-light">
+                    {product.productType === 'Soccer Cleats' ? (
+                      <>
+                        <li className="flex items-start">
+                          <span className="text-brand-primary font-bold mr-3 mt-0.5">✓</span> 
+                          <span>Suitable for firm-ground pitches</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-brand-primary font-bold mr-3 mt-0.5">✓</span> 
+                          <span>Available in the sizes shown</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-brand-primary font-bold mr-3 mt-0.5">✓</span> 
+                          <span>Delivery available</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-brand-primary font-bold mr-3 mt-0.5">✓</span> 
+                          <span>Easy ordering through WhatsApp</span>
+                        </li>
+                      </>
+                    ) : (
+                      <>
+                        <li className="flex items-start">
+                          <span className="text-brand-primary font-bold mr-3 mt-0.5">✓</span> 
+                          <span>Genuine product</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-brand-primary font-bold mr-3 mt-0.5">✓</span> 
+                          <span>Available in the sizes shown</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-brand-primary font-bold mr-3 mt-0.5">✓</span> 
+                          <span>Delivery available</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-brand-primary font-bold mr-3 mt-0.5">✓</span> 
+                          <span>Easy ordering through WhatsApp</span>
+                        </li>
+                      </>
+                    )}
+                  </ul>
+                </div>*/}
+                
               </motion.div>
               
             </motion.div>
@@ -555,17 +752,17 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
         </div>
 
         {/* Customer Reviews Section (Restored PDP Layout + New 3-Tier Cards + Pagination) */}
-        <section id="reviews" className="border-t border-white/10 bg-brand-dark py-20 px-6">
+        <section id="reviews" className="border-t border-white/10 bg-brand-dark py-14 px-6">
           <div className="max-w-7xl mx-auto">
             
             {/* Header - PDP Style (Left Title, Right Button) */}
             <motion.div 
               initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
-              className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12"
+              className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6"
             >
               <div>
                 <h2 className="font-display uppercase tracking-wide text-3xl md:text-5xl text-white mb-4">
-                  Why Customers Love It
+                  CUSTOMER REVIEWS
                 </h2>
                 <div className="flex items-center text-brand-primary">
                   {[1,2,3,4,5].map((s) => (
@@ -574,9 +771,11 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   <span className="ml-3 text-lg font-bold text-white tracking-widest">
                     {product.rating ? Number(product.rating).toFixed(1) : '5.0'} OUT OF 5
                   </span>
-                  <span className="text-gray-500 text-sm ml-3 font-medium uppercase tracking-widest">
-                    ({reviews?.length || 0} Reviews)
-                  </span>
+                  {(reviews?.length > 0 || product.reviews > 0) && (
+                    <span className="text-gray-500 text-sm ml-3 font-medium uppercase tracking-widest">
+                      ({reviews?.length || product.reviews} Reviews)
+                    </span>
+                  )}
                 </div>
               </div>
               <button 
@@ -788,6 +987,24 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
 
       </div>
 
+      {/* NEW: Mobile Sticky CTA Bar (Slides in when main CTA is out of view) */}
+      <div 
+        className={`md:hidden fixed bottom-0 left-0 right-0 z-[90] bg-brand-dark/95 backdrop-blur-md border-t border-brand-primary/20 p-3 flex items-center justify-between gap-4 shadow-[0_-20px_40px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-in-out ${
+          isMainCTAVisible ? 'translate-y-full' : 'translate-y-0'
+        }`}
+      >
+        <div className="flex flex-col pl-2 shrink-0">
+          <span className="text-sm font-bold text-white">{formatPrice(product.price * quantity)}</span>
+        </div>
+        <button 
+          onClick={handleWhatsAppClick}
+          className="flex-1 h-12 bg-brand-primary hover:bg-white text-black font-bold uppercase tracking-widest text-[11px] sm:text-xs flex items-center justify-center transition-colors rounded-md shadow-[0_0_15px_-5px_rgba(0,0,0,0.3)]"
+        >
+          <MessageCircle className="h-4 w-4 mr-2 shrink-0" /> 
+          <span className="truncate">ORDER ON WHATSAPP</span>
+        </button>
+      </div>
+
       {/* Universal Public Review Modal */}
       <PublicReviewModal 
         isOpen={isReviewModalOpen} 
@@ -795,6 +1012,97 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
         productId={product.id} 
         productName={product.name} 
       />
+
+      {/* NEW: Humanized WhatsApp Confirmation Modal */}
+      <AnimatePresence>
+        {isWhatsAppModalOpen && (
+          <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
+              onClick={() => setIsWhatsAppModalOpen(false)} 
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm" 
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }} 
+              animate={{ opacity: 1, scale: 1, y: 0 }} 
+              exit={{ opacity: 0, scale: 0.95, y: 20 }} 
+              className="relative w-full max-w-md bg-brand-card border border-brand-primary/30 shadow-2xl overflow-hidden rounded-xl z-10 flex flex-col"
+            >
+              <div className="bg-brand-dark p-5 border-b border-white/10 flex justify-between items-center">
+                <h3 className="font-bold text-white uppercase tracking-widest flex items-center text-sm">
+                  <span className="w-2 h-2 rounded-full bg-green-500 mr-3 animate-pulse"></span>
+                  Confirm Your Order
+                </h3>
+                <button onClick={() => setIsWhatsAppModalOpen(false)} className="text-gray-400 hover:text-white transition-colors">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              
+              <div className="bg-brand-dark p-6">
+                <p className="text-sm text-gray-300 mb-5 leading-relaxed">
+                  Your <span className="font-bold text-white">{product.name}</span> is ready to order.
+                </p>
+                
+                {/* Order Summary Box */}
+                <div className="bg-brand-primary/5 border border-white/10 rounded-lg p-4 mb-6">
+                  <div className="flex justify-between items-center text-sm mb-2">
+                    <span className="text-gray-400">Size</span>
+                    <span className="font-bold text-white">{selectedSize || 'Standard'}</span>
+                  </div>
+                  {selectedColor && (
+                    <div className="flex justify-between items-center text-sm mb-2">
+                      <span className="text-gray-400">Color:</span>
+                      <span className="font-bold text-white">{selectedColor}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center text-sm mb-2">
+                    <span className="text-gray-400">Pair(s):</span>
+                    <span className="font-bold text-white">{quantity}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm pt-2 border-t border-white/10 mt-2">
+                    <span className="text-gray-400">Total:</span>
+                    <span className="font-bold text-brand-primary">KSh {(product.price * quantity).toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {/* Humanized Inputs */}
+                <div className="space-y-4 mb-8">
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Your Name (Optional)</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. John" 
+                      value={buyerName}
+                      onChange={(e) => setBuyerName(e.target.value)}
+                      className="w-full bg-black/50 border border-white/20 rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-primary transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Where should we deliver your order?</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. Nairobi CBD" 
+                      value={buyerLocation}
+                      onChange={(e) => setBuyerLocation(e.target.value)}
+                      className="w-full bg-black/50 border border-white/20 rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-primary transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <button 
+                  onClick={proceedToWhatsApp}
+                  className="w-full h-14 bg-brand-primary hover:bg-white text-black font-bold uppercase tracking-widest text-xs flex items-center justify-center transition-colors rounded-md"
+                >
+                  <MessageCircle className="h-5 w-5 mr-2" /> SEND TO WHATSAPP
+                </button>
+                <p className="text-[10px] text-center text-gray-200 mt-3">
+                  You can review your order on WhatsApp before sending.
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
