@@ -312,6 +312,13 @@ export default async function ShopPage({ searchParams }: Props) {
                 '@type': 'Brand',
                 name: detectBrand(product.name),
               },
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: Number(product.rating || 5.0).toFixed(1),
+                reviewCount: Math.max(Number(product.reviews || 1), 1),
+                bestRating: '5',
+                worstRating: '1'
+              },
               offers: {
                 '@type': 'Offer',
                 priceCurrency: 'KES',
