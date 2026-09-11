@@ -15,6 +15,12 @@ function createSlug(name: string, id: string) {
   return `${cleanName}-${id}`;
 }
 
+function detectBrand(productName: string): string {
+  const knownBrands = ['Nike', 'Adidas', 'Jordan', 'Puma', 'New Balance', 'On Running', 'Asics', 'Vans', 'Converse', 'Timberland', 'Clarks'];
+  const matched = knownBrands.find((b) => new RegExp(`\\b${b}\\b`, 'i').test(productName));
+  return matched || 'Kickverse';
+}
+
 export default async function HomePage() {
   // 2. Await the database initialization
   const db = await getDb();
@@ -156,15 +162,40 @@ export default async function HomePage() {
             item: {
               '@type': 'Product',
               name: product.name,
+              description: `Buy original ${product.name} in Kenya. Authentic ${detectBrand(product.name)} footwear available with pay on delivery in Nairobi.`,
               url: productUrl,
               image: imageUrl,
+              brand: {
+                '@type': 'Brand',
+                name: detectBrand(product.name),
+              },
               offers: {
                 '@type': 'Offer',
                 priceCurrency: 'KES',
                 price: product.price,
+                validFrom: '2026-01-01',
+                priceValidUntil: '2027-12-31',
                 availability: 'https://schema.org/InStock',
                 itemCondition: 'https://schema.org/NewCondition',
-                seller: { '@type': 'Organization', name: brand.name }
+                seller: { '@type': 'Organization', name: brand.name },
+                shippingDetails: {
+                  '@type': 'OfferShippingDetails',
+                  shippingRate: { '@type': 'MonetaryAmount', value: '0', currency: 'KES' },
+                  shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'KE', addressRegion: 'Nairobi County' },
+                  deliveryTime: {
+                    '@type': 'ShippingDeliveryTime',
+                    handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
+                    transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
+                  },
+                },
+                hasMerchantReturnPolicy: {
+                  '@type': 'MerchantReturnPolicy',
+                  applicableCountry: 'KE',
+                  returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+                  merchantReturnDays: 7,
+                  returnMethod: 'https://schema.org/ReturnByMail',
+                  returnFees: 'https://schema.org/FreeReturn'
+                }
               }
             }
           };

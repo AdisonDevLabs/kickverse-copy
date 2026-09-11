@@ -266,6 +266,7 @@ export default async function ProductPage({ params }: Props) {
       url: `${brand.url}/product/${expectedSlug}`,
       priceCurrency: 'KES',
       price: product.price,
+      validFrom: '2026-01-01',
       priceValidUntil: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
         .toISOString()
         .split('T')[0],
@@ -285,6 +286,14 @@ export default async function ProductPage({ params }: Props) {
           handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
           transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
         },
+      },
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'KE',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+        merchantReturnDays: 7,
+        returnMethod: 'https://schema.org/ReturnByMail',
+        returnFees: 'https://schema.org/FreeReturn'
       },
     },
     aggregateRating: {
