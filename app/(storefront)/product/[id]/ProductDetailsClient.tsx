@@ -338,10 +338,14 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                     ))}
                     <span className="ml-2 text-sm font-bold text-white tracking-widest">{product.rating ? Number(product.rating).toFixed(1) : '5.0'}</span>
                   </div>
-                  <div className="w-1 h-1 rounded-full bg-white/20"></div>
-                  <button onClick={() => document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs font-bold text-gray-400 uppercase tracking-widest hover:text-white underline underline-offset-4">
-                    {reviews?.length || product.reviews || 0} Reviews
-                  </button>
+                  {(reviews?.length > 0 || product.reviews > 0) && (
+                    <>
+                      <div className="w-1 h-1 rounded-full bg-white/20"></div>
+                      <button onClick={() => document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs font-bold text-gray-400 uppercase tracking-widest hover:text-white underline underline-offset-4">
+                        {reviews?.length || product.reviews} Reviews
+                      </button>
+                    </>
+                  )}
                   <div className="w-1 h-1 rounded-full bg-white/20"></div>
                   <span className="text-xs font-bold uppercase tracking-widest text-brand-primary flex items-center">
                     <CheckCircle className="w-3 h-3 mr-1" /> In Stock
@@ -558,7 +562,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   <div className="pl-8">
                     <ul className="text-sm text-gray-400 space-y-2 mb-3">
                       <li><strong className="text-white">Nairobi:</strong> Pay on delivery available.</li>
-                      <li><strong className="text-white">Outside Nairobi:</strong> We'll let you know the available payment option when you order.</li>
+                      <li><strong className="text-white">Outside Nairobi:</strong> Payment options will be shared when you order.</li>
                     </ul>
                   </div>
                 </div>
@@ -574,12 +578,12 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                       <p className="text-sm text-gray-400">Contact us within 24 hours and we'll help you with an exchange.</p>
                     </div>
                     <div>
-                      <strong className="text-white block mb-1 text-sm">Wrong pair?</strong>
+                      <strong className="text-white block mb-1 text-sm">Received a wrong pair?</strong>
                       <p className="text-sm text-gray-400">Let us know and we'll arrange a replacement</p>
                     </div>
                     <div>
-                      <strong className="text-white block mb-1 text-sm">Any issue with your pair?</strong>
-                      <p className="text-sm text-gray-400">        Contact us when you receive it and we'll sort it out with you.</p>
+                      <strong className="text-white block mb-1 text-sm">Any other issue?</strong>
+                      <p className="text-sm text-gray-400">Contact us when you receive your order and we'll sort it out with you.</p>
                     </div>
                   </div>
                 </div>
@@ -605,7 +609,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                       <>
                         <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-widest text-gray-300">Everyday wear</span>
                         <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-widest text-gray-300">Casual outings</span>
-                        <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-widest text-gray-300">Daily use</span>
+                        <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-widest text-gray-300">Going out</span>
                       </>
                     )}
                   </div>
@@ -653,7 +657,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   </ul>
                 </div>
 
-                {/* 4. WHY BUY THIS PAIR? */}
+                {/* 4. WHY BUY THIS PAIR? 
                 <div>
                   <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-white/10 pb-2">
                     Why Buy This Pair?
@@ -699,7 +703,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                       </>
                     )}
                   </ul>
-                </div>
+                </div>*/}
                 
               </motion.div>
               
@@ -718,7 +722,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
             >
               <div>
                 <h2 className="font-display uppercase tracking-wide text-3xl md:text-5xl text-white mb-4">
-                  Why Customers Love It
+                  CUSTOMER REVIEWS
                 </h2>
                 <div className="flex items-center text-brand-primary">
                   {[1,2,3,4,5].map((s) => (
@@ -727,9 +731,11 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   <span className="ml-3 text-lg font-bold text-white tracking-widest">
                     {product.rating ? Number(product.rating).toFixed(1) : '5.0'} OUT OF 5
                   </span>
-                  <span className="text-gray-500 text-sm ml-3 font-medium uppercase tracking-widest">
-                    ({reviews?.length || 0} Reviews)
-                  </span>
+                  {(reviews?.length > 0 || product.reviews > 0) && (
+                    <span className="text-gray-500 text-sm ml-3 font-medium uppercase tracking-widest">
+                      ({reviews?.length || product.reviews} Reviews)
+                    </span>
+                  )}
                 </div>
               </div>
               <button 
