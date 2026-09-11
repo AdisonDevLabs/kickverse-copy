@@ -327,7 +327,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
               discoveryMode === 'just-dropped' && filterCategory === 'All' ? 'Latest Sneakers & New Footwear Arrivals Kenya' :
               discoveryMode === 'best-sellers' && filterCategory === 'All' ? 'Best Selling Shoes & Sneakers in Kenya' :
               filterCategory && filterCategory.toLowerCase().includes('boot') ? 'Walking & Hiking Boots in Kenya' :
-              filterCategory && filterCategory !== 'All' ? `${filterCategory} Shoes in Nairobi, Kenya` :
+              filterCategory && filterCategory !== 'All' ? `${filterCategory}${/(shoes|sneakers|sandals|cleats)/i.test(filterCategory) ? '' : ' Shoes'} in Nairobi, Kenya` :
               filterProductType === 'Soccer Cleats' ? 'Original Soccer Cleats & Football Boots in Kenya' :
               'Latest Sneakers in Nairobi, Kenya'}
           </motion.h1>
