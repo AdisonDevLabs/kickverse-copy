@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -45,6 +45,10 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
   const { addToCart, setIsCartOpen } = useCart();
   
   const [selectedSize, setSelectedSize] = useState<string>('');
+
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const [isMainCTAVisible, setIsMainCTAVisible] = useState(true);
+
   const [selectedColor, setSelectedColor] = useState<string>(product?.colors?.[0] || '');
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
@@ -94,6 +98,26 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
       document.body.style.overflow = '';
     };
   }, [showSizeGuide, isReviewModalOpen, isWhatsAppModalOpen]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // If it's not on screen AND it's above the viewport (top < 0), show sticky bar
+        if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
+          setIsMainCTAVisible(false);
+        } else {
+          setIsMainCTAVisible(true); // Hide sticky bar if CTA is on screen or below fold
+        }
+      },
+      { threshold: 0, rootMargin: "-80px 0px 0px 0px" } // Offset for mobile nav bar
+    );
+
+    if (ctaRef.current) observer.observe(ctaRef.current);
+    
+    return () => {
+      if (ctaRef.current) observer.unobserve(ctaRef.current);
+    };
+  }, []);
 
 
   const images = product.images && product.images.length > 0 ? product.images : [product.image];
@@ -228,7 +252,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
       {/* Context-Aware Breadcrumbs (Desktop) */}
       <motion.div 
         initial="hidden" animate="visible" variants={fadeUp}
-        className="bg-brand-card py-4 px-6 border-b border-white/10 hidden md:block"
+        className="bg-brand-card py-3 px-6 border-b border-white/10 hidden md:block"
       >
         <div className="max-w-7xl mx-auto flex items-center text-xs font-bold uppercase tracking-widest text-gray-500">
           <Link href="/" className="hover:text-white transition-colors">Home</Link>
@@ -255,23 +279,23 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
       {/* Mobile Back Button */}
       <motion.div 
         initial="hidden" animate="visible" variants={fadeUp}
-        className="md:hidden w-full bg-brand-card border-b border-white/10 px-4 py-3"
+        className="md:hidden w-full bg-brand-card border-b border-white/10 px-4 py-2"
       >
         <button onClick={() => router.back()} className="flex items-center text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors">
           <ArrowLeft className="h-4 w-4 mr-2" /> Back To Shop
         </button>
       </motion.div>
 
-      <div className="pt-6 md:pt-12">
+      <div className="pt-3 md:pt-6">
         <div className="max-w-7xl mx-auto px-0 md:px-6 md:pb-12">
           <div className="flex flex-col md:flex-row gap-0 md:gap-12 lg:gap-16">
             
             {/* Image Gallery with Mobile Drag Gestures */}
             <motion.div 
               initial="hidden" animate="visible" variants={fadeUp}
-              className="md:w-1/2 md:sticky md:top-24 h-fit z-10"
+              className="md:w-1/2 md:sticky md:top-24 h-fit z-10 px-4 md:px-0"
             >
-              <div className="relative aspect-[3/4] md:aspect-[4/5] w-full max-h-[calc(100vh-200px)] bg-brand-card overflow-hidden border-b md:border border-white/10 group md:rounded-md">
+              <div className="relative aspect-[3/4] md:aspect-[4/5] w-full max-h-[calc(100vh-200px)] bg-brand-card overflow-hidden border border-white/10 group rounded-md">
                 {product.isFlashDeal ? (
                   <div className="absolute top-4 left-4 z-20 bg-brand-accent text-white text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest shadow-xl rounded-md">Sale</div>
                 ) : product.isNewArrival ? (
@@ -368,9 +392,9 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                 
                 <div className="flex flex-col gap-1 items-start">
                   <div className="flex items-end gap-4">
-                    <span className="font-poppins font-semibold text-2.5xl sm:text-3.5xl font-sans font-medium text-white">{formatPrice(product.price)}</span>
+                    <span className="font-poppins font-semibold text-lg sm:text-xl font-sans font-medium text-white mb-1.5">{formatPrice(product.price)}</span>
                     {product.originalPrice && (
-                      <span className="text-lg sm:text-xl text-gray-500 line-through mb-1.5">{formatPrice(product.originalPrice)}</span>
+                      <span className="text-2.5xl sm:text-3.5xl text-gray-500 line-through mb-1.5">{formatPrice(product.originalPrice)}</span>
                     )}
                     {product.originalPrice && (
                       <span className="ml-2 bg-brand-accent/10 text-brand-accent rounded-md text-[10px] font-bold px-2 py-1 uppercase tracking-widest mb-2 border border-brand-accent/20 hidden sm:block">
@@ -516,7 +540,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                 
                 
                 {/* 🟢 READY TO ORDER / WHATSAPP CHECKOUT */}
-                <div className="mt-4 bg-brand-primary/5 border border-brand-primary/20 rounded-md p-5">
+                <div ref={ctaRef} className="mt-4 bg-brand-primary/5 border border-brand-primary/20 rounded-md p-5">
                   <h4 className="text-xs font-bold uppercase tracking-widest text-brand-primary mb-3 flex items-center">
                     <span className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
                     Ready to Order?
@@ -524,19 +548,20 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                   <p className="text-[11px] text-gray-400 mb-3 uppercase tracking-wide">Tap below to place your order.</p>
                   <button 
                     onClick={handleWhatsAppClick}
-                    className="w-full h-16 sm:h-20 bg-brand-primary text-black font-bold uppercase tracking-widest text-sm sm:text-base flex items-center justify-center hover:bg-brand-hover transition-colors shadow-[0_0_20px_-5px_rgba(0,0,0,0.3)] rounded-md"
+                    className="w-full h-14 sm:h-16 bg-brand-primary text-black font-bold uppercase tracking-widest text-sm sm:text-base flex items-center justify-center hover:bg-brand-hover transition-colors shadow-[0_0_20px_-5px_rgba(0,0,0,0.3)] rounded-md"
                   >
                     <MessageCircle className="h-5 w-5 mr-2" /> ORDER ON WHATSAPP
                   </button>
-                </div>
-
-                <button 
+                  <button 
                   onClick={handleAddToCart}
-                  className="w-full h-14 bg-transparent border border-brand-primary text-brand-primary font-bold uppercase tracking-widest text-xs flex items-center justify-center hover:bg-brand-primary transition-colors hover:text-black rounded-md"
+                  className="w-full h-12 bg-transparent border border-brand-primary text-brand-primary font-bold uppercase tracking-widest text-xs flex items-center justify-center hover:bg-brand-primary transition-colors hover:text-black rounded-md"
                 >
-                  <ShoppingBag className="h-5 w-5 mr-3" />
+                  <ShoppingBag className="h-4 w-4 mr-2" />
                   ADD TO CART
                 </button>
+                </div>
+
+                
               </motion.div>
 
               <motion.div variants={staggerItem} className="mb-12 rounded-md divide-y divide-white/10">
@@ -961,10 +986,13 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
 
       </div>
 
-      {/* NEW: Mobile Sticky CTA Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[90] bg-brand-dark/95 backdrop-blur-md border-t border-white/10 p-3 flex items-center justify-between gap-4 shadow-[0_-20px_40px_rgba(0,0,0,0.5)]">
-        <div className="flex flex-col pl-1 shrink-0">
-          <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-0.5">Total</span>
+      {/* NEW: Mobile Sticky CTA Bar (Slides in when main CTA is out of view) */}
+      <div 
+        className={`md:hidden fixed bottom-0 left-0 right-0 z-[90] bg-brand-dark/95 backdrop-blur-md border-t border-brand-primary/20 p-3 flex items-center justify-between gap-4 shadow-[0_-20px_40px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-in-out ${
+          isMainCTAVisible ? 'translate-y-full' : 'translate-y-0'
+        }`}
+      >
+        <div className="flex flex-col pl-2 shrink-0">
           <span className="text-sm font-bold text-white">{formatPrice(product.price * quantity)}</span>
         </div>
         <button 
