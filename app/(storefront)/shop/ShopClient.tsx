@@ -395,7 +395,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
           {/* Row 2: Crawlable Pill Navigation for Types & Collections */}
           <nav aria-label="Category Navigation" className="flex items-center overflow-x-auto hide-scrollbar gap-3 pb-2 -mx-6 px-6 lg:mx-0 lg:px-0">
             <div className="flex items-center gap-2 flex-nowrap pl-1 pr-3">
-              {/* 1. Main Product Type Pill */}
+              {/* 1. Main Product if (cat !== 'All') Type Pill */}
               <Link
                 href={`/shop?type=${filterProductType === 'Soccer Cleats' ? 'soccer-cleats' : 'sneakers'}`}
                 onClick={(e) => {
@@ -419,13 +419,32 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
               {/* 2. Ordered Categories */}
               {displayCategories.map((cat) => {
                 const isActive = filterCategory.toLowerCase() === cat.toLowerCase();
+
+                const params = new URLSearchParams();
                 
                 // Calculate target URL for crawler and client navigation
-                let targetHref = `/shop?type=${filterProductType === 'Soccer Cleats' ? 'soccer-cleats' : 'sneakers'}`;
+                {/*let targetHref = `/shop?type=${filterProductType === 'Soccer Cleats' ? 'soccer-cleats' : 'sneakers'}`;
                 if (cat === 'Official Shoes') targetHref = '/shop?type=official-shoes';
                 else if (cat === 'Opens & Sandals') targetHref = '/shop?type=opens-and-sandals';
                 else if (cat.toLowerCase().includes('boot')) targetHref = '/shop?category=boots';
-                else if (cat !== 'All') targetHref += `&category=${cat.toLowerCase().replace(/\s+/g, '-')}`;
+                else if (cat !== 'All') targetHref += `&category=${cat.toLowerCase().replace(/\s+/g, '-')}`;*/}
+
+                if (cat === 'Official Shoes') {
+                  params.set('type', 'official-shoes');
+                } else if (cat === 'Opens & Sandals') {
+                  params.set('type', 'opens-and-sandals');
+                } else if (cat.toLowerCase().includes('boot')) {
+                  params.set('type', filterProductType === 'Soccer Cleats' ? 'soccer-cleats' : 'sneakers');
+                  params.set('category', 'boots');
+                } else {
+                  params.set('type', filterProductType === 'Soccer Cleats' ? 'soccer-cleats' : 'sneakers');
+                  if (cat !== 'All') {
+                    const safeCategorySlug = cat.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                    params.set('category', safeCategorySlug);
+                  }
+                }
+
+                const targetHref = `/shop?${params.toString()}`;
 
                 return (
                   <Link
@@ -449,7 +468,9 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                         params.delete('category');
                       } else {
                         params.set('type', filterProductType === 'Soccer Cleats' ? 'soccer-cleats' : 'sneakers');
-                        params.set('category', newCategory.toLowerCase().replace(/\s+/g, '-'));
+                        // SAFETY FIX: Apply the same strict regex here
+                        const safeNewCategorySlug = newCategory.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                        params.set('category', safeNewCategorySlug);
                       }
                       window.history.replaceState(null, '', `${pathname}?${params.toString()}`);
                     }}

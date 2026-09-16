@@ -487,7 +487,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     <div className="absolute inset-0 bg-black/20 group-hover/card:bg-black/30 transition-colors duration-500 z-10" />
                     <Image
                       src={collection.image}
-                      alt={`${collection.name} Footwear Collection in Nairobi Kenya`}
+                      alt={`${collection.name || 'Featured'} Footwear Collection in Nairobi Kenya`}
                       fill
                       referrerPolicy="no-referrer"
                       className="object-cover transition-transform duration-1000 group-hover/card:scale-110 opacity-90 group-hover/card:opacity-100"
@@ -587,7 +587,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
 
                     <Image
                       src={product.image}
-                      alt={`${product.name} Price in Kenya | 100% Authentic with Pay on Delivery`}
+                      alt={`${product.name || 'Trending Footwear'} Price in Kenya | 100% Authentic with Pay on Delivery`}
                       fill
                       referrerPolicy="no-referrer"
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -683,7 +683,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
                     <Image
                       src={collection.image}
-                      alt={`${collection.name} Soccer Cleats and Turf Trainers in Kenya`}
+                      alt={`${collection.name || 'Professional'} Soccer Cleats and Turf Trainers in Kenya`}
                       fill
                       referrerPolicy="no-referrer"
                       className="object-cover group-hover:scale-110 transition-transform duration-700 opacity-90 group-hover:opacity-100"
@@ -741,7 +741,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   <Link href={`/product/${createSlug(product.name, product.id)}`} className="block w-full h-full absolute inset-0 z-10">
                     <Image
                       src={product.image}
-                      alt={`${product.name} - Latest Sneaker Arrival Price in Kenya`}
+                      alt={`${product.name || 'Latest Footwear Release'} - Latest Sneaker Arrival Price in Kenya`}
                       fill
                       referrerPolicy="no-referrer"
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -822,7 +822,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   <Link href={`/product/${createSlug(product.name, product.id)}`} className="block w-full h-full absolute inset-0 z-10">
                     <Image
                       src={product.image}
-                      alt={`${product.name} - Best Selling Original Shoe in Kenya`}
+                      alt={`${product.name || 'Top Rated Style'} - Best Selling Original Shoe in Kenya`}
                       fill
                       referrerPolicy="no-referrer"
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -1095,9 +1095,14 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 relative rounded-full overflow-hidden shrink-0 border border-white/10 bg-black">
                           {review.profile ? (
-                            <Image src={review.profile} alt={review.name} fill className="object-cover" />
+                            <Image 
+                              src={review.profile} 
+                              alt={review.name ? `${review.name} - Customer Review` : "Kickverse Customer Review Profile"} 
+                              fill 
+                              className="object-cover" 
+                            />
                           ) : (
-                            <div className={`w-full h-full flex items-center justify-center text-white font-bold text-[10px] sm:text-xs tracking-wider ${getAvatarColor(review.name)}`}>
+                            <div className={`w-full h-full flex items-center justify-center text-white font-bold text-[10px] sm:text-xs tracking-wider ${getAvatarColor(review.name || '')}`}>
                               {getInitials(review.name)}
                             </div>
                           )}

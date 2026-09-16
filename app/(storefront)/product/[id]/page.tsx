@@ -15,12 +15,15 @@ type Props = {
 }
 
 // SEO Slug Generator Helper
-function createSlug(name: string, id: string) {
+function createSlug(name: string | null | undefined, id: string) {
+  if (!name) return id; // Prevents toLowerCase() crash if name is null
   const cleanName = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
   return `${cleanName}-${id}`;
 }
 
-function detectBrand(productName: string): string {
+// Brand Detector Helper
+function detectBrand(productName: string | null | undefined): string {
+  if (!productName) return 'Kickverse'; // Prevents RegEx crash
   const knownBrands = ['Nike', 'Adidas', 'Jordan', 'Puma', 'New Balance', 'On Running', 'Asics', 'Vans', 'Converse', 'Timberland', 'Clarks'];
   const matched = knownBrands.find((b) => new RegExp(`\\b${b}\\b`, 'i').test(productName));
   return matched || 'Kickverse';
@@ -40,14 +43,17 @@ const getCachedProduct = unstable_cache(
 // 2. Cache the heavy relational queries together. 
 // FIX: productType is strictly typed to prevent the Drizzle ORM TypeScript error.
 const getCachedProductAssets = unstable_cache(
-  async (productId: string, productType: 'Sneakers' | 'Soccer Cleats') => {
+  async (productId: string, rawProductType: string | null | undefined) => {
     const db = await getDb();
+
+    const safeProductType = rawProductType === 'Soccer Cleats' ? 'Soccer Cleats' : 'Sneakers';
+
     const [allSizeGuides, allColorMaps, relatedPool, productReviews, recentlyViewedPool] = await Promise.all([
       db.select().from(sizeGuides),
       db.select().from(colorMap),
       db.select({ id: products.id, name: products.name, price: products.price, image: products.image })
         .from(products)
-        .where(and(eq(products.productType, productType), eq(products.isAccessory, false), not(eq(products.id, productId))))
+        .where(and(eq(products.productType, safeProductType), eq(products.isAccessory, false), not(eq(products.id, productId))))
         .orderBy(desc(products.createdAt))
         .limit(12),
       db.select()
@@ -57,7 +63,7 @@ const getCachedProductAssets = unstable_cache(
       db.select({ id: products.id, name: products.name, image: products.image })
         .from(products)
         .where(not(eq(products.id, productId)))
-        .orderBy(sql`CASE WHEN ${products.productType} = ${productType} THEN 0 ELSE 1 END`, desc(products.createdAt))
+        .orderBy(sql`CASE WHEN ${products.productType} = ${safeProductType} THEN 0 ELSE 1 END`, desc(products.createdAt))
         .limit(20)
     ]);
     return { allSizeGuides, allColorMaps, relatedPool, productReviews, recentlyViewedPool };
@@ -82,34 +88,37 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const expectedSlug = createSlug(product.name, product.id);
 
-  const detectedBrand = detectBrand(product.name);
+  const safeProductName = product.name || 'Authentic Footwear';
+  const detectedBrand = detectBrand(safeProductName);
   const previewImage = product.images && product.images.length > 0 
     ? product.images[0] 
     : product.image;
 
-  const absoluteImageUrl = previewImage.startsWith('http') 
-    ? previewImage 
-    : `${brand.url.replace(/\/$/, '')}${previewImage.startsWith('/') ? '' : '/'}${previewImage}`;
+  const absoluteImageUrl = previewImage 
+    ? (previewImage.startsWith('http') 
+        ? previewImage 
+        : `${brand.url.replace(/\/$/, '')}${previewImage.startsWith('/') ? '' : '/'}${previewImage}`)
+    : '';
 
   const baseKeywords = [
-    product.name,
-    `${product.name} price in Kenya`,
-    `${product.name} price in ksh`,
-    `Buy ${product.name} Nairobi`,
-    `${product.name} authentic`,
-    `is ${product.name} original`,
-    `where to buy ${product.name} in Kenya`,
+    safeProductName,
+    `${safeProductName} price in Kenya`,
+    `${safeProductName} price in ksh`,
+    `Buy ${safeProductName} Nairobi`,
+    `${safeProductName} authentic`,
+    `is ${safeProductName} original`,
+    `where to buy ${safeProductName} in Kenya`,
     `${detectedBrand} shoes Nairobi`,
     'Kickverse KE',
   ];
 
   if (product.colors && product.colors.length > 0) {
     const colorString = product.colors.join(' ');
-    baseKeywords.push(`${product.name} ${colorString}`);
-    baseKeywords.push(`${product.name} ${product.colors[0]} price in kenya`);
+    baseKeywords.push(`${safeProductName} ${colorString}`);
+    baseKeywords.push(`${safeProductName} ${product.colors[0]} price in kenya`);
   }
 
-  const productNameLower = product.name.toLowerCase();
+  const productNameLower = safeProductName.toLowerCase();
   if (productNameLower.includes('boot') || productNameLower.includes('trail') || productNameLower.includes('gore-tex')) {
     baseKeywords.push(
       'Hiking boots Kenya',
@@ -153,8 +162,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     );
   }
 
+  // 1. Create a safe, truncated name to guarantee the title stays under 70 characters
+  const maxNameLength = 40;
+  const safeName = safeProductName.length > maxNameLength 
+    ? `${safeProductName.substring(0, maxNameLength).trim()}...` 
+    : safeProductName;
+    
   const formattedPrice = `KSh ${Number(product.price).toLocaleString()}`;
-  const metaTitle = `${product.name} Price in Kenya | Buy Authentic at ${brand.name}`;
+  let metaTitle = `${safeName} Price in Kenya | Buy Authentic at ${brand.name}`;
+
+  if (metaTitle.length > 70) {
+     metaTitle = `${safeName} Price in Kenya`;
+  }
 
   const cleanDescription = (product.description || '')
     .replace(/(<([^>]+)>)/gi, '')
@@ -162,10 +181,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .trim()
     .substring(0, 120);
 
-  const localDescription = `Buy original ${product.name} for ${formattedPrice} at ${brand.name}. Free expedited delivery within Nairobi CBD, pay on delivery available across Nairobi & nationwide Kenya. ${cleanDescription}...`;
+  const localDescription = `Buy original ${safeProductName} for ${formattedPrice} at ${brand.name}. Free expedited delivery within Nairobi CBD, pay on delivery available across Nairobi & nationwide Kenya. ${cleanDescription}...`;
 
   return {
-    title: metaTitle, 
+    title: { absolute: metaTitle },
     description: localDescription,
     keywords: baseKeywords,
     alternates: {
@@ -187,14 +206,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: localDescription,
       url: `${brand.url}/product/${expectedSlug}`,
       siteName: brand.name,
-      images: [
+      images: absoluteImageUrl ? [
         {
           url: absoluteImageUrl,
           width: 800,
           height: 800,
-          alt: `${product.name} Price in Kenya | Authentic ${detectedBrand}`,
+          alt: `${safeProductName} Price in Kenya | Authentic ${detectedBrand}`,
         },
-      ],
+      ] : [],
       locale: 'en_KE',
       type: 'website',
     },
@@ -315,14 +334,17 @@ export default async function ProductPage({ params }: Props) {
     }));
   }
 
+  const safeProductName = product.name || 'Authentic Footwear';
+  const safeCategory = product.category || 'Authentic Footwear';
+
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: `${brand.url}/` },
       { '@type': 'ListItem', position: 2, name: 'Shop', item: `${brand.url}/shop` },
-      { '@type': 'ListItem', position: 3, name: product.category, item: `${brand.url}/shop?category=${encodeURIComponent(product.category.toLowerCase().replace(/\s+/g, '-'))}` },
-      { '@type': 'ListItem', position: 4, name: product.name, item: `${brand.url}/product/${expectedSlug}` },
+      { '@type': 'ListItem', position: 3, name: safeCategory, item: `${brand.url}/shop?category=${encodeURIComponent(safeCategory.toLowerCase().replace(/\s+/g, '-'))}` },
+      { '@type': 'ListItem', position: 4, name: safeProductName, item: `${brand.url}/product/${expectedSlug}` },
     ],
   };
 
@@ -332,23 +354,23 @@ export default async function ProductPage({ params }: Props) {
     mainEntity: [
       {
         '@type': 'Question',
-        name: `How much does the ${product.name} cost in Kenya?`,
-        acceptedAnswer: { '@type': 'Answer', text: `The current price for the ${product.name} is ${formattedPrice} (KSh). We offer Pay on Delivery across Nairobi and surrounding environs.` },
+        name: `How much does the ${safeProductName} cost in Kenya?`,
+        acceptedAnswer: { '@type': 'Answer', text: `The current price for the ${safeProductName} is ${formattedPrice} (KSh). We offer Pay on Delivery across Nairobi and surrounding environs.` },
       },
       {
         '@type': 'Question',
-        name: `Are the ${product.name} shoes authentic and original?`,
-        acceptedAnswer: { '@type': 'Answer', text: `Yes, we guarantee that the ${product.name} and all our sneakers, boots, and cleats are 100% authentic and original.` },
+        name: `Are the ${safeProductName} shoes authentic and original?`,
+        acceptedAnswer: { '@type': 'Answer', text: `Yes, we guarantee that the ${safeProductName} and all our sneakers, boots, and cleats are 100% authentic and original.` },
       },
       {
         '@type': 'Question',
-        name: `Where can I buy the ${product.name} online in Nairobi?`,
-        acceptedAnswer: { '@type': 'Answer', text: `You can order the ${product.name} easily online at Kickverse KE or directly via WhatsApp. We provide prompt dispatch within Nairobi CBD and nationwide shipping.` },
+        name: `Where can I buy the ${safeProductName} online in Nairobi?`,
+        acceptedAnswer: { '@type': 'Answer', text: `You can order the ${safeProductName} easily online at Kickverse KE or directly via WhatsApp. We provide prompt dispatch within Nairobi CBD and nationwide shipping.` },
       },
       {
         '@type': 'Question',
-        name: `How do I order the ${product.name} in Nairobi?`,
-        acceptedAnswer: { '@type': 'Answer', text: `You can easily order the ${product.name} online at Kickverse KE or directly via WhatsApp. We provide prompt dispatch with direct communication.` },
+        name: `How do I order the ${safeProductName} in Nairobi?`,
+        acceptedAnswer: { '@type': 'Answer', text: `You can easily order the ${safeProductName} online at Kickverse KE or directly via WhatsApp. We provide prompt dispatch with direct communication.` },
       },
       {
         '@type': 'Question',
@@ -357,7 +379,7 @@ export default async function ProductPage({ params }: Props) {
       },
       {
         '@type': 'Question',
-        name: `Are the sizes for ${product.name} standard fit?`,
+        name: `Are the sizes for ${safeProductName} standard fit?`,
         acceptedAnswer: { '@type': 'Answer', text: `Yes, our pairs run true to standard sizing. If you have wider feet, we recommend selecting half a size up. Consult our interactive Size Guide for exact measurements.` },
       },
     ],
