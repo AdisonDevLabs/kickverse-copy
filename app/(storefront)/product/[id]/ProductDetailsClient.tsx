@@ -500,16 +500,12 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                         <HelpCircle className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
                         <p className="text-[11px] text-gray-400 leading-relaxed">
                           Not sure about your size?{' '}
-                          <a
-                            href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(
-                              `Hi Kickverse, I need help choosing my size for the ${product.name}.`
-                            )}`}
-                            target="_blank"
-                            rel="noreferrer"
+                          <button
+                            onClick={() => setShowSizeGuide(true)}
                             className="text-brand-primary hover:text-white underline underline-offset-2 font-bold transition-colors"
                           >
-                            Ask us on WhatsApp
-                          </a>
+                            View our detailed measurement guide
+                          </button>
                         </p>
                       </div>
                     </div>

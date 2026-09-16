@@ -14,12 +14,14 @@ type Props = {
 };
 
 // SEO Slug Generator Helper
-function createSlug(name: string, id: string) {
+function createSlug(name: string | null | undefined, id: string) {
+  if (!name) return id;
   const cleanName = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
   return `${cleanName}-${id}`;
 }
 
-function detectBrand(productName: string): string {
+function detectBrand(productName: string | null | undefined): string {
+  if (!productName) return 'Kickverse';
   const knownBrands = ['Nike', 'Adidas', 'Jordan', 'Puma', 'New Balance', 'On Running', 'Asics', 'Vans', 'Converse', 'Timberland', 'Clarks'];
   const matched = knownBrands.find((b) => new RegExp(`\\b${b}\\b`, 'i').test(productName));
   return matched || 'Kickverse';
@@ -46,8 +48,15 @@ function formatParam(str?: string): string {
 // 2. Replace static metadata with dynamic generateMetadata
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const resolvedParams = await searchParams;
-  const categoryRaw = typeof resolvedParams.category === 'string' ? resolvedParams.category : undefined;
-  const typeRaw = typeof resolvedParams.type === 'string' ? resolvedParams.type : undefined;
+
+  // Helper to safely extract strings and intercept crawler 'amp;' bugs
+  const getSafeString = (val: string | string[] | undefined) => {
+    const stringVal = Array.isArray(val) ? val[0] : val;
+    return stringVal ? stringVal.replace(/^amp;/, '') : undefined;
+  };
+
+  const categoryRaw = getSafeString(resolvedParams.category || resolvedParams['amp;category']);
+  const typeRaw = getSafeString(resolvedParams.type || resolvedParams['amp;type']);
 
   // Helper to format URL slugs (e.g., 'official-shoes' -> 'Official Shoes')
   const formatString = (str?: string) => {
@@ -87,6 +96,10 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     dynamicDescription = `Browse authentic ${activeTaxonomy} at ${brand.name}. Best prices in Kenyan Shillings with same-day Nairobi delivery and nationwide shipping.`;
   }
 
+  if (dynamicTitle.length > 70) {
+      dynamicTitle = dynamicTitle.substring(0, 67).trim() + '...';
+  }
+
   // Build clean, accurate self-referencing canonical URL
   const canonicalParams = new URLSearchParams();
   if (typeRaw) canonicalParams.set('type', typeRaw);
@@ -120,7 +133,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   ];
 
   return {
-    title: dynamicTitle,
+    title: { absolute: dynamicTitle },
     description: dynamicDescription,
     keywords: dynamicKeywords,
     alternates: {
@@ -229,8 +242,15 @@ export default async function ShopPage({ searchParams }: Props) {
     desc(products.id)
   ).limit(500);*/}
 
-  const categoryRaw = typeof resolvedParams.category === 'string' ? resolvedParams.category : undefined;
-  const typeRaw = typeof resolvedParams.type === 'string' ? resolvedParams.type : undefined;
+  // Apply the same safe extraction here
+  const getSafeString = (val: string | string[] | undefined) => {
+    const stringVal = Array.isArray(val) ? val[0] : val;
+    return stringVal ? stringVal.replace(/^amp;/, '') : undefined;
+  };
+
+  const categoryRaw = getSafeString(resolvedParams.category || resolvedParams['amp;category']);
+  const typeRaw = getSafeString(resolvedParams.type || resolvedParams['amp;type']);
+
   const categoryName = formatParam(categoryRaw);
   const typeName = formatParam(typeRaw);
   const activeTaxonomy = categoryName || typeName;
@@ -293,9 +313,11 @@ export default async function ShopPage({ searchParams }: Props) {
         'numberOfItems': allProducts.length,
         'itemListElement': allProducts.slice(0, 60).map((product, index) => {
           const productUrl = `${baseUrl}/product/${createSlug(product.name, product.id)}`;
-          const imageUrl = product.image.startsWith('http')
-            ? product.image
-            : `${baseUrl}${product.image.startsWith('/') ? '' : '/'}${product.image}`;
+          const imageUrl = product.image 
+            ? (product.image.startsWith('http')
+                ? product.image
+                : `${baseUrl}${product.image.startsWith('/') ? '' : '/'}${product.image}`)
+            : '';
 
           return {
             '@type': 'ListItem',
@@ -307,7 +329,7 @@ export default async function ShopPage({ searchParams }: Props) {
               name: product.name,
               description: `Buy original ${product.name} in Kenya. Authentic ${detectBrand(product.name)} footwear available with pay on delivery in Nairobi.`,
               url: productUrl,
-              image: imageUrl,
+              image: imageUrl ? imageUrl : undefined,
               brand: {
                 '@type': 'Brand',
                 name: detectBrand(product.name),
@@ -356,7 +378,7 @@ export default async function ShopPage({ searchParams }: Props) {
       },
       {
         '@type': 'FAQPage',
-        '@id': `${currentUrl}/shop/#faq`,
+        '@id': `${baseUrl}/shop/#faq`,
         'mainEntity': [
           {
             '@type': 'Question',
