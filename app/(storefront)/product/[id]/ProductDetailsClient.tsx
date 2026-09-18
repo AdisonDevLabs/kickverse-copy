@@ -972,8 +972,9 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                     </table>
                   </div>
                   <div className="mt-8 bg-brand-primary/10 border border-brand-primary/20 p-4 flex items-start gap-4 rounded-md">
+                  {/*
                     <MessageCircle className="w-6 h-6 text-brand-primary shrink-0" />
-                    <div><h4 className="text-xs font-bold uppercase tracking-widest text-brand-primary mb-1">Still Unsure?</h4><p className="text-[10px] uppercase tracking-widest text-gray-400 mb-3 leading-relaxed">Send us a message and we&apos;ll help you find your perfect fit.</p><a href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent("I need help with sizing/options!")}`} target="_blank" rel="noreferrer" className="text-xs font-bold text-white hover:text-brand-primary underline underline-offset-4 uppercase tracking-widest">Chat on WhatsApp</a></div>
+                    <div><h4 className="text-xs font-bold uppercase tracking-widest text-brand-primary mb-1">Still Unsure?</h4><p className="text-[10px] uppercase tracking-widest text-gray-400 mb-3 leading-relaxed">Send us a message and we&apos;ll help you find your perfect fit.</p><a href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent("I need help with sizing/options!")}`} target="_blank" rel="noreferrer" className="text-xs font-bold text-white hover:text-brand-primary underline underline-offset-4 uppercase tracking-widest">Chat on WhatsApp</a></div>*/}
                   </div>
                 </div>
               </motion.div>
