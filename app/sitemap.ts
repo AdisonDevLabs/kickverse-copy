@@ -3,7 +3,7 @@ import { getDb } from '@/lib/db';
 import { products } from '@/lib/db/schema';
 import { brand } from '@/lib/data/brand';
 
-export const revalidate = 86400;
+export const revalidate = 0;
 
 const createSlug = (name: string, id: string) => {
   if (!name) return id;
