@@ -42,6 +42,7 @@ const createSlug = (name: string, id: string) => {
 
 export default function ProductDetailsClient({ product, reviews, relatedProducts, recentlyViewed, sizeGuides, colorMap }: any) {
   const router = useRouter();
+  const [formError, setFormError] = useState('');
   const { addToCart, setIsCartOpen } = useCart();
   
   const [selectedSize, setSelectedSize] = useState<string>('');
@@ -61,6 +62,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
   const [activeGuideTab, setActiveGuideTab] = useState(sizeGuides?.[0]?.id || '');
 
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
+  const [isFittingRequest, setIsFittingRequest] = useState(false);
   const [buyerName, setBuyerName] = useState('');
   const [buyerLocation, setBuyerLocation] = useState('');
 
@@ -184,20 +186,39 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
   
   const handleWhatsAppClick = () => {
     if (!selectedSize && product.sizes && product.sizes.length > 0) return triggerSizeError();
+    setIsFittingRequest(false);
     setIsWhatsAppModalOpen(true);
   };
 
   const proceedToWhatsApp = () => {
+
+    if (!buyerName.trim() || !buyerLocation.trim()) {
+      setFormError('Please provide your name and delivery location to continue.');
+      return;
+    }
+    
+    setFormError('');
+
     const productUrl = window.location.href;
     const greeting = buyerName.trim() ? `Hello Kickverse team, I'm ${buyerName.trim()}.` : `Hello Kickverse team,`;
     const locationText = buyerLocation.trim() ? `\n• Delivery To: ${buyerLocation.trim()}` : '';
     const totalCost = (product.price * quantity).toLocaleString();
 
-    const message = `${greeting}\n\nI have confirmed my selection and I'm ready to complete my order for:\n\n• Product: ${product.name}\n${selectedSize ? `• Size: ${selectedSize}\n` : ''}${selectedColor ? `• Color: ${selectedColor}\n` : ''}• Quantity: ${quantity}${locationText}\n\n*Total:* KSh ${totalCost}\n\nPlease let me know how we proceed with payment and delivery\n\n${productUrl}`;
+    const fittingText = isFittingRequest
+      ? `\n\n*Special Request:* I am not completely sure about my size. Please bring an extra pair for fitting upon delivery.`
+      : '';
+
+    const message = `${greeting}\n\nI have confirmed my selection and I'm ready to complete my order for:\n\n• Product: ${product.name}\n${selectedSize ? `• Size: ${selectedSize}\n` : ''}${selectedColor ? `• Color: ${selectedColor}\n` : ''}• Quantity: ${quantity}${locationText}${fittingText}\n\n*Total:* KSh ${totalCost}\n\nPlease let me know how we proceed with payment and delivery\n\n${productUrl}`;
     
     const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/${brand.whatsappNumber}?text=${encodedMessage}`, '_blank');
+
+    const targetPhoneNumber = product.productType === 'Soccer Cleats' 
+      ? brand.bootRoom // <-- REPLACE THIS with the cleats department number (Use country code, no + or spaces)
+      : brand.sneakers;
+
+    window.open(`https://wa.me/${targetPhoneNumber}?text=${encodedMessage}`, '_blank');
     setIsWhatsAppModalOpen(false);
+    setIsFittingRequest(false);
   };
 
   return (
@@ -971,10 +992,31 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                       </tbody>
                     </table>
                   </div>
-                  <div className="mt-8 bg-brand-primary/10 border border-brand-primary/20 p-4 flex items-start gap-4 rounded-md">
-                  {/*
-                    <MessageCircle className="w-6 h-6 text-brand-primary shrink-0" />
-                    <div><h4 className="text-xs font-bold uppercase tracking-widest text-brand-primary mb-1">Still Unsure?</h4><p className="text-[10px] uppercase tracking-widest text-gray-400 mb-3 leading-relaxed">Send us a message and we&apos;ll help you find your perfect fit.</p><a href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent("I need help with sizing/options!")}`} target="_blank" rel="noreferrer" className="text-xs font-bold text-white hover:text-brand-primary underline underline-offset-4 uppercase tracking-widest">Chat on WhatsApp</a></div>*/}
+                  <div className="flex items-start gap-4 p-4 bg-white/5 border border-brand-primary/10 rounded-lg mt-6">
+                    <MessageCircle className="w-6 h-6 text-brand-primary shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="text-xs font-bold uppercase tracking-widest text-brand-primary mb-1">Still not sure?</h4>
+                      <p className="text-[10px] tracking-widest text-white mb-3 leading-relaxed">
+                        Select your closest size. We can deliver an pair for fitting to ensure you get the perfect fit.
+                      </p>
+                      <button 
+                        onClick={() => {
+                          if (!selectedSize && product?.sizes?.length > 0) {
+                            setShowSizeGuide(false);
+                            // Add a tiny delay to allow the modal close animation to clear the screen
+                            setTimeout(() => triggerSizeError(), 100);
+                            return;
+                          }
+                          
+                          setIsFittingRequest(true);
+                          setShowSizeGuide(false); // Close size guide before opening WhatsApp modal
+                          setIsWhatsAppModalOpen(true);
+                        }}
+                        className="text-xs font-bold text-white hover:text-brand-primary underline underline-offset-4 uppercase tracking-widest text-left"
+                      >
+                        Request Extra Pair
+                      </button>
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -1044,7 +1086,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                 <div className="bg-brand-primary/5 border border-white/10 rounded-lg p-4 mb-6">
                   <div className="flex justify-between items-center text-sm mb-2">
                     <span className="text-gray-400">Size</span>
-                    <span className="font-bold text-white">{selectedSize || 'Standard'}</span>
+                    <span className="font-bold text-white">{selectedSize}</span>
                   </div>
                   {selectedColor && (
                     <div className="flex justify-between items-center text-sm mb-2">
@@ -1056,6 +1098,14 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                     <span className="text-gray-400">Pair(s):</span>
                     <span className="font-bold text-white">{quantity}</span>
                   </div>
+
+                  {isFittingRequest && (
+                    <div className="flex justify-between items-center text-sm mb-2 pt-2 border-t border-white/10 mt-2">
+                      <span className="text-brand-primary/80 text-[10px] uppercase tracking-widest">Special Request:</span>
+                      <span className="font-bold text-brand-primary text-xs text-right">Bring extra pair for fitting</span>
+                    </div>
+                  )}
+
                   <div className="flex justify-between items-center text-sm pt-2 border-t border-white/10 mt-2">
                     <span className="text-gray-400">Total:</span>
                     <span className="font-bold text-brand-primary">KSh {(product.price * quantity).toLocaleString()}</span>
@@ -1064,13 +1114,19 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
 
                 {/* Humanized Inputs */}
                 <div className="space-y-4 mb-8">
+                  {formError && (
+                    <div className="bg-red-500/10 border border-red-500/50 text-red-500 text-[10px] font-bold p-3 rounded-md uppercase tracking-widest flex items-center">
+                      <X className="w-4 h-4 mr-2" /> {formError}
+                    </div>
+                  )}
                   <div>
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Your Name (Optional)</label>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Your Name</label>
                     <input 
                       type="text" 
                       placeholder="e.g. John" 
                       value={buyerName}
                       onChange={(e) => setBuyerName(e.target.value)}
+                      required
                       className="w-full bg-black/50 border border-white/20 rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-primary transition-colors"
                     />
                   </div>
@@ -1081,6 +1137,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                       placeholder="e.g. Nairobi CBD" 
                       value={buyerLocation}
                       onChange={(e) => setBuyerLocation(e.target.value)}
+                      required
                       className="w-full bg-black/50 border border-white/20 rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-primary transition-colors"
                     />
                   </div>

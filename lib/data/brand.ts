@@ -76,6 +76,8 @@ export const brand = {
   },
 
   whatsappNumber: "254713625575",
+  sneakers: "254713625575",
+  bootRoom: "254794584404",
   contacts: {
     sneakers: {
       phone: "0713625575",
