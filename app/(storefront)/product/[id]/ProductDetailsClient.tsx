@@ -42,6 +42,7 @@ const createSlug = (name: string, id: string) => {
 
 export default function ProductDetailsClient({ product, reviews, relatedProducts, recentlyViewed, sizeGuides, colorMap }: any) {
   const router = useRouter();
+  const [formError, setFormError] = useState('');
   const { addToCart, setIsCartOpen } = useCart();
   
   const [selectedSize, setSelectedSize] = useState<string>('');
@@ -190,6 +191,14 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
   };
 
   const proceedToWhatsApp = () => {
+
+    if (!buyerName.trim() || !buyerLocation.trim()) {
+      setFormError('Please provide your name and delivery location to continue.');
+      return;
+    }
+    
+    setFormError('');
+
     const productUrl = window.location.href;
     const greeting = buyerName.trim() ? `Hello Kickverse team, I'm ${buyerName.trim()}.` : `Hello Kickverse team,`;
     const locationText = buyerLocation.trim() ? `\n• Delivery To: ${buyerLocation.trim()}` : '';
@@ -983,22 +992,29 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                       </tbody>
                     </table>
                   </div>
-                  <div className="flex items-start gap-4 p-4 bg-brand-primary/5 border border-brand-primary/10 rounded-lg mt-6">
+                  <div className="flex items-start gap-4 p-4 bg-white/5 border border-brand-primary/10 rounded-lg mt-6">
                     <MessageCircle className="w-6 h-6 text-brand-primary shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="text-xs font-bold uppercase tracking-widest text-brand-primary mb-1">Not sure about your exact size?</h4>
-                      <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-3 leading-relaxed">
-                        Select your closest size. We can deliver up to 2 pairs for fitting to ensure you get the perfect fit.
+                      <h4 className="text-xs font-bold uppercase tracking-widest text-brand-primary mb-1">Still not sure?</h4>
+                      <p className="text-[10px] tracking-widest text-white mb-3 leading-relaxed">
+                        Select your closest size. We can deliver an pair for fitting to ensure you get the perfect fit.
                       </p>
                       <button 
                         onClick={() => {
-                          if (!selectedSize && product.sizes && product.sizes.length > 0) return triggerSizeError();
+                          if (!selectedSize && product?.sizes?.length > 0) {
+                            setShowSizeGuide(false);
+                            // Add a tiny delay to allow the modal close animation to clear the screen
+                            setTimeout(() => triggerSizeError(), 100);
+                            return;
+                          }
+                          
                           setIsFittingRequest(true);
+                          setShowSizeGuide(false); // Close size guide before opening WhatsApp modal
                           setIsWhatsAppModalOpen(true);
                         }}
                         className="text-xs font-bold text-white hover:text-brand-primary underline underline-offset-4 uppercase tracking-widest text-left"
                       >
-                        Request Extra Pair & Checkout
+                        Request Extra Pair
                       </button>
                     </div>
                   </div>
@@ -1098,6 +1114,11 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
 
                 {/* Humanized Inputs */}
                 <div className="space-y-4 mb-8">
+                  {formError && (
+                    <div className="bg-red-500/10 border border-red-500/50 text-red-500 text-[10px] font-bold p-3 rounded-md uppercase tracking-widest flex items-center">
+                      <X className="w-4 h-4 mr-2" /> {formError}
+                    </div>
+                  )}
                   <div>
                     <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Your Name</label>
                     <input 
