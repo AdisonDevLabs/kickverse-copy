@@ -381,7 +381,7 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
               className="md:w-1/2 p-6 md:p-0 flex flex-col z-0"
             >
               <motion.div variants={staggerItem} className="mb-8 mt-2 md:mt-0">
-                <h1 className="font-poppins font-bold uppercase tracking-wide text-2xl sm:text-3xl md:text-4xl lg:text-6xl text-white leading-[1.1] mb-4">
+                <h1 className="font-poppins font-bold uppercase tracking-wide text-2xl sm:text-3xl md:text-4xl lg:text-6xl text-gray-100 leading-[1.1] mb-4">
                   {product.name}
                   {selectedColor && (
                     <span className="block text-2xl sm:text-3xl text-gray-400 mt-2 font-medium capitalize">
