@@ -13,10 +13,16 @@ const createSlug = (name: string, id: string) => {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = brand.url.replace(/\/$/, '');
-  const db = await getDb();
   
-  // Fetch all products from D1 Database
-  const allProducts = await db.select({ id: products.id, name: products.name }).from(products);
+  let allProducts: { id: string, name: string }[] = [];
+  
+  // Wrapped in a try/catch so a D1 timeout doesn't crash the entire sitemap into an HTML 500 error
+  try {
+    const db = await getDb();
+    allProducts = await db.select({ id: products.id, name: products.name }).from(products);
+  } catch (error) {
+    console.error("Failed to fetch products for sitemap:", error);
+  }
 
   // Static routes
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -41,7 +47,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/shop?type=sneakers&category=hiking-boots`,
+      // FIX: Escaped the raw '&' to '&amp;' for strict XML validation
+      url: `${baseUrl}/shop?type=sneakers&amp;category=hiking-boots`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.85,

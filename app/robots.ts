@@ -16,16 +16,6 @@ export default function robots(): MetadataRoute.Robots {
           '/api/admin/',
           '/api/admin/*',
           '/draft/',
-          
-          // SEO: Block internal search queries from being indexed
-          '/*?*q=*',
-          '/*?*brand=*',
-          '/*?*model=*',
-          
-          // SEO: Block low-value faceted filtering combinations
-          '/*?*sort=*',
-          '/*?*size=*',
-          '/*?*price=*',
         ],
       },
       {
@@ -35,12 +25,6 @@ export default function robots(): MetadataRoute.Robots {
           '/admin/', 
           '/api/admin/',
           '/draft/',
-          '/*?*q=*',
-          '/*?*brand=*',
-          '/*?*model=*',
-          '/*?*sort=*',
-          '/*?*size=*',
-          '/*?*price=*',
         ],
       },
     ],
