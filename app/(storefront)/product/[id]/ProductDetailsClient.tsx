@@ -605,9 +605,12 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                     >
                       <ShoppingBag className="h-4 w-4 mr-2" /> ADD TO CART
                     </button>
+                  </div>
+                  {/* RECOMMENDED SHARE PLACEMENT: Subtle secondary action */}
+                  <div className="mt-5 flex justify-center">
                     <button 
                       onClick={handleShare}
-                      className="w-full h-12 sm:h-14 bg-transparent border border-white/20 text-white font-bold uppercase tracking-widest text-xs flex items-center justify-center hover:bg-white/10 transition-colors rounded-md"
+                      className="flex items-center text-[11px] font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-colors"
                     >
                       {isCopied ? (
                         <><CheckCircle className="h-4 w-4 mr-2 text-green-500" /> LINK COPIED</>
