@@ -6,7 +6,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, Minus, Plus, ShoppingBag, MessageCircle, ArrowLeft, ShieldCheck, Truck, X, HelpCircle, CheckCircle, SearchX } from 'lucide-react';
+import { Star, Minus, Plus, ShoppingBag, MessageCircle, ArrowLeft, ShieldCheck, Truck, X, HelpCircle, CheckCircle, SearchX,Share2 } from 'lucide-react';
 import { formatPrice } from '@/lib/data';
 import { brand } from '@/lib/data/brand';
 import { useCart } from '@/lib/CartContext';
@@ -72,6 +72,33 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
 
   const [showAddedToast, setShowAddedToast] = useState(false);
   const [sizeError, setSizeError] = useState(false);
+  
+  const [isCopied, setIsCopied] = useState(false);
+  
+  const handleShare = async () => {
+    const shareData = {
+      title: product.name,
+      text: `Check out the ${product.name} at ${brand.name}!`,
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.log('Share canceled or failed:', err);
+      }
+    } else {
+      // Fallback for desktop browsers
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2500);
+      } catch (err) {
+        console.error('Failed to copy link:', err);
+      }
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -577,6 +604,16 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                       className="w-full h-12 sm:h-14 bg-transparent border border-brand-primary text-brand-primary font-bold uppercase tracking-widest text-xs flex items-center justify-center hover:bg-brand-primary hover:text-black transition-colors rounded-md"
                     >
                       <ShoppingBag className="h-4 w-4 mr-2" /> ADD TO CART
+                    </button>
+                    <button 
+                      onClick={handleShare}
+                      className="w-full h-12 sm:h-14 bg-transparent border border-white/20 text-white font-bold uppercase tracking-widest text-xs flex items-center justify-center hover:bg-white/10 transition-colors rounded-md"
+                    >
+                      {isCopied ? (
+                        <><CheckCircle className="h-4 w-4 mr-2 text-green-500" /> LINK COPIED</>
+                      ) : (
+                        <><Share2 className="h-4 w-4 mr-2" /> SHARE THIS SHOE</>
+                      )}
                     </button>
                   </div>
                 </div>
