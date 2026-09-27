@@ -48,7 +48,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       // FIX: Escaped the raw '&' to '&amp;' for strict XML validation
-      url: `${baseUrl}/shop?type=sneakers&amp;category=hiking-boots`,
+      url: `${baseUrl}/shop?type=sneakers&category=hiking-boots`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.85,
