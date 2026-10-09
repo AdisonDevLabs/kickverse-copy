@@ -3,7 +3,7 @@ import { getDb } from '@/lib/db';
 import { products } from '@/lib/db/schema';
 import { brand } from '@/lib/data/brand';
 
-export const revalidate = 86400;
+export const revalidate = 0;
 
 const createSlug = (name: string, id: string) => {
   if (!name) return id;
@@ -47,8 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
-      // FIX: Escaped the raw '&' to '&amp;' for strict XML validation
-      url: `${baseUrl}/shop?type=sneakers&category=hiking-boots`,
+      url: `${baseUrl}/shop?category=hiking-boots`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.85,
