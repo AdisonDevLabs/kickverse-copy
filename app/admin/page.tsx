@@ -50,7 +50,7 @@ export default async function AdminDashboard(props: { searchParams: SearchParams
       .where(whereClause)
       .limit(itemsPerPage)
       .offset((currentPage - 1) * itemsPerPage)
-      .orderBy(desc(products.isOutOfStock), desc(products.restockedAt), desc(products.id)),
+      .orderBy(desc(products.restockedAt), desc(products.id)),
     db.select({ count: sql<number>`count(*)` }).from(products).where(whereClause)
   ]);
 
