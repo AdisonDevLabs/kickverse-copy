@@ -635,7 +635,7 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                           <Link href={`/product/${createSlug(product.name, product.id)}`} className="absolute inset-0 z-10" aria-label={`View ${product.name}`}></Link>
                           
                           {/* Badge */}
-                          <div className="absolute top-3 left-3 z-20 shadow-xl">
+                          <div className="absolute top-2 left-2 z-20 shadow-xl">
                             {product.isFlashDeal ? (
                               <span className="bg-brand-accent text-white rounded-md text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest leading-none block">Sale</span>
                             ) : product.restockedAt ? (
