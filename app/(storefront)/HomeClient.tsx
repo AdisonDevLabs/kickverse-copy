@@ -594,7 +594,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-100 group-hover:opacity-100"
                     />
                     {product.isOutOfStock && (
-                      <div className="absolute bottom-2 right-2 z-30">
+                      <div className="absolute top-2 left-2 z-30">
                         <span className="text-[8px] sm:text-[10px] font-bold text-white bg-red-600/90 backdrop-blur-sm uppercase tracking-widest px-2 py-1 rounded shadow-lg shadow-red-900/50">
                           Out of Stock
                         </span>
@@ -761,7 +761,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out opacity-90 group-hover:opacity-100"
                     />
                     {product.isOutOfStock && (
-                      <div className="absolute bottom-2 right-2 z-30">
+                      <div className="absolute top-2 left-2 z-30">
                         <span className="text-[8px] sm:text-[10px] font-bold text-white bg-red-600/90 backdrop-blur-sm uppercase tracking-widest px-2 py-1 rounded shadow-lg shadow-red-900/50">
                           Out of Stock
                         </span>
@@ -855,7 +855,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       className="object-cover transition-transform duration-700 ease-in-out opacity-90 group-hover:opacity-100 group-hover:scale-105"
                     />
                     {product.isOutOfStock && (
-                      <div className="absolute bottom-2 right-2 z-30">
+                      <div className="absolute top-2 left-2 z-30">
                         <span className="text-[8px] sm:text-[10px] font-bold text-white bg-red-600/90 backdrop-blur-sm uppercase tracking-widest px-2 py-1 rounded shadow-lg shadow-red-900/50">
                           Out of Stock
                         </span>
