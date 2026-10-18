@@ -100,6 +100,7 @@ export async function createProduct(formData: FormData) {
       isNewArrival: formData.get('isNewArrival') === 'on',
       isBestSeller: formData.get('isBestSeller') === 'on',
       isFlashDeal: formData.get('isFlashDeal') === 'on',
+      isOutOfStock: formData.get('isOutOfStock') === 'on',
       rating: 5.0,
       reviews: 0,
       createdAt: new Date().toISOString(),
@@ -197,6 +198,15 @@ export async function updateProduct(id: string, formData: FormData) {
       finalImagesArray = [finalMainImageUrl, ...galleryUrls];
     }
 
+    const wasOutOfStock = existing[0].isOutOfStock;
+    const isNowOutOfStock = formData.get('isOutOfStock') === 'on';
+    
+    // If it was out of stock, and you just unchecked it, update the restocked timestamp
+    let newRestockedAt = existing[0].restockedAt;
+    if (wasOutOfStock && !isNowOutOfStock) {
+       newRestockedAt = new Date().toISOString();
+    }
+
     const updatedData = {
       name: formData.get('name') as string,
       price: parseInt(formData.get('price') as string, 10),
@@ -214,6 +224,8 @@ export async function updateProduct(id: string, formData: FormData) {
       isNewArrival: formData.get('isNewArrival') === 'on',
       isBestSeller: formData.get('isBestSeller') === 'on',
       isFlashDeal: formData.get('isFlashDeal') === 'on',
+      isOutOfStock: isNowOutOfStock,
+      restockedAt: newRestockedAt,
     };
 
     await db.update(products).set(updatedData).where(eq(products.id, id));

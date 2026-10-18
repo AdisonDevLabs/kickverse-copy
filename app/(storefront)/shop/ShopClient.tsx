@@ -655,6 +655,13 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                             referrerPolicy="no-referrer"
                             className="object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100"
                           />
+                          {product.isOutOfStock && (
+                            <div className="absolute bottom-2 right-2 z-30">
+                              <span className="text-[8px] sm:text-[10px] font-bold text-white bg-red-600/90 backdrop-blur-sm uppercase tracking-widest px-2 py-1 rounded shadow-lg shadow-red-900/50">
+                                Out of Stock
+                              </span>
+                            </div>
+                          )}
                         </div>
                         
                         <div className="w-full text-left flex flex-col flex-1 px-1">

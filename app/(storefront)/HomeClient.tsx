@@ -593,6 +593,13 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                       className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-100 group-hover:opacity-100"
                     />
+                    {product.isOutOfStock && (
+                      <div className="absolute bottom-2 right-2 z-30">
+                        <span className="text-[8px] sm:text-[10px] font-bold text-white bg-red-600/90 backdrop-blur-sm uppercase tracking-widest px-2 py-1 rounded shadow-lg shadow-red-900/50">
+                          Out of Stock
+                        </span>
+                      </div>
+                    )}
                   </Link>
                   
                   {/* Stock Indicator Progress Bar */}
@@ -621,21 +628,27 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                   
                   {/* Action Buttons */}
                   <div className="p-3 sm:p-4 mt-auto flex flex-col gap-1.5 sm:gap-2 relative z-30">
-                       <a 
-                        href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(
-                          `👋 Hello ${brand.name},\n\nI would like to grab this flash deal:\n\n📦 *Item:* ${product.name}\n💰 *Price:* Ksh ${product.price}\n\nPlease let me know the next steps for delivery`
-                        )}\n\n${brand.url}/product/${createSlug(product.name, product.id)}`}
-                        target="_blank" rel="noreferrer"
-                        className="w-full bg-brand-primary text-black rounded-md font-bold py-1.5 sm:py-2.5 hover:bg-brand-hover transition-colors flex justify-center items-center uppercase tracking-widest text-[8px] sm:text-xs"
-                       >
-                         <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" /> Order On WhatsApp
-                       </a>
-                      <Link 
-                        href={`/product/${createSlug(product.name, product.id)}`}
-                        className="w-full bg-transparent border rounded-md border-white/20 text-white font-bold py-1.5 sm:py-2.5 hover:bg-white hover:text-black transition-colors flex justify-center items-center uppercase tracking-widest text-[8px] sm:text-xs"
-                       >
-                         View Details
-                       </Link>
+                    {product.isOutOfStock ? (
+                      <button disabled className="w-full bg-white/5 text-gray-500 font-bold py-1.5 sm:py-2.5 rounded-md transition-colors flex justify-center items-center uppercase tracking-widest text-[8px] sm:text-[9px] md:text-xs border border-white/10 cursor-not-allowed">
+                        Out of Stock
+                      </button>
+                    ) : (
+                      <a 
+                      href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(
+                        `👋 Hello ${brand.name},\n\nI would like to grab this flash deal:\n\n📦 *Item:* ${product.name}\n💰 *Price:* Ksh ${product.price}\n\nPlease let me know the next steps for delivery`
+                      )}\n\n${brand.url}/product/${createSlug(product.name, product.id)}`}
+                      target="_blank" rel="noreferrer"
+                      className="w-full bg-brand-primary text-black rounded-md font-bold py-1.5 sm:py-2.5 hover:bg-brand-hover transition-colors flex justify-center items-center uppercase tracking-widest text-[8px] sm:text-xs"
+                      >
+                        <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" /> Order On WhatsApp
+                      </a>
+                    )}
+                    <Link 
+                      href={`/product/${createSlug(product.name, product.id)}`}
+                      className="w-full bg-transparent border rounded-md border-white/20 text-white font-bold py-1.5 sm:py-2.5 hover:bg-white hover:text-black transition-colors flex justify-center items-center uppercase tracking-widest text-[8px] sm:text-xs"
+                    >
+                      View Details
+                    </Link>
                   </div>
                 </motion.div>
                 );
@@ -747,6 +760,13 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                       className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out opacity-90 group-hover:opacity-100"
                     />
+                    {product.isOutOfStock && (
+                      <div className="absolute bottom-2 right-2 z-30">
+                        <span className="text-[8px] sm:text-[10px] font-bold text-white bg-red-600/90 backdrop-blur-sm uppercase tracking-widest px-2 py-1 rounded shadow-lg shadow-red-900/50">
+                          Out of Stock
+                        </span>
+                      </div>
+                    )}
                   </Link>
                 </div>
                 
@@ -765,15 +785,21 @@ export default function HomeClient({ initialProducts, initialCategories, initial
 
                   {/* Actions - Always visible below content */}
                   <div className="mt-3 sm:mt-4 flex flex-col gap-1.5 sm:gap-2 w-full">
-                     <a 
-                      href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(
-                        `👋 Hello ${brand.name} team,\n\nI just saw your new arrival and I would love to get my hands on it!\n\n✨ *Item:* ${product.name}\n💰 *Price:* Ksh ${product.price}\n\nIs this currently in stock, and what are the delivery options?`
-                      )}\n\n${brand.url}/product/${createSlug(product.name, product.id)}`}
-                      target="_blank" rel="noreferrer"
-                      className="w-full bg-brand-primary text-black font-bold py-1.5 sm:py-2 rounded-md transition-colors flex justify-center items-center uppercase tracking-widest text-[7px] sm:text-[9px] md:text-xs hover:bg-brand-hover"
-                     >
-                       <MessageCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-4 md:w-4 mr-1 sm:mr-2" /> Order on WhatsApp
-                     </a>
+                    {product.isOutOfStock ? (
+                      <button disabled className="w-full bg-white/5 text-gray-500 font-bold py-1.5 sm:py-2.5 rounded-md transition-colors flex justify-center items-center uppercase tracking-widest text-[8px] sm:text-[9px] md:text-xs border border-white/10 cursor-not-allowed">
+                        Out of Stock
+                      </button>
+                    ) : (
+                      <a 
+                        href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(
+                          `👋 Hello ${brand.name} team,\n\nI just saw your new arrival and I would love to get my hands on it!\n\n✨ *Item:* ${product.name}\n💰 *Price:* Ksh ${product.price}\n\nIs this currently in stock, and what are the delivery options?`
+                        )}\n\n${brand.url}/product/${createSlug(product.name, product.id)}`}
+                        target="_blank" rel="noreferrer"
+                        className="w-full bg-brand-primary text-black font-bold py-1.5 sm:py-2 rounded-md transition-colors flex justify-center items-center uppercase tracking-widest text-[7px] sm:text-[9px] md:text-xs hover:bg-brand-hover"
+                      >
+                        <MessageCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-4 md:w-4 mr-1 sm:mr-2" /> Order on WhatsApp
+                      </a>
+                      )}
                      <Link 
                       href={`/product/${createSlug(product.name, product.id)}`}
                       className="w-full bg-transparent border border-white/20 text-white font-bold py-1.5 sm:py-2 rounded-md transition-colors flex justify-center items-center uppercase tracking-widest text-[8px] sm:text-[10px] md:text-xs hover:bg-white hover:text-black"
@@ -828,6 +854,13 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                       className="object-cover transition-transform duration-700 ease-in-out opacity-90 group-hover:opacity-100 group-hover:scale-105"
                     />
+                    {product.isOutOfStock && (
+                      <div className="absolute bottom-2 right-2 z-30">
+                        <span className="text-[8px] sm:text-[10px] font-bold text-white bg-red-600/90 backdrop-blur-sm uppercase tracking-widest px-2 py-1 rounded shadow-lg shadow-red-900/50">
+                          Out of Stock
+                        </span>
+                      </div>
+                    )}
                   </Link>
                 </div>
                 
@@ -858,15 +891,21 @@ export default function HomeClient({ initialProducts, initialCategories, initial
 
                   {/* Actions */}
                   <div className="mt-auto flex flex-col gap-1.5 sm:gap-2 w-full">
-                     <a 
-                      href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(
-                        `👋 Hello ${brand.name}!\n\nI saw this is one of your best sellers and I'd love to order one before it sells out:\n\n🌟 *Item:* ${product.name}\n💰 *Price:* Ksh ${product.price}\n\nPlease let me know if you still have stock and the next steps for delivery`
-                      )}\n\n${brand.url}/product/${createSlug(product.name, product.id)}`}
-                      target="_blank" rel="noreferrer"
-                      className="w-full bg-brand-primary text-black font-bold py-1.5 sm:py-2 rounded-md transition-colors flex justify-center items-center uppercase tracking-widest text-[7px] sm:text-[9px] md:text-xs hover:bg-brand-hover"
-                     >
-                       <MessageCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-4 md:w-4 mr-1 sm:mr-2" /> Order on WhatsApp
-                     </a>
+                    {product.isOutOfStock ? (
+                      <button disabled className="w-full bg-white/5 text-gray-500 font-bold py-1.5 sm:py-2.5 rounded-md transition-colors flex justify-center items-center uppercase tracking-widest text-[8px] sm:text-[9px] md:text-xs border border-white/10 cursor-not-allowed">
+                        Out of Stock
+                      </button>
+                    ) : (
+                      <a 
+                        href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(
+                          `👋 Hello ${brand.name}!\n\nI saw this is one of your best sellers and I'd love to order one before it sells out:\n\n🌟 *Item:* ${product.name}\n💰 *Price:* Ksh ${product.price}\n\nPlease let me know if you still have stock and the next steps for delivery`
+                        )}\n\n${brand.url}/product/${createSlug(product.name, product.id)}`}
+                        target="_blank" rel="noreferrer"
+                        className="w-full bg-brand-primary text-black font-bold py-1.5 sm:py-2 rounded-md transition-colors flex justify-center items-center uppercase tracking-widest text-[7px] sm:text-[9px] md:text-xs hover:bg-brand-hover"
+                      >
+                        <MessageCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-4 md:w-4 mr-1 sm:mr-2" /> Order on WhatsApp
+                      </a>
+                      )}
                      <Link 
                       href={`/product/${createSlug(product.name, product.id)}`}
                       className="w-full bg-transparent border border-white/20 text-white font-bold py-1.5 sm:py-2 rounded-md transition-colors flex justify-center items-center uppercase tracking-widest text-[8px] sm:text-[10px] md:text-xs hover:bg-white hover:text-black"

@@ -400,6 +400,10 @@ export default function EditFormClient({ product, initialCategories, initialMedi
 
           <div className="flex flex-wrap gap-6 py-4 border-y border-white/5">
             <label className="flex items-center space-x-3 cursor-pointer">
+              <input type="checkbox" name="isOutOfStock" defaultChecked={product.isOutOfStock} className="w-5 h-5 accent-red-500 bg-brand-dark border-white/10 transition-colors" />
+              <span className="text-sm font-bold uppercase tracking-widest text-red-400">Out of Stock</span>
+            </label>
+            <label className="flex items-center space-x-3 cursor-pointer">
               <input type="checkbox" name="isNewArrival" defaultChecked={product.isNewArrival} className="w-5 h-5 accent-brand-primary bg-brand-dark border-white/10 transition-colors" />
               <span className="text-sm font-bold uppercase tracking-widest text-white">New Arrival</span>
             </label>
