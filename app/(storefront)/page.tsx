@@ -184,7 +184,7 @@ export default async function HomePage() {
                 price: product.price,
                 validFrom: '2026-01-01',
                 priceValidUntil: '2027-12-31',
-                availability: 'https://schema.org/InStock',
+                availability: product.isOutOfStock ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
                 itemCondition: 'https://schema.org/NewCondition',
                 seller: { '@type': 'Organization', name: brand.name },
                 shippingDetails: {
