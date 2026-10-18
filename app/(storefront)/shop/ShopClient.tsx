@@ -638,10 +638,12 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                           <div className="absolute top-3 left-3 z-20 shadow-xl">
                             {product.isFlashDeal ? (
                               <span className="bg-brand-accent text-white rounded-md text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest leading-none block">Sale</span>
-                            ) : product.isNewArrival ? (
-                              <span className="bg-white text-black rounded-md text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest leading-none block">New</span>
+                            ) : product.restockedAt ? (
+                              <span className="bg-green-500 text-white rounded-md text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest leading-none block">Restocked</span>
                             ) : product.isBestSeller ? (
                               <span className="bg-brand-primary text-black rounded-md text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest leading-none block">Best Seller</span>
+                            ) : product.isNewArrival ? (
+                              <span className="bg-white text-black rounded-md text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest leading-none block">New</span>
                             ) : null}
                           </div>
                           
