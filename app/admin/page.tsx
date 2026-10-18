@@ -132,12 +132,13 @@ export default async function AdminDashboard(props: { searchParams: SearchParams
                         className="object-cover" 
                         sizes="48px"
                       />
-                    </div>
-                    {p.isOutOfStock && (
+                      {p.isOutOfStock && (
                       <div className="absolute inset-0 bg-black/60 z-10 flex items-center justify-center backdrop-blur-[1px]">
                         <span className="text-[8px] font-bold text-red-500 uppercase tracking-tighter bg-red-500/10 px-1 py-0.5 rounded border border-red-500/30 rotate-[-15deg]">Sold Out</span>
                       </div>
                     )}
+                    </div>
+                    
                   </td>
                   <td className="px-4 sm:px-6 py-3">
                     <p className="font-medium text-gray-200 truncate max-w-[150px] sm:max-w-xs md:max-w-md" title={p.name}>
