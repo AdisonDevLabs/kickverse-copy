@@ -434,3 +434,26 @@ export async function togglePinProduct(id: string, currentStatus: boolean) {
     return { success: false, error: error.message };
   }
 }
+
+export async function toggleStockStatus(id: string, isCurrentlyOut: boolean) {
+  try {
+    const db = await getDb();
+    const now = new Date().toISOString();
+
+    await db.update(products)
+      .set({
+        isOutOfStock: !isCurrentlyOut,
+        // Only record the restock timestamp when the shoe is brought BACK to the market
+        restockedAt: !isCurrentlyOut ? null : now 
+      })
+      .where(eq(products.id, id));
+
+    revalidatePath('/shop');
+    revalidatePath('/');
+    revalidatePath('/admin');
+
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
