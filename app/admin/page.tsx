@@ -7,6 +7,7 @@ import { Suspense } from 'react';
 import { Plus, Edit, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import DeleteButton from './DeleteButton';
 import PinButton from './PinButton';
+import StockButton from './components/StockButton';
 import CategoryManager from './CategoryManager';
 import ProductToolbar from './components/ProductToolbar';
 
@@ -45,7 +46,7 @@ export default async function AdminDashboard(props: { searchParams: SearchParams
       .where(whereClause)
       .limit(itemsPerPage)
       .offset((currentPage - 1) * itemsPerPage)
-      .orderBy(desc(products.id)),
+      .orderBy(desc(products.restockedAt), desc(products.id)),
     db.select({ count: sql<number>`count(*)` }).from(products).where(whereClause)
   ]);
 
@@ -132,6 +133,11 @@ export default async function AdminDashboard(props: { searchParams: SearchParams
                         sizes="48px"
                       />
                     </div>
+                    {p.isOutOfStock && (
+                      <div className="absolute inset-0 bg-black/60 z-10 flex items-center justify-center backdrop-blur-[1px]">
+                        <span className="text-[8px] font-bold text-red-500 uppercase tracking-tighter bg-red-500/10 px-1 py-0.5 rounded border border-red-500/30 rotate-[-15deg]">Sold Out</span>
+                      </div>
+                    )}
                   </td>
                   <td className="px-4 sm:px-6 py-3">
                     <p className="font-medium text-gray-200 truncate max-w-[150px] sm:max-w-xs md:max-w-md" title={p.name}>
@@ -158,6 +164,7 @@ export default async function AdminDashboard(props: { searchParams: SearchParams
                   <td className="px-4 sm:px-6 py-3 text-right sticky right-0 bg-brand-card group-hover:bg-[#1a1a1a] transition-colors shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.5)]">
                     <div className="flex justify-end gap-2 sm:gap-3 opacity-90 group-hover:opacity-100 transition-opacity">
                       <PinButton id={p.id} isPinned={Boolean(p.isPinned)} />
+                      <StockButton id={p.id} isOutOfStock={Boolean(p.isOutOfStock)} />
                       <Link href={`/admin/products/${p.id}/edit`} className="text-gray-400 hover:text-blue-400 p-2 bg-white/5 hover:bg-blue-500/10 rounded-md transition-all border border-transparent hover:border-blue-500/20" aria-label="Edit">
                         <Edit className="w-4 h-4" />
                       </Link>

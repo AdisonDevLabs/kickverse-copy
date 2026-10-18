@@ -35,7 +35,9 @@ export const products = sqliteTable('products', {
   isPinned: integer('is_pinned', { mode: 'boolean' }).default(false),
   isAccessory: integer('is_accessory', { mode: 'boolean' }).default(false),
   description: text('description').notNull(),
-  createdAt: text('created_at')
+  createdAt: text('created_at'),
+  isOutOfStock: integer('is_out_of_stock', { mode: 'boolean' }).default(false),
+  restockedAt: text('restocked_at'),
 });
 
 // ==========================================
