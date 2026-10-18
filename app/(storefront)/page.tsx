@@ -42,10 +42,12 @@ export default async function HomePage() {
       isNewArrival: products.isNewArrival,
       isBestSeller: products.isBestSeller,
       isFlashDeal: products.isFlashDeal,
+      isOutOfStock: products.isOutOfStock,
+      restockedAt: products.restockedAt,
       createdAt: products.createdAt,
     })
     .from(products)
-    .orderBy(desc(products.createdAt)),
+    .orderBy(desc(products.restockedAt), desc(products.createdAt)),
 
     // Query 2: Categories
     db.select().from(categories),

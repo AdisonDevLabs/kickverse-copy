@@ -635,13 +635,15 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                           <Link href={`/product/${createSlug(product.name, product.id)}`} className="absolute inset-0 z-10" aria-label={`View ${product.name}`}></Link>
                           
                           {/* Badge */}
-                          <div className="absolute top-3 left-3 z-20 shadow-xl">
+                          <div className="absolute top-2 left-2 z-20 shadow-xl">
                             {product.isFlashDeal ? (
                               <span className="bg-brand-accent text-white rounded-md text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest leading-none block">Sale</span>
-                            ) : product.isNewArrival ? (
-                              <span className="bg-white text-black rounded-md text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest leading-none block">New</span>
+                            ) : product.restockedAt ? (
+                              <span className="bg-green-500 text-white rounded-md text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest leading-none block">Restocked</span>
                             ) : product.isBestSeller ? (
                               <span className="bg-brand-primary text-black rounded-md text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest leading-none block">Best Seller</span>
+                            ) : product.isNewArrival ? (
+                              <span className="bg-white text-black rounded-md text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest leading-none block">New</span>
                             ) : null}
                           </div>
                           
@@ -655,6 +657,13 @@ export default function ShopClient({ initialProducts }: { initialProducts: any[]
                             referrerPolicy="no-referrer"
                             className="object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100"
                           />
+                          {product.isOutOfStock && (
+                            <div className="absolute bottom-2 right-2 z-30">
+                              <span className="text-[8px] sm:text-[10px] font-bold text-white bg-red-600/90 backdrop-blur-sm uppercase tracking-widest px-2 py-1 rounded shadow-lg shadow-red-900/50">
+                                Out of Stock
+                              </span>
+                            </div>
+                          )}
                         </div>
                         
                         <div className="w-full text-left flex flex-col flex-1 px-1">

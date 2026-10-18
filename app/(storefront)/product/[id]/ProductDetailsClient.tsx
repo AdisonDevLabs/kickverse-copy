@@ -433,9 +433,15 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                     </>
                   )}
                   <div className="w-1 h-1 rounded-full bg-white/20"></div>
-                  <span className="text-xs font-bold uppercase tracking-widest text-brand-primary flex items-center">
-                    <CheckCircle className="w-3 h-3 mr-1" /> In Stock
-                  </span>
+                  {product.isOutOfStock ? (
+                    <span className="text-xs font-bold uppercase tracking-widest text-red-500 flex items-center">
+                      <X className="w-3 h-3 mr-1" /> Out of Stock
+                    </span>
+                  ) : (
+                    <span className="text-xs font-bold uppercase tracking-widest text-brand-primary flex items-center">
+                      <CheckCircle className="w-3 h-3 mr-1" /> In Stock
+                    </span>
+                  )}
                 </div>
                 
                 <div className="flex flex-col gap-1 items-start">
@@ -585,27 +591,43 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                 
                 {/* Main CTA Section (Tracked for Sticky Bar) */}
                 <div ref={ctaRef} className="mt-4">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-brand-primary mb-2 flex items-center">
-                    <span className="w-2 h-2 rounded-full bg-brand-primary mr-2 animate-pulse"></span>
-                    Ready to Order?
-                  </h4>
-                  <p className="text-[11px] text-gray-400 mb-4 uppercase tracking-wide">Tap below to place your order.</p>
-                  
-                  <div className="flex flex-col gap-3">
-                    <button 
-                      onClick={handleWhatsAppClick}
-                      className="w-full h-14 sm:h-16 bg-brand-primary text-black font-bold uppercase tracking-widest text-sm flex items-center justify-center hover:bg-white transition-colors rounded-md"
-                    >
-                      <MessageCircle className="h-5 w-5 mr-2" /> ORDER ON WHATSAPP
-                    </button>
+                  {product.isOutOfStock ? (
+                    <>
+                      <h4 className="text-xs font-bold uppercase tracking-widest text-red-500 mb-2 flex items-center">
+                        <X className="w-4 h-4 mr-1" /> Currently Unavailable
+                      </h4>
+                      <p className="text-[11px] text-gray-400 mb-4 uppercase tracking-wide">This item is sold out.</p>
+                      <div className="flex flex-col gap-3">
+                        <button disabled className="w-full h-14 sm:h-16 bg-white/5 border border-white/10 text-gray-500 font-bold uppercase tracking-widest text-sm flex items-center justify-center rounded-md cursor-not-allowed">
+                          SOLD OUT
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <h4 className="text-xs font-bold uppercase tracking-widest text-brand-primary mb-2 flex items-center">
+                        <span className="w-2 h-2 rounded-full bg-brand-primary mr-2 animate-pulse"></span>
+                        Ready to Order?
+                      </h4>
+                      <p className="text-[11px] text-gray-400 mb-4 uppercase tracking-wide">Tap below to place your order.</p>
+                      
+                      <div className="flex flex-col gap-3">
+                        <button 
+                          onClick={handleWhatsAppClick}
+                          className="w-full h-14 sm:h-16 bg-brand-primary text-black font-bold uppercase tracking-widest text-sm flex items-center justify-center hover:bg-white transition-colors rounded-md"
+                        >
+                          <MessageCircle className="h-5 w-5 mr-2" /> ORDER ON WHATSAPP
+                        </button>
 
-                    <button 
-                      onClick={handleAddToCart}
-                      className="w-full h-12 sm:h-14 bg-transparent border border-brand-primary text-brand-primary font-bold uppercase tracking-widest text-xs flex items-center justify-center hover:bg-brand-primary hover:text-black transition-colors rounded-md"
-                    >
-                      <ShoppingBag className="h-4 w-4 mr-2" /> ADD TO CART
-                    </button>
-                  </div>
+                        <button 
+                          onClick={handleAddToCart}
+                          className="w-full h-12 sm:h-14 bg-transparent border border-brand-primary text-brand-primary font-bold uppercase tracking-widest text-xs flex items-center justify-center hover:bg-brand-primary hover:text-black transition-colors rounded-md"
+                        >
+                          <ShoppingBag className="h-4 w-4 mr-2" /> ADD TO CART
+                        </button>
+                      </div>
+                    </>
+                  )}
                   {/* RECOMMENDED SHARE PLACEMENT: Subtle secondary action */}
                   <div className="mt-5 flex justify-center">
                     <button 
@@ -970,6 +992,13 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
                     <Link href={`/product/${createSlug(prod.name, prod.id)}`} className="group flex flex-col hover:-translate-y-1 transition-transform duration-300">
                       <div className="relative aspect-[3/4] w-full bg-brand-dark overflow-hidden rounded-md mb-4 border border-transparent group-hover:border-white/10">
                         <Image src={prod.image} alt={`${prod.name} - Current Price in Kenya`} fill referrerPolicy="no-referrer" className="object-cover group-hover:scale-[1.03] opacity-90 group-hover:opacity-100 transition-transform duration-700" />
+                        {prod.isOutOfStock && (
+                        <div className="absolute bottom-2 right-2 z-30">
+                          <span className="text-[8px] sm:text-[10px] font-bold text-white bg-red-600/90 backdrop-blur-sm uppercase tracking-widest px-2 py-1 rounded shadow-lg shadow-red-900/50">
+                            Out of Stock
+                          </span>
+                        </div>
+                      )}
                       </div>
                       <div className="text-left w-full mt-auto">
                         <h3 className="font-sans font-medium text-white line-clamp-2 mb-1 group-hover:text-brand-primary transition-colors text-sm sm:text-base leading-tight">{prod.name}</h3>
@@ -1075,13 +1104,19 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
         <div className="flex flex-col pl-2 shrink-0">
           <span className="text-sm font-bold text-white">{formatPrice(product.price * quantity)}</span>
         </div>
-        <button 
-          onClick={handleWhatsAppClick}
-          className="flex-1 h-12 bg-brand-primary hover:bg-white text-black font-bold uppercase tracking-widest text-[11px] sm:text-xs flex items-center justify-center transition-colors rounded-md shadow-[0_0_15px_-5px_rgba(0,0,0,0.3)]"
-        >
-          <MessageCircle className="h-4 w-4 mr-2 shrink-0" /> 
-          <span className="truncate">ORDER ON WHATSAPP</span>
-        </button>
+        {product.isOutOfStock ? (
+          <button disabled className="flex-1 h-12 bg-white/10 text-gray-500 border border-white/10 font-bold uppercase tracking-widest text-[11px] sm:text-xs flex items-center justify-center rounded-md cursor-not-allowed">
+            <span className="truncate">SOLD OUT</span>
+          </button>
+        ) : (
+          <button 
+            onClick={handleWhatsAppClick}
+            className="flex-1 h-12 bg-brand-primary hover:bg-white text-black font-bold uppercase tracking-widest text-[11px] sm:text-xs flex items-center justify-center transition-colors rounded-md shadow-[0_0_15px_-5px_rgba(0,0,0,0.3)]"
+          >
+            <MessageCircle className="h-4 w-4 mr-2 shrink-0" /> 
+            <span className="truncate">ORDER ON WHATSAPP</span>
+          </button>
+        )}
       </div>
 
       {/* Universal Public Review Modal */}

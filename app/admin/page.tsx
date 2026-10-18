@@ -4,7 +4,7 @@ import { like, and, eq, sql, desc } from 'drizzle-orm';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Suspense } from 'react';
-import { Plus, Edit, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { Plus, Edit, ChevronLeft, ChevronRight, Loader2, PackageX } from 'lucide-react';
 import DeleteButton from './DeleteButton';
 import PinButton from './PinButton';
 import StockButton from './components/StockButton';
@@ -24,6 +24,7 @@ export default async function AdminDashboard(props: { searchParams: SearchParams
   // 2. Extract Search Params safely
   const query = typeof searchParams.q === 'string' ? searchParams.q : '';
   const categoryFilter = typeof searchParams.category === 'string' ? searchParams.category : '';
+  const stockFilter = typeof searchParams.stock === 'string' ? searchParams.stock : ''; // <-- NEW
   const currentPage = typeof searchParams.page === 'string' ? Number(searchParams.page) : 1;
   const itemsPerPage = 20;
 
@@ -35,6 +36,9 @@ export default async function AdminDashboard(props: { searchParams: SearchParams
   }
   if (categoryFilter) {
     conditions.push(eq(products.category, categoryFilter));
+  }
+  if (stockFilter === 'out') { // <-- NEW
+    conditions.push(eq(products.isOutOfStock, true));
   }
   
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
@@ -58,7 +62,17 @@ export default async function AdminDashboard(props: { searchParams: SearchParams
     const params = new URLSearchParams();
     if (query) params.set('q', query);
     if (categoryFilter) params.set('category', categoryFilter);
+    if (stockFilter) params.set('stock', stockFilter); // <-- NEW
     params.set('page', pageNumber.toString());
+    return `?${params.toString()}`;
+  };
+
+  const toggleStockUrl = () => {
+    const params = new URLSearchParams();
+    if (query) params.set('q', query);
+    if (categoryFilter) params.set('category', categoryFilter);
+    // If it's not active, turn it on. If it is active, omit it to turn it off.
+    if (stockFilter !== 'out') params.set('stock', 'out'); 
     return `?${params.toString()}`;
   };
 
@@ -107,7 +121,25 @@ export default async function AdminDashboard(props: { searchParams: SearchParams
               <th className="px-4 sm:px-6 py-4 font-bold uppercase tracking-widest text-gray-500 text-[10px] hidden md:table-cell">Type</th>
               <th className="px-4 sm:px-6 py-4 font-bold uppercase tracking-widest text-gray-500 text-[10px] hidden sm:table-cell">Category</th>
               {/*<th className="px-4 sm:px-6 py-4 font-bold uppercase tracking-widest text-gray-500 text-[10px] w-12 text-center">Pin</th>*/}
-              <th className="px-4 sm:px-6 py-4 font-bold uppercase tracking-widest text-gray-500 text-[10px] text-right sticky right-0 bg-brand-card/95 backdrop-blur-md">Actions</th>
+              <th className="px-4 sm:px-6 py-3 font-bold uppercase tracking-widest text-gray-500 text-[10px] text-right sticky right-0 bg-brand-card/95 backdrop-blur-md">
+                <div className="flex items-center justify-end gap-3">
+                  <Link 
+                    href={toggleStockUrl()}
+                    title={stockFilter === 'out' ? 'Clear Sold Out Filter' : 'Show Sold Out Items'}
+                    className={`px-2.5 py-1.5 rounded border transition-colors flex items-center ${
+                      stockFilter === 'out' 
+                        ? 'bg-red-500/10 text-red-400 border-red-500/30 shadow-inner' 
+                        : 'bg-transparent text-gray-400 hover:text-white hover:bg-white/10 border-transparent hover:border-white/20'
+                    }`}
+                  >
+                    <PackageX className="w-3.5 h-3.5 sm:mr-1.5" /> 
+                    <span className="hidden sm:inline">
+                      {stockFilter === 'out' ? 'Viewing Sold Out' : 'Show Sold Out'}
+                    </span>
+                  </Link>
+                  <span>Actions</span>
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
@@ -133,11 +165,7 @@ export default async function AdminDashboard(props: { searchParams: SearchParams
                         sizes="48px"
                       />
                     </div>
-                    {p.isOutOfStock && (
-                      <div className="absolute inset-0 bg-black/60 z-10 flex items-center justify-center backdrop-blur-[1px]">
-                        <span className="text-[8px] font-bold text-red-500 uppercase tracking-tighter bg-red-500/10 px-1 py-0.5 rounded border border-red-500/30 rotate-[-15deg]">Sold Out</span>
-                      </div>
-                    )}
+                    
                   </td>
                   <td className="px-4 sm:px-6 py-3">
                     <p className="font-medium text-gray-200 truncate max-w-[150px] sm:max-w-xs md:max-w-md" title={p.name}>

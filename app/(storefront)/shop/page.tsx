@@ -195,10 +195,13 @@ const getCachedProducts = unstable_cache(
       isFlashDeal: products.isFlashDeal,
       isPinned: products.isPinned,
       isAccessory: products.isAccessory,
+      isOutOfStock: products.isOutOfStock,
+      restockedAt: products.restockedAt,
       createdAt: products.createdAt,
     })
     .from(products)
     .orderBy(
+      desc(products.restockedAt),
       desc(products.isPinned),
       desc(products.id)
     ).limit(1000);

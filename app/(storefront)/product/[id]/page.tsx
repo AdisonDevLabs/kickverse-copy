@@ -51,7 +51,13 @@ const getCachedProductAssets = unstable_cache(
     const [allSizeGuides, allColorMaps, relatedPool, productReviews, recentlyViewedPool] = await Promise.all([
       db.select().from(sizeGuides),
       db.select().from(colorMap),
-      db.select({ id: products.id, name: products.name, price: products.price, image: products.image })
+      db.select({ 
+        id: products.id, 
+        name: products.name, 
+        price: products.price, 
+        image: products.image,
+        isOutOfStock: products.isOutOfStock,
+      })
         .from(products)
         .where(and(eq(products.productType, safeProductType), eq(products.isAccessory, false), not(eq(products.id, productId))))
         .orderBy(desc(products.createdAt))
@@ -60,7 +66,12 @@ const getCachedProductAssets = unstable_cache(
         .from(testimonials)
         .where(and(eq(testimonials.product, productId), eq(testimonials.isApproved, true)))
         .orderBy(desc(testimonials.id)),
-      db.select({ id: products.id, name: products.name, image: products.image })
+      db.select({ 
+        id: products.id, 
+        name: products.name, 
+        image: products.image,
+        isOutOfStock: products.isOutOfStock,
+      })
         .from(products)
         .where(not(eq(products.id, productId)))
         .orderBy(sql`CASE WHEN ${products.productType} = ${safeProductType} THEN 0 ELSE 1 END`, desc(products.createdAt))
