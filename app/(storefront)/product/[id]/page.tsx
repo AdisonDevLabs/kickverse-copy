@@ -57,6 +57,7 @@ const getCachedProductAssets = unstable_cache(
         price: products.price, 
         image: products.image,
         isOutOfStock: products.isOutOfStock,
+        restockedAt: products.restockedAt
       })
         .from(products)
         .where(and(eq(products.productType, safeProductType), eq(products.isAccessory, false), not(eq(products.id, productId))))
@@ -71,6 +72,7 @@ const getCachedProductAssets = unstable_cache(
         name: products.name, 
         image: products.image,
         isOutOfStock: products.isOutOfStock,
+        restockedAt: products.restockedAt
       })
         .from(products)
         .where(not(eq(products.id, productId)))
@@ -301,7 +303,7 @@ export default async function ProductPage({ params }: Props) {
         .toISOString()
         .split('T')[0],
       itemCondition: 'https://schema.org/NewCondition',
-      availability: 'https://schema.org/InStock',
+      availability: product.isOutOfStock ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
       seller: {
         '@type': 'Organization',
         name: brand.name,

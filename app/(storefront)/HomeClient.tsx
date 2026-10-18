@@ -564,7 +564,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             </div>
             
             {/* Unchanged Product Card Rail/Grid */}
-            <div className="flex -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:grid md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 overflow-x-auto pb-6 sm:pb-8 md:pb-0 after:content-[''] after:min-w-[16px] sm:after:min-w-[24px] md:after:hidden">
+            <div className="flex -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:grid md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 overflow-x-auto overflow-y-hidden snap-x snap-mandatory pb-6 sm:pb-8 md:pb-0 pt-2 after:content-[''] after:min-w-[16px] sm:after:min-w-[24px] md:after:hidden [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-white/5 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-brand-primary/40 [&::-webkit-scrollbar-thumb]:rounded-full active:[&::-webkit-scrollbar-thumb]:bg-brand-primary">
               {flashDeals.map((product: any) => {
                 return (
                  <motion.div 
@@ -574,11 +574,17 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                  >
                   <Link href={`/product/${createSlug(product.name, product.id)}`} className="block relative aspect-[4/3] bg-black overflow-hidden group-hover:opacity-90 transition-opacity rounded-t-md">
                     {/* Discount Badge */}
-                    {product.originalPrice && (
-                      <div className="absolute top-2 left-2 z-20 rounded-md bg-brand-accent text-white text-[9px] sm:text-sm font-display uppercase tracking-widest px-2 py-0.5 sm:px-3 sm:py-1 shadow-lg shadow-brand-accent/40">
-                        -{Math.round((1 - product.price / product.originalPrice) * 100)}%
-                      </div>
-                    )}
+                    <div className="absolute top-2 left-2 z-20">
+                      {product.originalPrice ? (
+                        <span className="bg-brand-accent text-white rounded-md text-[9px] sm:text-sm font-display uppercase tracking-widest px-2 py-0.5 sm:px-3 sm:py-1 shadow-lg shadow-brand-accent/40 block">
+                          -{Math.round((1 - product.price / product.originalPrice) * 100)}%
+                        </span>
+                      ) : product.restockedAt ? (
+                        <span className="bg-green-500 text-white rounded-md text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest leading-none shadow-lg block">
+                          Restocked
+                        </span>
+                      ) : null}
+                    </div>
                     
                     {/* Social Proof Badge */}
                      <div className="absolute top-2 right-2 z-20 bg-black/60 backdrop-blur-md text-white border rounded-md border-white/10 text-[8px] sm:text-[10px] font-bold px-2 py-1 sm:px-3 sm:py-1.5 uppercase tracking-widest flex items-center">
@@ -594,7 +600,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-100 group-hover:opacity-100"
                     />
                     {product.isOutOfStock && (
-                      <div className="absolute top-2 left-2 z-30">
+                      <div className="absolute bottom-2 right-2 z-30">
                         <span className="text-[8px] sm:text-[10px] font-bold text-white bg-red-600/90 backdrop-blur-sm uppercase tracking-widest px-2 py-1 rounded shadow-lg shadow-red-900/50">
                           Out of Stock
                         </span>

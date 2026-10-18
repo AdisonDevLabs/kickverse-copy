@@ -344,13 +344,17 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
               className="md:w-1/2 md:sticky md:top-24 h-fit z-10 px-4 md:px-0"
             >
               <div className="relative aspect-[3/4] md:aspect-[4/5] w-full max-h-[calc(100vh-200px)] bg-brand-card overflow-hidden border border-white/10 group rounded-md">
-                {product.isFlashDeal ? (
-                  <div className="absolute top-4 left-4 z-20 bg-brand-accent text-white text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest shadow-xl rounded-md">Sale</div>
-                ) : product.isNewArrival ? (
-                  <div className="absolute top-4 left-4 z-20 bg-white text-black text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest shadow-xl rounded-md">New Arrival</div>
-                ) : product.isBestSeller ? (
-                  <div className="absolute top-4 left-4 z-20 bg-brand-primary text-black text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest shadow-xl rounded-md">Best Seller</div>
-                ) : null}
+                <div className="absolute top-4 left-4 z-20 shadow-xl">
+                  {product.isFlashDeal ? (
+                    <span className="bg-brand-accent text-white rounded-md text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest leading-none block">Sale</span>
+                  ) : product.restockedAt ? (
+                    <span className="bg-green-500 text-white rounded-md text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest leading-none block">Restocked</span>
+                  ) : product.isBestSeller ? (
+                    <span className="bg-brand-primary text-black rounded-md text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest leading-none block">Best Seller</span>
+                  ) : product.isNewArrival ? (
+                    <span className="bg-white text-black rounded-md text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest leading-none block">New Arrival</span>
+                  ) : null}
+                </div>
                 
                 <AnimatePresence mode="wait">
                   <motion.div
