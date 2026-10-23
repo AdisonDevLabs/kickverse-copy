@@ -282,22 +282,6 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             >
               {brand.description}
             </motion.p>
-            
-            {/* Micro Trust List - Centered vertically 
-            <motion.div 
-              variants={staggerItem}
-              className="flex flex-col items-center justify-center gap-y-2 sm:gap-y-3 mb-4 sm:mb-6 text-[9px] sm:text-[11px] md:text-xs font-bold uppercase tracking-widest text-white drop-shadow-xl shadow-black"
-            >
-              <div className="flex items-center">
-                <Truck className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-brand-primary" /> {brand.trustStatements[0] || "We Deliver countrywide"}
-              </div>
-              <div className="flex items-center">
-                <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-brand-primary" /> {brand.trustStatements[1] || "Genuine quality"}
-              </div>
-               <div className="flex items-center">
-                <Wallet className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-brand-primary" /> {brand.trustStatements[2] || "Pay on delivery"}
-              </div>
-            </motion.div>*/}
 
             {/* CTA Section - Added justify-center */}
             <motion.div 

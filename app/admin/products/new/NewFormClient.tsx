@@ -18,8 +18,8 @@ type ProductImage = {
 // ULTRA-FAST, LOW-MEMORY SINGLE-PASS WEBP CONVERTER
 async function convertToWebpMemorySafe(
   file: File, 
-  maxDim = 1920, 
-  targetSizeKb = 300
+  maxDim = 1440, // Reduced from 1920 to hit file size limits without crushing quality
+  targetSizeKb = 200 // Target set to 200kb
 ): Promise<File> {
   const originalNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
   const webpName = `${originalNameWithoutExt}.webp`;
@@ -81,7 +81,7 @@ async function convertToWebpMemorySafe(
     new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/webp', q));
 
   // STEP 1: Iterative Quality Adjustments (Binary Search)
-  let minQ = 0.1;
+  let minQ = 0.75; // Raised floor from 0.1 to 0.75 to prevent compression artifacts
   let maxQ = 1.0;
   let quality = 0.95; 
   let attempts = 0;
@@ -101,7 +101,7 @@ async function convertToWebpMemorySafe(
   let currentHeight = height;
   
   while (webpBlob && webpBlob.size > targetBytes && currentWidth > 600) {
-    currentWidth = Math.round(currentWidth * 0.85);
+    currentWidth = Math.round(currentWidth * 0.85); // Shrinks dimensions by 15% iteratively if still over 200kb
     currentHeight = Math.round(currentHeight * 0.85);
 
     const tempCanvas = document.createElement('canvas');
