@@ -16,5 +16,6 @@ coverage/
 
 cleanup-r2.mjs
 compress-r2.mjs
+compress-r2c.mjs
 list-r2.mjs
 r2-inventory.json

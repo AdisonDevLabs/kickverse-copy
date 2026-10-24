@@ -16,7 +16,7 @@ import { brand } from '@/lib/data/brand';
 
 export const metadata: Metadata = {
   title: `Store Policies, Authenticity & Pay on Delivery Shoes Nairobi | ${brand.name}`,
-  description: `Official store policies for ${brand.name}. Learn about our 100% authenticity guarantee, Pay on Delivery in Nairobi, shoe prices in KSh, and 48-hour exchanges.`,
+  description: `Official store policies for ${brand.name}. Learn about our 100% authenticity guarantee, Pay on Delivery in Nairobi, shoe prices in KSh, and 24-hour returns & exchanges.`,
   keywords: [
     "Kickverse store policies",
     "pay on delivery shoes Nairobi",
@@ -69,7 +69,7 @@ export default function PoliciesPage() {
             "name": "Where can I buy original sneakers and cleats online in Kenya?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "You can buy original sneakers, walking boots, and cleats directly on our website, kickverse.co.ke. We offer free delivery within Nairobi CBD and Pay on Delivery for Nairobi County."
+              "text": "You can buy original sneakers, walking boots, and cleats directly on our website, https://kickverse.co.ke. We offer free delivery within Nairobi CBD and Pay on Delivery for Nairobi County."
             }
           },
           {
@@ -85,7 +85,7 @@ export default function PoliciesPage() {
             "name": "How do I order sneakers and soccer cleats from Kickverse KE?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Browse our collection on kickverse.co.ke and click the 'Order on WhatsApp' button. Our customer support team will immediately confirm your exact size, verify stock, and coordinate delivery."
+              "text": "Browse our collection on https://kickverse.co.ke and click the 'Order on WhatsApp' button. Our customer support team will immediately confirm your exact size, verify stock, and coordinate delivery."
             }
           },
           {
@@ -93,7 +93,7 @@ export default function PoliciesPage() {
             "name": "Does Kickverse KE offer Pay on Delivery in Nairobi?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Yes. We offer convenient Pay on Delivery (PoD) for all orders within Nairobi County. Delivery within the Nairobi Central Business District (CBD) is completely complimentary."
+              "text": "Yes. We offer convenient Pay on Delivery (PoD) for all orders within Nairobi County. Delivery within the Nairobi Central Business District (CBD) is completely free."
             }
           },
           {
@@ -101,7 +101,7 @@ export default function PoliciesPage() {
             "name": "What is the return and exchange policy at Kickverse KE?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "We accept exchange requests within 48 hours of delivery for different sizes or styles. Returned items must be clean, unworn, and preserved in their original condition."
+              "text": "We accept returns and exchange requests within 24 hours of delivery for different sizes or styles. A KES 500 restocking fee applies to returns. Returned items must be clean, unworn, and preserved in their original condition."
             }
           }
         ]
@@ -169,7 +169,7 @@ export default function PoliciesPage() {
               </div>
             </section>
 
-            {/* Section 2: Authenticity & Pricing (New SEO Section) */}
+            {/* Section 2: Authenticity & Pricing */}
             <section 
               id="authenticity" 
               aria-labelledby="authenticity-heading"
@@ -228,7 +228,7 @@ export default function PoliciesPage() {
               </div>
             </section>
 
-            {/* Section 4: Returns & Exchanges */}
+            {/* Section 4: Returns & Exchanges (UPDATED FOR GOOGLE) */}
             <section 
               id="returns" 
               aria-labelledby="returns-heading"
@@ -237,14 +237,23 @@ export default function PoliciesPage() {
               <div className="flex items-center mb-6 text-brand-primary border-b border-white/5 pb-4">
                 <RefreshCw className="w-6 h-6 mr-3 shrink-0" />
                 <h2 id="returns-heading" className="font-display text-xl md:text-2xl uppercase tracking-widest">
-                  Returns & Size Exchanges
+                  Returns, Refunds & Size Exchanges
                 </h2>
               </div>
               <div className="space-y-4 text-gray-300 text-sm md:text-base leading-relaxed">
+                
+                {/* NEW GOOGLE REQUIREMENT PARAGRAPH */}
+                <div className="bg-black/30 p-5 rounded-md border border-brand-primary/20 mb-6">
+                  <h3 className="text-white font-semibold mb-2">Returns and Refunds:</h3>
+                  <p className="text-sm text-gray-300 leading-normal">
+                    We accept returns for both defective and non-defective footwear within <strong>24 hours of delivery</strong>. Items must be unworn, uncreased, and in their original packaging. Returns are handled via courier at the customer's responsibility. A restocking fee of <strong>KES 500</strong> applies to all returns. Contact our us on WhatsApp to initiate a return or exchange.
+                  </p>
+                </div>
+
                 <ul className="space-y-3">
                   <li className="flex items-start">
                     <ShieldCheck className="w-5 h-5 mr-3 mt-0.5 text-brand-primary shrink-0" />
-                    <span><strong>48-Hour Exchange Window:</strong> We facilitate exchanges for alternative sizes or styles within 48 hours of parcel receipt. Reach out to our WhatsApp help desk to initiate a swap.</span>
+                    <span><strong>24-Hour Exchange Window:</strong> We facilitate exchanges for alternative sizes or styles within 24 hours of parcel receipt. Reach out to us on WhatsApp to initiate a swap.</span>
                   </li>
                   <li className="flex items-start">
                     <ShieldCheck className="w-5 h-5 mr-3 mt-0.5 text-brand-primary shrink-0" />
@@ -300,7 +309,7 @@ export default function PoliciesPage() {
                 </div>
                 <div className="border-b border-white/5 pb-4">
                   <h3 className="text-white font-semibold text-base mb-1">Where can I buy original sneakers online in Kenya?</h3>
-                  <p className="text-gray-300 text-sm">You can order directly here on kickverse.co.ke or via our WhatsApp desk. We offer free delivery within Nairobi CBD and Pay on Delivery across Nairobi County.</p>
+                  <p className="text-gray-300 text-sm">You can order directly here on https://kickverse.co.ke or via our WhatsApp desk. We offer free delivery within Nairobi CBD and Pay on Delivery across Nairobi County.</p>
                 </div>
                 <div className="border-b border-white/5 pb-4">
                   <h3 className="text-white font-semibold text-base mb-1">Are all pairs inspected before delivery?</h3>
