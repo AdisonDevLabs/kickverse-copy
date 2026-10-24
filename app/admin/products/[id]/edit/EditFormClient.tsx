@@ -18,8 +18,8 @@ type ProductImage = {
 // ULTRA-FAST, LOW-MEMORY SINGLE-PASS WEBP CONVERTER
 async function convertToWebpMemorySafe(
   file: File, 
-  maxDim = 1920, 
-  targetSizeKb = 300
+  maxDim = 1440, // Reduced from 1920. 1440px is plenty large for e-commerce and crucial for hitting 200kb.
+  targetSizeKb = 200 // Set target to 200kb
 ): Promise<File> {
   const originalNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
   const webpName = `${originalNameWithoutExt}.webp`;
@@ -46,6 +46,7 @@ async function convertToWebpMemorySafe(
 
   let width = imageSource.width;
   let height = imageSource.height;
+  
   if (width > maxDim || height > maxDim) {
     if (width > height) {
       height = Math.round((height * maxDim) / width);
@@ -81,7 +82,8 @@ async function convertToWebpMemorySafe(
     new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/webp', q));
 
   // STEP 1: Iterative Quality Adjustments (Binary Search)
-  let minQ = 0.1;
+  // We raise the minimum quality floor to 0.75 so the image never gets heavily pixelated/compressed.
+  let minQ = 0.75; 
   let maxQ = 1.0;
   let quality = 0.95; 
   let attempts = 0;
@@ -97,6 +99,8 @@ async function convertToWebpMemorySafe(
   }
 
   // STEP 2: Dimensional Scaling Fallback 
+  // If the file is STILL over 200kb at our 0.75 quality floor, we scale down the dimensions by 15% iteratively.
+  // This is the only way to retain crisp visual quality without introducing ugly compression artifacts.
   let currentWidth = width;
   let currentHeight = height;
   

@@ -16,11 +16,11 @@ type FileStatus = {
 const MAX_AUTO_RETRIES = 2;
 const UPLOAD_BATCH_SIZE = 5; // Network batch size for Cloudflare Free Tier
 
-// ULTRA-FAST ITERATIVE WEBP CONVERTER (TARGET: < 300KB)
+// ULTRA-FAST ITERATIVE WEBP CONVERTER (TARGET: < 200KB)
 async function convertToWebpMemorySafe(
   file: File, 
-  maxDim = 1920, 
-  targetSizeKb = 300
+  maxDim = 1440, // Reduced from 1920 to hit file size limits without crushing quality
+  targetSizeKb = 200
 ): Promise<File> {
   const originalNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
   const webpName = `${originalNameWithoutExt}.webp`;
@@ -85,7 +85,7 @@ async function convertToWebpMemorySafe(
     new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/webp', q));
 
   // STEP 1: Iterative Quality Adjustments (Binary Search)
-  let minQ = 0.1;
+  let minQ = 0.75; // Raised floor from 0.1 to 0.75 to prevent compression artifacts
   let maxQ = 1.0;
   let quality = 0.95; // Start near lossless
   let attempts = 0;
