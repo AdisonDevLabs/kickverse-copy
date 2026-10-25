@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
     unoptimized: false,
     // 2. Add modern image formats for better Core Web Vitals
     formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 31536000,
     remotePatterns: [
       {
         protocol: 'https',
