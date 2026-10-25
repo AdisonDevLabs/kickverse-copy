@@ -8,7 +8,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 
-import { motion, useAnimationFrame, useMotionValue } from 'motion/react';
+import { motion, useAnimationFrame, useMotionValue, useInView } from 'motion/react';
 import { fadeUp, fadeLeft, heroReveal, staggerContainer, staggerItem } from '@/lib/animations';
 import { ArrowRight, Pencil, Star, ShoppingBag, Truck, ShieldCheck, Clock, MessageCircle, Flame, Eye, Zap, Sparkles, Wallet, CheckCircle, Users, Tag, Grid } from 'lucide-react';
 
@@ -32,6 +32,8 @@ export default function HomeClient({ initialProducts, initialCategories, initial
   
   // --- DRAGGABLE MARQUEE STATE ---
   const carouselRef = useRef<HTMLDivElement>(null);
+  const isCarouselInView = useInView(carouselRef);
+
   const x = useMotionValue(0);
   const copyWidthRef = useRef(0); // Holds the exact pixel width of 1 copy (including gaps)
   const isPausedRef = useRef(false);
@@ -187,7 +189,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
   }, [displayCategories, x]);
 
   useAnimationFrame((time, delta) => {
-    if (copyWidthRef.current === 0) return;
+    if (copyWidthRef.current === 0 || !isCarouselInView) return;
 
     let currentX = x.get();
     
@@ -242,6 +244,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
             priority
             fetchPriority="high"
             referrerPolicy="no-referrer"
+            sizes="100vw"
             className="hero-image object-cover object-left md:object-center opacity-80 md:opacity-100"
           />
         </div>
@@ -323,6 +326,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     src={displayCategories?.[0]?.image || brand.hero?.sneakersImage}
                     alt="Buy Original Sneakers in Nairobi - Nike, Jordan, Adidas, New Balance"
                     fill
+                    sizes="(max-width: 768px) 50vw, 25vw"
                     className="object-cover group-hover:scale-103 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                   />
                   <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-3 text-left">
@@ -349,6 +353,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     src={displayCleatCategories?.[0]?.image || brand.hero?.soccerCleatsImage}
                     alt="Buy Professional Soccer Cleats and Artificial Turf Trainers in Nairobi"
                     fill
+                    sizes="(max-width: 768px) 50vw, 25vw"
                     className="object-cover group-hover:scale-103 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                   />
                   <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-3 text-left">
@@ -375,6 +380,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     src={displayOfficialCategories?.[0]?.image || brand.hero?.officialsImage}
                     alt="Buy Pure Leather Official Shoes in Nairobi CBD"
                     fill
+                    sizes="(max-width: 768px) 50vw, 25vw"
                     className="object-cover group-hover:scale-103 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                   />
                   <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-3 text-left">
@@ -401,6 +407,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     src={displaySandalCategories?.[0]?.image || brand.hero?.opensSandalsImage}
                     alt="Buy Casual Suede Clogs and Sandals Online in Kenya"
                     fill
+                    sizes="(max-width: 768px) 50vw, 25vw"
                     className="object-cover group-hover:scale-103 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                   />
                   <div className="absolute inset-0 z-20 flex flex-col justify-end p-2.5 sm:p-3 text-left">
@@ -474,6 +481,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       alt={`${collection.name || 'Featured'} Footwear Collection in Nairobi Kenya`}
                       fill
                       referrerPolicy="no-referrer"
+                      sizes="(max-width: 640px) 75vw, (max-width: 768px) 300px, 400px"
                       className="object-cover transition-transform duration-1000 group-hover/card:scale-110 opacity-90 group-hover/card:opacity-100"
                     />
                     
@@ -689,6 +697,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                       alt={`${collection.name || 'Professional'} Soccer Cleats and Turf Trainers in Kenya`}
                       fill
                       referrerPolicy="no-referrer"
+                      sizes="(max-width: 640px) 35vw, (max-width: 768px) 192px, 224px"
                       className="object-cover group-hover:scale-110 transition-transform duration-700 opacity-90 group-hover:opacity-100"
                     />
                   </Link>
@@ -1128,6 +1137,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                               src={review.profile} 
                               alt={review.name ? `${review.name} - Customer Review` : "Kickverse Customer Review Profile"} 
                               fill 
+                              sizes="(max-width: 640px) 40px, 48px"
                               className="object-cover" 
                             />
                           ) : (
@@ -1251,7 +1261,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                    {/* DYNAMIC LOGO / FALLBACK SHORTNAME */}
                    <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-neutral-800 flex items-center justify-center mr-3 sm:mr-4 border border-white/10 overflow-hidden shrink-0">
                      {brand.logo ? (
-                       <Image src={brand.logo} alt={brand.name} fill className="object-cover" />
+                       <Image src={brand.logo} alt={brand.name} fill sizes="(max-width: 640px) 32px, 40px" className="object-cover" />
                      ) : (
                        <span className="font-display text-white text-base sm:text-lg">
                          {brand.shortName || brand.name.substring(0, 2).toUpperCase()}
@@ -1274,7 +1284,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                           {/* DYNAMIC LOGO / FALLBACK SHORTNAME */}
                           <div className="relative flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-neutral-800 flex items-center justify-center mt-auto border border-white/10 overflow-hidden">
                              {brand.logo ? (
-                               <Image src={brand.logo} alt={brand.name} fill className="object-cover" />
+                               <Image src={brand.logo} alt={brand.name} fill sizes="(max-width: 640px) 24px, 32px" className="object-cover" />
                              ) : (
                                <span className="font-display text-white text-[10px] sm:text-xs">
                                  {brand.shortName || brand.name.substring(0, 2).toUpperCase()}
