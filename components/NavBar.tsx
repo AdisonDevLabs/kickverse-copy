@@ -280,6 +280,7 @@ export function NavBar() {
                 <button 
                   className="text-brand-primary transition-colors flex items-center p-1.5 rounded-md"
                   onClick={() => setIsSearchOpen(!isSearchOpen)}
+                  aria-label={isSearchOpen ? "Close search" : "Open search"}
                 >
                   {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
                 </button>
@@ -334,6 +335,7 @@ export function NavBar() {
                       key="icon"
                       exit={{ opacity: 0 }}
                       onClick={() => setIsDesktopSearchOpen(true)}
+                      aria-label="Open search"
                       className="absolute right-0 text-white hover:text-brand-primary transition-colors p-1.5 z-10"
                     >
                       <Search className="h-5 w-5" />
@@ -362,6 +364,7 @@ export function NavBar() {
                           autoFocus
                         />
                         <button 
+                          aria-label="Close search"
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-white hover:text-white"
                           onClick={() => {
                             setIsDesktopSearchOpen(false);
@@ -398,6 +401,7 @@ export function NavBar() {
               <button 
                 className="text-brand-primary lg:text-white hover:text-brand-primary transition-colors relative group p-1.5 lg:p-2 rounded-md flex items-center lg:gap-2"
                 onClick={() => setIsCartOpen(true)}
+                aria-label="Open cart"
               >
                 <motion.div
                   animate={cartPulse ? { scale: [1, 1.2, 1] } : {}}
@@ -423,6 +427,7 @@ export function NavBar() {
                 href={`https://wa.me/${brand.whatsappNumber}`} 
                 target="_blank" 
                 rel="noreferrer"
+                aria-label="Chat on WhatsApp"
                 className="text-brand-primary p-1.5 flex lg:hidden hover:scale-105 transition-transform"
               >
                 <MessageCircle className="h-5 w-5" />
@@ -464,6 +469,7 @@ export function NavBar() {
           <div className="relative flex-shrink-0 px-1 sm:px-2">
             <button 
               onClick={() => setIsCartOpen(true)}
+              aria-label="Open cart"
               className="bg-brand-primary text-black p-3 rounded-full flex flex-col items-center justify-center h-14 w-14 border-[3px] border-brand-card shadow-lg focus:outline-none"
             >
               <motion.div animate={cartPulse ? { scale: [1, 1.2, 1] } : {}} transition={{ duration: 0.3 }}>
