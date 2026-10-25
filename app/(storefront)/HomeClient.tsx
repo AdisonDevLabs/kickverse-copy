@@ -466,7 +466,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               onHoverEnd={handleInteractionEnd}
             >
               {/* Mapping 4 exact copies ensures there's always safe space to loop within */}
-              {[...displayCategories, ...displayCategories, ...displayCategories, ...displayCategories].map((collection: any, idx: number) => (
+              {[...displayCategories, ...displayCategories].map((collection: any, idx: number) => (
                 <div 
                   key={idx} 
                   className={`relative w-[75vw] sm:w-[300px] md:w-[400px] shrink-0 h-[300px] sm:h-[400px] md:h-[500px]`}
@@ -1063,7 +1063,7 @@ export default function HomeClient({ initialProducts, initialCategories, initial
               transition={{ repeat: Infinity, ease: "linear", duration: 40 }}
             >
               {/* Map over the initialTestimonials passed from the server */}
-              {[...initialTestimonials, ...initialTestimonials, ...initialTestimonials, ...initialTestimonials].map((review: any, idx: number) => {
+              {[...initialTestimonials, ...initialTestimonials].map((review: any, idx: number) => {
                 
                 // Safely extract up to 2 review images from the schema's text column
                 const reviewImages = review.reviewImage ? review.reviewImage.split(',').slice(0, 2) : [];
@@ -1073,26 +1073,6 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                     key={`${review.id}-${idx}`} 
                     className="w-[85vw] sm:w-[380px] md:w-[420px] shrink-0 bg-brand-card border border-white/5 hover:border-brand-primary/30 flex flex-col group/review rounded-xl transition-all duration-500 hover:-translate-y-2 shadow-xl overflow-hidden"
                   >
-                    {/* --- TOP SECTION: Hero Image & Quote --- 
-                    <div className="relative w-full h-48 sm:h-56 bg-brand-dark/50 border-b border-white/5">
-                      {/* Quote Overlay 
-                      <div className="absolute top-3 left-4 z-20">
-                        <span className="text-brand-primary text-5xl sm:text-6xl font-serif italic font-bold leading-none drop-shadow-lg opacity-90">&ldquo;</span>
-                      </div>
-                      
-                      {reviewImages.length > 0 ? (
-                        <Image src={reviewImages[0].trim()} alt={review.productName || "Customer Photo"} fill className="object-cover" />
-                      ) : (
-                        /* Placeholder when no image exists 
-                        <div className="w-full h-full flex flex-col items-center justify-center bg-gray-900/40">
-                          <span className="text-gray-600 font-medium uppercase tracking-widest text-[10px] sm:text-xs">No Image Provided</span>
-                        </div>*/}
-                    
-                      
-                      {/* Subtle dark gradient overlay to ensure the quote pops against light images 
-                      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent pointer-events-none z-10" />
-                    </div>*/}
-
                     {/* --- BOTTOM SECTION: Content & Profile --- */}
                     <div className="p-5 sm:p-6 flex flex-col flex-1">
                       
