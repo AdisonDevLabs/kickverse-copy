@@ -250,41 +250,46 @@ export default function HomeClient({ initialProducts, initialCategories, initial
         </div>
 
         {/* Content Wrapper */}
-        <div
+        <motion.div 
+          initial="hidden" animate="visible" variants={staggerContainer}
           className="relative z-10 max-w-7xl mx-auto w-full flex flex-col items-center text-center px-4 sm:px-6 lg:px-16 xl:px-24"
         >
             {/* Trust Label Pill */}
-            <div
-              className="opacity-0 animate-fade-up inline-flex items-center justify-center space-x-1.5 bg-transparent border border-white/20 rounded-full px-2.5 py-1 mb-2 sm:mb-4"
+            <motion.div
+              variants={staggerItem}
+              className="inline-flex items-center justify-center space-x-1.5 bg-transparent border border-white/20 rounded-full px-2.5 py-1 mb-2 sm:mb-4"
             >
               <ShieldCheck className="h-3.5 w-3.5 sm:h-3.5 sm:w-3.5 text-brand-primary" />
               <span className="text-white text-[10px] sm:text-[10px] font-bold tracking-widest uppercase">
                 {brand.hero?.badge || "TESTED, TRUSTED AND APPROVED IN NAIROBI"}
               </span>
-            </div>
+            </motion.div>
 
             {/* Main Headline - Increased text sizes for all breakpoints */}
             <div className="overflow-hidden mb-4 sm:mb-6 w-full">
-              <h1
-                className="opacity-0 animate-hero-reveal delay-100 font-display uppercase tracking-wider text-[2.8rem] sm:text-[3.5rem] md:text-[5rem] lg:text-[7rem] leading-[0.9] text-white drop-shadow-2xl"
+              <motion.h1 
+                variants={heroReveal}
+                className="font-display uppercase tracking-wider text-[2.8rem] sm:text-[3.5rem] md:text-[5rem] lg:text-[7rem] leading-[0.9] text-white drop-shadow-2xl"
               >
                 <span className="sr-only">
                   Buy Authentic Sneakers, Walking Boots, Soccer Cleats & Official Shoes in Kenya | Best Footwear Prices in Nairobi CBD -</span>
                 {brand.hero?.headlineTop || "HOME OF THE BEST"} <br/> 
                 <span className="text-brand-primary inline-block mt-5 sm:mt-6">{brand.hero?.headlineHighlight || "SNEAKERS & CLEATS"}</span>
-              </h1>
+              </motion.h1>
             </div>
 
             {/* Subheadline */}
-            <p
-              className="opacity-0 animate-fade-up delay-200 text-gray-100 sm:text-gray-200 text-[13px] sm:text-sm md:text-base max-w-[480px] sm:max-w-lg mb-5 sm:mb-6 font-medium leading-relaxed drop-shadow-xl shadow-black mx-auto"
+            <motion.p 
+              variants={staggerItem}
+              className="text-gray-100 sm:text-gray-200 text-[13px] sm:text-sm md:text-base max-w-[480px] sm:max-w-lg mb-5 sm:mb-6 font-medium leading-relaxed drop-shadow-xl shadow-black mx-auto"
             >
               {brand.description}
-            </p>
+            </motion.p>
 
             {/* CTA Section - Added justify-center */}
-            <div
-              className="opacity-0 animate-fade-up delay-300 flex flex-row justify-center w-full sm:w-auto gap-2 sm:gap-3"
+            <motion.div 
+              variants={staggerItem}
+              className="flex flex-row justify-center w-full sm:w-auto gap-2 sm:gap-3"
             >
                <a 
                 href={`https://wa.me/${brand.whatsappNumber}`} 
@@ -300,11 +305,12 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                >
                  {brand.hero?.ctaSecondary || "SHOP COLLECTION"}
                </Link>
-            </div>
+            </motion.div>
 
             {/* Choose Your Collection Cards - Expanded max width to support 4 columns */}
-            <div
-              className="opacity-0 animate-fade-up delay-400 w-full max-w-sm sm:max-w-lg md:max-w-5xl lg:max-w-6xl mt-6 sm:mt-10"
+            <motion.div 
+              variants={staggerItem} 
+              className="w-full max-w-sm sm:max-w-lg md:max-w-5xl lg:max-w-6xl mt-6 sm:mt-10"
             >
               {/* Changed to md:grid-cols-4 for big screens and grid-cols-2 for mobile screens */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
@@ -418,9 +424,9 @@ export default function HomeClient({ initialProducts, initialCategories, initial
                 </Link>
 
               </div>
-            </div>
+            </motion.div>
 
-        </div>
+        </motion.div>
       </section>
 
       {/* Featured Collections Section */}
