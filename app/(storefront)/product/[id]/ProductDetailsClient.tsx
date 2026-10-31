@@ -10,6 +10,7 @@ import { Star, Minus, Plus, ShoppingBag, MessageCircle, ArrowLeft, ShieldCheck, 
 import { formatPrice } from '@/lib/data';
 import { brand } from '@/lib/data/brand';
 import { useCart } from '@/lib/CartContext';
+import { sendGAEvent } from '@next/third-parties/google';
 import { motion, AnimatePresence } from 'motion/react';
 import { fadeUp, fadeLeft, staggerContainer, staggerItem } from '@/lib/animations';
 import { PublicReviewModal } from '@/components/PublicReviewModal';
@@ -213,6 +214,12 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
   
   const handleWhatsAppClick = () => {
     if (!selectedSize && product.sizes && product.sizes.length > 0) return triggerSizeError();
+    
+    sendGAEvent({
+	event: 'whatsapp_intent_click',
+	item_name: product.name,
+	value: product.price
+    });
     setIsFittingRequest(false);
     setIsWhatsAppModalOpen(true);
   };
@@ -225,6 +232,13 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
     }
     
     setFormError('');
+    	event: 'generate_lead',
+    	currency: 'KES',
+    	value: product.price * quantity,
+    	item_name: product.name,
+    	location_provided: buyerLocation.trim()
+    });
+    sendGAEvent({
 
     const productUrl = window.location.href;
     const greeting = buyerName.trim() ? `Hello Kickverse team, I'm ${buyerName.trim()}.` : `Hello Kickverse team,`;
