@@ -232,13 +232,13 @@ export default function ProductDetailsClient({ product, reviews, relatedProducts
     }
     
     setFormError('');
+    sendGAEvent({
     	event: 'generate_lead',
     	currency: 'KES',
     	value: product.price * quantity,
     	item_name: product.name,
     	location_provided: buyerLocation.trim()
     });
-    sendGAEvent({
 
     const productUrl = window.location.href;
     const greeting = buyerName.trim() ? `Hello Kickverse team, I'm ${buyerName.trim()}.` : `Hello Kickverse team,`;
